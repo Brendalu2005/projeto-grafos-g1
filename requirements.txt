@@ -1,0 +1,6 @@
+# [IA] Claude – sugestão das dependências iniciais
+pandas>=3.1
+matplotlib>=3.11
+pytest>=9.0
+# networkx só pode ser usado dentro de tests/, como oráculo
+networkx>=3.6
