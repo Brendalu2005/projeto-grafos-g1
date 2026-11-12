@@ -1,5 +1,11 @@
 import math
 from collections import deque
+# imports do dikjstra abaixo (Brenda)
+import heapq #fila de prioridade 
+#heappush adiciona(mantem menor pronto pra sair), heappop remove e devolve o menor elemento
+import math #math.inf valor infinito ou float("inf")
+from itertools import count #itertools.count() quando há distâncias iguais, compara com o campo seguinte da tupla
+from collections import defaultdict #dicionáro cria valor padrão ao acessar chave nova (opcional)
 
 # Bellman-Ford (Vinícius)
 def belman_ford(grafo, origem):
@@ -75,3 +81,59 @@ def dfs(grafo):
             visita(v)
 
     return d, f, p, arestas, len(arestas["retorno"]) > 0
+
+# Dijkstra (Brenda)
+def dijkstra(grafo, origem):
+    nos = set()
+    dist = {}
+    proc = {}
+
+    for no, vizinhos in grafo.items():
+        nos.add(no)
+        for vizinho, peso in vizinhos:
+            if peso < 0:
+                raise ValueError("Dijkstra não funciona para pesos negativos")
+            nos.add(vizinho)
+
+    if origem not in nos:
+        raise ValueError("Origem fora do grafo")
+
+    for no in nos:
+        dist[no] = math.inf 
+        proc[no] = None 
+    dist[origem] = 0 
+
+    desempate = count() 
+    fila_prioridade = [] 
+    heapq.heappush(fila_prioridade, (dist[origem], next(desempate), origem))
+
+    while fila_prioridade:
+        distancia_atual, _, no_atual = heapq.heappop(fila_prioridade) 
+
+        if distancia_atual > dist[no_atual]:
+            continue
+
+        for vizinho, peso in grafo.get(no_atual, []):
+            nova_distancia = dist[no_atual] + peso
+            if nova_distancia < dist[vizinho]: 
+                dist[vizinho] = nova_distancia 
+                proc[vizinho] = no_atual 
+                heapq.heappush(fila_prioridade, (nova_distancia, next(desempate), vizinho)) 
+
+    return dist, proc
+
+# função de reconstrução de caminho que pode ser utilizada para dikjstra e bellman-ford (Brenda)
+def reconstruir_caminho(dist, proc, destino):
+    if dist[destino] == math.inf:
+        return "sem caminho"
+
+    caminho = []
+    atual = destino
+
+    while atual is not None:
+        caminho.append(atual)
+        atual = proc[atual]
+
+    caminho.reverse()
+    return caminho
+
