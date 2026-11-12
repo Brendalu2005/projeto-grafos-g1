@@ -1,4 +1,5 @@
 import math
+from collections import deque
 
 # Bellman-Ford (Vinícius)
 def belman_ford(grafo, origem):
@@ -16,6 +17,32 @@ def belman_ford(grafo, origem):
     for i in range (num_vertices - 1):
         #ex
         vertice_inicial = origem
+
+# BFS (Clarissa Lopes)
+def bfs(grafo, origem):
+    distancias = {vertice: math.inf for vertice in grafo}
+    predecessores = {vertice: None for vertice in grafo}
+
+    for vizinhos in grafo.values():
+        for vizinho, _ in vizinhos:
+            distancias.setdefault(vizinho, math.inf)
+            predecessores.setdefault(vizinho, None)
+
+    distancias.setdefault(origem, math.inf)
+    predecessores.setdefault(origem, None)
+    distancias[origem] = 0
+    fila = deque([origem])
+
+    while fila:
+        atual = fila.popleft()
+
+        for vizinho, _ in grafo.get(atual, []):
+            if distancias[vizinho] == math.inf:
+                distancias[vizinho] = distancias[atual] + 1
+                predecessores[vizinho] = atual
+                fila.append(vizinho)
+
+    return distancias, predecessores
 
 #DFS (André Avelino)
 def dfs(grafo):
