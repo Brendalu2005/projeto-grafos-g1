@@ -20,11 +20,21 @@ def test_pesos_negativos_sem_ciclo():
         "D": [("A", -4), ("C", -1)],
         "E": [("D", 1)],
     }
+
     dist, pred, ciclo = bellman_ford(grafo, "S")
 
     assert ciclo is None
-    assert dist == {"S": ..., "A": ..., "B": ..., "C": ..., "D": ..., "E": ...}
-    assert pred["A"] == ...
+
+    assert dist == {
+        "S": 0,
+        "A": 5,
+        "B": 5,
+        "C": 7,
+        "D": 9,
+        "E": 8
+    }
+
+    assert pred["A"] == "D"
 
 
 def test_ciclo_negativo_detectado():
@@ -35,11 +45,18 @@ def test_ciclo_negativo_detectado():
         "C": [("A", 1), ("D", 2)],
         "D": [],
     }
+
     dist, pred, ciclo = bellman_ford(grafo, "S")
 
     assert ciclo is not None
     assert ciclo[0] == ciclo[-1]
+
     # D é alcançável a partir do ciclo, mas não faz parte dele
     assert set(ciclo) == {"A", "B", "C"}
-    custo = sum(peso(grafo, u, v) for u, v in zip(ciclo, ciclo[1:]))
-    assert custo == ...
+
+    custo = sum(
+        peso(grafo, u, v)
+        for u, v in zip(ciclo, ciclo[1:])
+    )
+
+    assert custo == -1
