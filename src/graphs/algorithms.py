@@ -54,8 +54,15 @@ def bellman_ford(grafo, origem):
                     distancia[vertice_destino] = distancia[vertice_atual] + peso
                     proc[vertice_destino] = vertice_atual
 
+    # Verificação de ciclo negativo
+    
+        for vertice_atual in grafo:
+    
+            for vertice_destino, peso in grafo[vertice_atual]:
 
-            
+                # Se distancia de A->B + (-4) < distancia de A->C + (1)
+                if distancia[vertice_atual] + peso < distancia[vertice_destino]:
+                    tem_ciclo = True
 
     return distancia, proc, tem_ciclo
 
