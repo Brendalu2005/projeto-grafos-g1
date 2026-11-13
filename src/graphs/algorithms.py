@@ -8,21 +8,50 @@ from itertools import count #itertools.count() quando há distâncias iguais, co
 from collections import defaultdict #dicionáro cria valor padrão ao acessar chave nova (opcional)
 
 # Bellman-Ford (Vinícius)
-def belman_ford(grafo, origem):
+def bellman_ford(grafo, origem):
 
+    # Distancia de cada vértice da origem
     distancia = {}
+    # Vértice que procede cada vértice no melhor caminho até agora
+    proc = {}
+
+    num_vertices = len(grafo)
+
+    if origem not in grafo:
+        raise ValueError('O vértice de origem não está no grafo')
 
     for vertice in grafo:
-        if (vertice.value == origem):
-            distancia[vertice.value] == 0
+
+        proc[vertice] = None
+
+        if vertice == origem:
+            distancia[vertice] = 0
         else:
-            distancia[vertice.value] = math.inf
+            distancia[vertice] = math.inf
 
-    num_vertices = 6 # ex 
+    tem_ciclo = False
 
+    # Referência: grafo = {'S': [('E', 8), ('A', 10)]}
+
+    # Execução do bellmna-ford em si
     for i in range (num_vertices - 1):
-        #ex
-        vertice_inicial = origem
+
+        vertice_atual = origem
+
+        for vertice_atual in grafo:
+
+            print('Vertice:')
+            print(vertice_atual)
+            print('Vizinhos:')
+
+            for vertice_vizinho, peso in grafo[vertice_atual]:
+
+                print(vertice_vizinho, peso)
+
+
+            
+
+    return distancia, proc, tem_ciclo
 
 # BFS (Clarissa Lopes)
 def bfs(grafo, origem):
