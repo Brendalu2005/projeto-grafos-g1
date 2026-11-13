@@ -108,37 +108,52 @@ def bfs(grafo, origem):
     return distancias, predecessores
 
 #DFS (André Avelino)
-def dfs(grafo):
+def dfs(grafo, origem, cobrir_todos=False):
     d, f, p = {}, {}, {}
-    arestas = {"arvore": [], "retorno": [], "avanco": [], "cruzamento": []}
+    classif = {}
     tempo = 0
 
-    def visita(u):
+    def explora(raiz):
         nonlocal tempo
         tempo += 1
-        d[u] = tempo
+        d[raiz] = tempo
+        p[raiz] = None
+        pilha = [[raiz, 0]]
 
-        # [IA] Claude – depuração de KeyError em nó sem saída (grafo[u] -> grafo.get(u, []))
-        for v, _ in grafo.get(u, []):
+        while pilha:
+            topo = pilha[-1]
+            u, i = topo
+            vizinhos = grafo.get(u, [])
+
+            if i < len(vizinhos):
+                topo[1] += 1
+                v = vizinhos[i][0]
+
+                if v not in d:
+                    classif[(u, v)] = "arvore"
+                    tempo += 1
+                    d[v] = tempo
+                    p[v] = u
+                    pilha.append([v, 0])
+                elif v not in f:
+                    classif[(u, v)] = "retorno"
+                elif d[u] < d[v]:
+                    classif[(u, v)] = "avanco"
+                else:
+                    classif[(u, v)] = "cruzamento"
+            else:
+                tempo += 1
+                f[u] = tempo
+                pilha.pop()
+
+    explora(origem)
+    if cobrir_todos:
+        for v in grafo:
             if v not in d:
-                p[v] = u
-                arestas["arvore"].append((u, v))
-                visita(v)
-            elif v not in f: 
-                arestas["retorno"].append((u, v))
-            elif d[u] < d[v]:
-                arestas["avanco"].append((u, v))
-            else:  
-                arestas["cruzamento"].append((u, v))
+                explora(v)
 
-        tempo += 1
-        f[u] = tempo
-    for v in grafo:
-        if v not in d:
-            p[v] = None
-            visita(v)
-
-    return d, f, p, arestas, len(arestas["retorno"]) > 0
+    tem_ciclo = "retorno" in classif.values()
+    return d, f, p, classif, tem_ciclo
 
 # Dijkstra (Brenda)
 def dijkstra(grafo, origem):
