@@ -29,7 +29,7 @@ def bellman_ford(grafo, origem):
         else:
             distancia[vertice] = math.inf
 
-    tem_ciclo = False
+    ciclo = None
 
     # Referência: grafo = {'S': [('E', 8), ('A', 10)]}
 
@@ -56,15 +56,33 @@ def bellman_ford(grafo, origem):
 
     # Verificação de ciclo negativo
     
-        for vertice_atual in grafo:
-    
-            for vertice_destino, peso in grafo[vertice_atual]:
+    for vertice_atual in grafo:
 
-                # Se distancia de A->B + (-4) < distancia de A->C + (1)
-                if distancia[vertice_atual] + peso < distancia[vertice_destino]:
-                    tem_ciclo = True
+        for vertice_destino, peso in grafo[vertice_atual]:
 
-    return distancia, proc, tem_ciclo
+            # Se distancia de A->B + (-4) < distancia de A->C + (1)
+            if distancia[vertice_atual] + peso < distancia[vertice_destino]:
+                
+                proc[vertice_destino] = vertice_atual
+
+                atual = vertice_destino
+
+                for i in range (num_vertices):
+                    atual = proc[atual]
+
+                ciclo = [atual]
+                vertice_anterior = proc[atual]
+
+                while vertice_anterior != atual:
+
+                    ciclo.append(vertice_anterior)
+                    vertice_anterior = proc[vertice_anterior]
+
+                ciclo.append(atual) #  adiçãodo primeiro vértice pra fechar
+
+                ciclo.reverse()
+
+    return distancia, proc, ciclo
 
 # BFS (Clarissa Lopes)
 def bfs(grafo, origem):
