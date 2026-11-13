@@ -2,6 +2,7 @@ from src.graphs.algorithms import dijkstra
 import math
 import pytest
 
+# [IA] ChatGPT – sugestão de testes para algoritmo de dijkstra
 @pytest.fixture
 # parte 1
 def grafo():
