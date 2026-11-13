@@ -40,17 +40,12 @@ def bellman_ford(grafo, origem):
 
         for vertice_atual in grafo:
 
-            print('Vertice:')
-            print(vertice_atual)
-            print('Vizinhos:')
-
             for vertice_destino, peso in grafo[vertice_atual]:
-
-                print(vertice_destino, peso)
 
                 # Se a distancia de S->S (0) + 8 < distancia de S->E (infinito) (VERDADEIRO)
                 # Peso 8 mais leve que infinito
                 if distancia[vertice_atual] + peso < distancia[vertice_destino]:
+                    
                     distancia[vertice_destino] = distancia[vertice_atual] + peso
                     proc[vertice_destino] = vertice_atual
 
@@ -81,6 +76,8 @@ def bellman_ford(grafo, origem):
                 ciclo.append(atual) #  adiçãodo primeiro vértice pra fechar
 
                 ciclo.reverse()
+
+                return distancia, proc, ciclo
 
     return distancia, proc, ciclo
 
