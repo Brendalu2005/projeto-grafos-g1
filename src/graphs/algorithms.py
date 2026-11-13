@@ -118,7 +118,8 @@ def dfs(grafo):
         tempo += 1
         d[u] = tempo
 
-        for v, _ in grafo[u]:
+        # [IA] Claude – depuração de KeyError em nó sem saída (grafo[u] -> grafo.get(u, []))
+        for v, _ in grafo.get(u, []):
             if v not in d:
                 p[v] = u
                 arestas["arvore"].append((u, v))
