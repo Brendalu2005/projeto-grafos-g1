@@ -32,3 +32,31 @@ def test_grafo_vazio_levanta_erro():
 def test_no_inalcancavel_fica_infinito(grafo):
     dist, _ = dijkstra(grafo, "C")
     assert dist["A"] == math.inf
+
+
+# [IA] ChatGPT (Codex) – sugestão de teste de revisão com arestas de peso zero
+def test_arestas_de_peso_zero():
+    grafo = {
+        "S": [("A", 0), ("B", 5)],
+        "A": [("B", 0)],
+        "B": [("T", 2)],
+        "T": [],
+    }
+
+    dist, proc = dijkstra(grafo, "S")
+
+    assert dist == {"S": 0, "A": 0, "B": 0, "T": 2}
+    assert proc == {"S": None, "A": "S", "B": "A", "T": "B"}
+
+
+# [IA] ChatGPT (Codex) – sugestão de teste de revisão com peso negativo inalcançável
+def test_peso_negativo_inalcancavel_levanta_erro():
+    grafo = {
+        "S": [("A", 1)],
+        "A": [],
+        "X": [("Y", -1)],
+        "Y": [],
+    }
+
+    with pytest.raises(ValueError, match="negativ"):
+        dijkstra(grafo, "S")
