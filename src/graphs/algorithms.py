@@ -123,8 +123,7 @@ def dfs(grafo, origem, cobrir_todos=False):
         while pilha:
             topo = pilha[-1]
             u, i = topo
-            vizinhos = grafo.get(u, [])
-
+            vizinhos = grafo.get(u, []) # [IA] Claude – apoio na depuração: uso de get para tratar nó sem lista de adjacência
             if i < len(vizinhos):
                 topo[1] += 1
                 v = vizinhos[i][0]
@@ -153,6 +152,7 @@ def dfs(grafo, origem, cobrir_todos=False):
                 explora(v)
 
     tem_ciclo = "retorno" in classif.values()
+    # [IA] Claude – sugestão de ampliar o retorno com tempos e predecessores
     return d, f, p, classif, tem_ciclo
 
 # Dijkstra (Brenda)
