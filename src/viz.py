@@ -3,6 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
+from src.graphs.algorithms import bfs
 from src.graphs.io import ler_mapa
 
 
@@ -44,6 +45,74 @@ def heatmap_multiplicidade(caminho_mapa, caminho_graus, caminho_png):
     eixo.set_title(f"Multiplicidade das casas do {mapa.nome}: máximo {maximo}, atingido por {casas_maximo} casas")
     eixo.set_xlabel("coluna")
     eixo.set_ylabel("linha")
+
+    figura.savefig(caminho_png, dpi=150, bbox_inches="tight")
+    plt.close(figura)
+
+
+def arvore_bfs(caminho_arestas, caminho_png):
+    grafo = {}
+    inicio = None
+    with open(caminho_arestas, encoding="utf-8") as arquivo:
+        for linha in csv.DictReader(arquivo):
+            origem = linha["origem"]
+            destino = linha["destino"]
+            if inicio is None:
+                inicio = origem
+            if origem not in grafo:
+                grafo[origem] = []
+            if destino not in grafo:
+                grafo[destino] = []
+            grafo[origem].append((destino, int(linha["peso"])))
+
+    distancia, pai = bfs(grafo, inicio)
+
+    niveis = {}
+    for estado in grafo:
+        nivel = distancia[estado]
+        if nivel not in niveis:
+            niveis[nivel] = []
+        niveis[nivel].append(estado)
+
+    posicao = {}
+    for nivel in niveis:
+        quantos = len(niveis[nivel])
+        for i in range(quantos):
+            estado = niveis[nivel][i]
+            posicao[estado] = (i - (quantos - 1) / 2, nivel)
+
+    figura, eixo = plt.subplots(figsize=(8, 14))
+
+    for estado in grafo:
+        if pai[estado] is not None:
+            x1, y1 = posicao[pai[estado]]
+            x2, y2 = posicao[estado]
+            eixo.plot([x1, x2], [y1, y2], color="gray", zorder=1)
+
+    for estado in grafo:
+        x, y = posicao[estado]
+        if estado == "ALVO":
+            cor = "black"
+        elif "|-|" in estado:
+            cor = "green"
+        else:
+            cor = "orange"
+        eixo.scatter(x, y, color=cor, zorder=2)
+        eixo.text(x + 0.06, y, estado, fontsize=7, va="center")
+
+    eixo.scatter([], [], color="green", label="estado sem chave")
+    eixo.scatter([], [], color="orange", label="estado com a chave a")
+    eixo.scatter([], [], color="black", label="ALVO")
+    eixo.plot([], [], color="gray", label="aresta da árvore (pai → filho)")
+    eixo.legend(loc="lower left")
+
+    eixo.set_title("Árvore BFS de estados do m02")
+    eixo.set_ylabel("nível (distância BFS a partir do início)")
+    eixo.set_yticks(range(len(niveis)))
+    eixo.set_xticks([])
+    eixo.set_xlim(-1.5, 2)
+    eixo.invert_yaxis()
+    eixo.grid(axis="y", alpha=0.3)
 
     figura.savefig(caminho_png, dpi=150, bbox_inches="tight")
     plt.close(figura)
