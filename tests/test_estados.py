@@ -1,3 +1,4 @@
+# [IA] Claude – sugestão dos casos de teste;
 from src.graphs.estados import construir_g_est, rotulo
 from src.graphs.graph import arcos
 from src.graphs.io import ler_mapa

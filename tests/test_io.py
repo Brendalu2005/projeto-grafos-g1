@@ -1,3 +1,4 @@
+# [IA] Claude – sugestão de estrutura de código
 import pytest
 
 from src.graphs.io import ler_mapa
