@@ -1,8 +1,13 @@
 import math
+import csv
+from pathlib import Path
 
 from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra, reconstruir_caminho
 from src.graphs.estados import ALVO, construir_g_est, estado_inicial, rotulo
 from src.graphs.io import exportar_parte1, ler_mapa
+
+COLUNAS_SOLUCOES = ['mapa', 'algoritmo', 'passos', 'custo', 'status', 'caminho']
+COLUNAS_DFS = ['mapa', 'arvore', 'retorno', 'avanco', 'cruzamento']
 
 # Roda algoritmo no mapa e devolve linha em solucoes.csv
 def resolver(caminho_mapa, algoritmo, fonte_consumivel = False):
@@ -91,6 +96,31 @@ def contar_classificacao(caminho_mapa):
 
     return linha
 
+# [IA] Claude – sintaxe de pathlib e csv
+def escrever_csv(linhas, colunas, caminho):
+    with open(caminho, 'w', newline = '', encoding = 'utf-8') as arquivo:
+            escritor = csv.DictWriter(arquivo, fieldnames = (colunas))
+            escritor.writeheader()
+            escritor.writerows(linhas)
+
 # Percorre todos os mapas, chama as duas funções.
 def resolver_todos(pastas, pasta_saida):
-    return
+
+    pasta_saida = Path(pasta_saida)
+    pasta_saida.mkdir(parents = True, exist_ok = True)
+
+    linhas_solucoes = []
+    linhas_classificacao = []
+
+    algoritmos = ['BFS', 'DIJKSTRA', 'BELLMAN_FORD']
+
+    for pasta in pastas:
+        for caminho in sorted(Path(pasta).glob("*.txt")):
+            linhas_classificacao.append(contar_classificacao(caminho))
+            for algoritmo in algoritmos:
+                linhas_solucoes.append(resolver(caminho, algoritmo))
+
+    escrever_csv(linhas_solucoes, COLUNAS_SOLUCOES, pasta_saida / 'solucoes.csv')
+    escrever_csv(linhas_classificacao, COLUNAS_DFS, pasta_saida / 'dfs_classificacao.csv')
+    
+    exportar_parte1(pastas, pasta_saida)

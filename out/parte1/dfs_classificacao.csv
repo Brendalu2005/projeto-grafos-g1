@@ -1,0 +1,9 @@
+mapa,arvore,retorno,avanco,cruzamento
+m01_terreno,24,22,0,1
+m02_uma_chave,39,36,0,0
+m03_tres_chaves,213,231,23,0
+m04_esteiras,37,30,0,0
+m05_bonus,215,208,5,16
+m06_fonte,24,22,0,1
+m07_impossivel,15,19,4,0
+m08_grande,2919,3178,265,3
