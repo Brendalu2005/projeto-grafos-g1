@@ -71,7 +71,25 @@ def resolver(caminho_mapa, algoritmo, fonte_consumivel = False):
 
 # Roda DFS e devolve linha em dfs_classificacao.csv
 def contar_classificacao(caminho_mapa):
-    return
+
+    mapa = ler_mapa(caminho_mapa)
+    
+    grafo = construir_g_est(mapa)
+    
+    origem = estado_inicial(mapa)
+
+    _, _, _, classif, _ = dfs(grafo, origem)
+
+    linha = {'mapa': mapa.nome,
+             'arvore': 0,
+             'retorno': 0,
+             'avanco': 0,
+             'cruzamento': 0}
+
+    for tipo in classif.values():
+        linha[tipo] += 1
+
+    return linha
 
 # Percorre todos os mapas, chama as duas funções.
 def resolver_todos(pastas, pasta_saida):
