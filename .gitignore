@@ -6,3 +6,5 @@ __pycache__/
 
 # grafo exemplo
 mini.txt
+*.csv
+raw/
