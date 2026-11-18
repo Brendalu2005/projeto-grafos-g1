@@ -5,35 +5,46 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111811">
+  <meta name="theme-color" content="#0c1110">
   <meta name="description" content="Visualizador interativo de labirintos e algoritmos de teoria dos grafos.">
   <title>Labirintos — Explorador de Grafos</title>
   <link rel="stylesheet" href="./style.css">
   <!-- [IA[  ChatGPT (Codex) - carregamento dos dados antes da interface. -->
   <script src="./dados.js" defer></script>
   <script src="./script.js" defer></script>
+  <!-- [IA[  ChatGPT (Codex) - animação do botão baseada no componente Arrow Reveal Button do Originkit. -->
+  <script src="./interface-motion.js" defer></script>
 </head>
 <body>
   <main id="inicio">
     <section class="intro">
       <div class="intro-copy"><h1>Desvende o <em>labirinto.</em></h1><p>Explore os estados, acompanhe cada decisão e veja os algoritmos em ação — sem perder nenhum passo pelo caminho.</p></div>
+      <svg class="intro-drawing" viewBox="0 0 148 124" fill="none" aria-hidden="true">
+        <path d="M4 20h140M4 48h140M4 76h140M4 104h140M18 6v112M46 6v112M74 6v112M102 6v112M130 6v112" stroke="currentColor" opacity=".28"/>
+        <path d="M18 20h56v28h28V20h28v84H74V76H46v28H18V48h28" stroke="currentColor" stroke-width="2"/>
+        <path d="M18 20h28v56h28v28h56" stroke="#d9a37d" stroke-width="2" stroke-dasharray="3 4"/>
+        <circle cx="18" cy="20" r="4" fill="#b3d6a5"/><circle cx="130" cy="104" r="4" fill="#d9a37d"/>
+      </svg>
     </section>
 
     <section class="control-panel" aria-label="Controles de visualização">
       <label class="control-field"><span class="field-label">MAPA</span><span class="select-wrap"><select id="map-select" aria-label="Selecionar mapa"><option value="m01">m01</option><option value="m02">m02</option><option value="m03">m03</option><option value="m04">m04</option><option value="m05">m05</option><option value="m06">m06</option><option value="m07">m07</option><option value="m08">m08</option><option value="grupo-01">Mapa do grupo 01</option><option value="grupo-02">Mapa do grupo 02</option><option value="demo">Demonstração</option></select><span class="select-arrow">⌄</span></span></label>
-      <label class="control-field"><span class="field-label">ALGORITMO</span><span class="select-wrap"><select id="algorithm-select" aria-label="Selecionar algoritmo"><option value="bfs">BFS <span>· menor número de movimentos</span></option><option value="dfs">DFS · exploração</option><option value="dijkstra">Dijkstra · menor custo</option><option value="bellman-ford">Bellman-Ford · menor custo</option></select><span class="select-arrow">⌄</span></span></label>
-      <button class="button button-primary" id="load-button" type="button"><span>CARREGAR VISUALIZAÇÃO</span><span aria-hidden="true">↗</span></button>
-      <label class="file-button" for="data-file">＋ <span>ABRIR DADOS</span></label><input class="sr-only" id="data-file" type="file" accept=".json,.csv,application/json,text/csv" aria-label="Abrir arquivo de dados local">
+      <label class="control-field"><span class="field-label">ALGORITMO</span><span class="select-wrap"><select id="algorithm-select" aria-label="Selecionar algoritmo"><option value="bfs">BFS · menor número de movimentos</option><option value="dfs">DFS · exploração</option><option value="dijkstra">Dijkstra · menor custo</option><option value="bellman-ford">Bellman-Ford · menor custo</option></select><span class="select-arrow">⌄</span></span></label>
+      <span class="origin-button-wrap">
+        <button class="button button-primary origin-button" id="load-button" type="button" aria-controls="analises" aria-expanded="false"><span class="origin-label">Ver análises</span><span class="origin-slot" aria-hidden="true"></span><span class="origin-badge" aria-hidden="true"></span><span class="origin-arrow" aria-hidden="true">→</span></button>
+        <span class="origin-stroke" aria-hidden="true"></span>
+      </span>
+      <label class="file-button" for="data-file">＋ <span>Abrir dados</span></label><input class="sr-only" id="data-file" type="file" accept=".json,.csv,application/json,text/csv" aria-label="Abrir arquivo de dados local">
     </section>
 
-    <div id="status-message" class="status-message" role="status" aria-live="polite"><span class="status-icon">⌁</span><span><strong>Pronto para explorar</strong><small>Selecione um mapa e carregue os dados de resultados disponíveis.</small></span></div>
+    <div id="status-message" class="status-message" role="status" aria-live="polite"><span class="status-icon">⌁</span><span><strong>Pronto para explorar</strong><small>Selecione um mapa e algoritmo; a visualização será atualizada automaticamente.</small></span></div>
 
     <section class="workspace" aria-label="Visualização do mapa e do percurso">
       <article class="panel map-panel"><div class="panel-heading"><h2>Terreno de exploração</h2><span class="map-chip" id="map-label">M01</span></div>
         <div id="maze-container" class="maze-container"><div class="empty-state"><span class="empty-symbol">▦</span><strong>O mapa aparecerá aqui</strong><span>Carregue os arquivos de dados para começar.</span></div></div>
         <div class="legend" aria-label="Legenda do mapa"><span><i class="legend-cell wall"></i> Parede</span><span><i class="legend-cell start">S</i> Início</span><span><i class="legend-cell goal">G</i> Saída</span><span><i class="legend-cell key">a</i> Chave</span><span><i class="legend-cell door">A</i> Porta</span><span><i class="legend-cell bonus">+</i> Bônus</span><span><i class="legend-cell path"></i> Percurso</span></div>
       </article>
-      <aside class="panel stats-panel"><div class="panel-heading"><h2>Diário da jornada</h2><span class="status-tag" id="run-state">AGUARDANDO</span></div>
+      <aside class="panel stats-panel"><div class="panel-heading"><h2>Diário da jornada</h2></div>
         <div class="current-position"><div><span class="field-label">POSIÇÃO · LINHA / COLUNA</span><strong id="position-value">— / —</strong></div></div>
         <div class="stat-grid"><div class="stat-card"><span>CHAVES</span><strong id="keys-value">—</strong></div><div class="stat-card"><span>BÔNUS USADOS</span><strong id="bonus-value">—</strong></div><div class="stat-card"><span>CUSTO ACUMULADO</span><strong id="cost-value">—</strong></div><div class="stat-card"><span>MOVIMENTOS</span><strong id="moves-value">—</strong></div></div>
         <div class="algorithm-note"><span class="note-mark">✳</span><p id="algorithm-note">Os dados reais do algoritmo serão exibidos após o carregamento.</p></div>
@@ -42,8 +53,8 @@
 
     <section class="playback-panel" aria-label="Controles de animação"><div class="playback-title"><h2>Acompanhe cada passo</h2></div><div class="playback-controls"><button class="icon-button" id="restart-button" type="button" aria-label="Reiniciar" title="Reiniciar">↺</button><button class="icon-button" id="back-button" type="button" aria-label="Voltar um passo" title="Voltar um passo">←</button><button class="play-button" id="play-button" type="button" aria-label="Iniciar animação"><span id="play-icon">▶</span></button><button class="icon-button" id="next-button" type="button" aria-label="Avançar um passo" title="Avançar um passo">→</button><div class="step-counter"><strong id="step-value">0</strong><span> / <span id="step-total">0</span> passos</span></div></div><div class="timeline-wrap"><input id="timeline" type="range" min="0" max="0" value="0" aria-label="Progresso da animação"><div class="timeline-labels"><span>INÍCIO</span><span id="timeline-percent">0%</span><span>ALVO</span></div></div><label class="speed-control"><span>VELOCIDADE</span><input id="speed-range" type="range" min="120" max="1100" value="600" step="40" aria-label="Velocidade da animação"><span id="speed-value">Normal</span></label></section>
 
-    <section class="visualizations" aria-label="Visualizações dos grafos"><div class="section-heading"><h2>Além do caminho</h2></div><div class="viz-grid">
-      <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">01</span><h3>Grafo de estados</h3></div><span class="viz-tag">M02 · CAMADAS</span></div><div class="viz-content" id="graph-view"><div class="viz-empty">Aguardando dados do grafo de estados.</div></div></article>
+    <section class="visualizations" id="analises" tabindex="-1" aria-label="Visualizações dos grafos" hidden><div class="section-heading"><h2>Além do caminho</h2></div><div class="viz-grid">
+      <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">01</span><h3>Camadas do grafo de estados</h3></div><span class="viz-tag" id="graph-tag">CAMADAS</span></div><div class="viz-content" id="graph-view"><div class="viz-empty">Aguardando dados do grafo de estados.</div></div></article>
       <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">02</span><h3>Árvore de exploração</h3></div><span class="viz-tag">BFS</span></div><div class="viz-content" id="tree-view"><div class="viz-empty">Aguardando dados da árvore BFS.</div></div></article>
       <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">03</span><h3>Estados por posição</h3></div><span class="viz-tag">HEATMAP</span></div><div class="viz-content" id="heatmap-view"><div class="viz-empty">Aguardando contagens de estados por casa.</div></div></article>
       <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">04</span><h3>Classificação dos arcos</h3></div><span class="viz-tag">DFS</span></div><div class="viz-content arc-legend"><span><i class="arc-dot tree"></i>Árvore</span><span><i class="arc-dot back"></i>Retorno</span><span><i class="arc-dot forward"></i>Avanço</span><span><i class="arc-dot cross"></i>Cruzamento</span><p>As classificações são apresentadas quando constarem nos resultados DFS.</p></div></article>

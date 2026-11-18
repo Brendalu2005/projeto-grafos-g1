@@ -37,22 +37,44 @@
     if (!match) throw new Error(`Rótulo de estado inválido: ${label}`);
     return {estado: label.trim(), linha: Number(match[1]), coluna: Number(match[2]), chaves: match[3] === '-' ? [] : [...match[3]], bonus_consumidos: match[4].trim() ? match[4].split(',').map(Number) : []};
   }
+  // [IA[  ChatGPT (Codex) - normaliza o CSV e a saída textual da DFS oficial para a interface.
+  function dfsRow(row) {
+    const kinds = ['arvore', 'retorno', 'avanco', 'cruzamento'];
+    if (!row?.mapa || !kinds.every(kind => Object.hasOwn(row, kind))) return row;
+    return {...row, algoritmo:'DFS', status:'CLASSIFICACAO',
+      classificacao_arcos:Object.fromEntries(kinds.map(kind => [kind, row[kind]]))};
+  }
   // O CLI atual imprime repr(dict). Leitura limitada a campos escalares, sem eval.
   function cliRow(text) {
     const row = {};
     const fields = /'([a-z_]+)'\s*:\s*(?:'((?:\\.|[^'\\])*)'|(-?\d+(?:\.\d+)?))/g;
     for (const match of text.matchAll(fields)) row[match[1]] = match[2] !== undefined
       ? match[2].replace(/\\([\\'nrt])/g, (_, char) => ({n:'\n',r:'\r',t:'\t'}[char] ?? char)) : Number(match[3]);
-    if (!row.mapa || !row.algoritmo || !row.status) throw new Error('Selecione uma saída válida da CLI ou solucoes.csv.');
-    return row;
+    const normalized = dfsRow(row);
+    if (!normalized.mapa || !normalized.algoritmo || !normalized.status) throw new Error('Selecione uma saída válida da CLI ou um CSV oficial.');
+    return normalized;
   }
   function records(text, name) {
-    if (name.endsWith('.csv')) return csv(text);
-    if (name.endsWith('.json')) { const data = JSON.parse(text); return Array.isArray(data) ? data : [data]; }
+    if (name.endsWith('.csv')) return csv(text).map(dfsRow);
+    if (name.endsWith('.json')) { const data = JSON.parse(text); return (Array.isArray(data) ? data : [data]).map(dfsRow); }
     return [cliRow(text)];
   }
   const imported = new Map();
   const edgeCache = new Map();
+  // [IA[  ChatGPT (Codex) - apresenta no front as camadas e a classificação DFS já exportadas pelo projeto.
+  async function analyses(name) {
+    const [layersText, dfsText] = await Promise.all([
+      optional(output('camadas.json')), optional(output('dfs_classificacao.csv'))
+    ]);
+    const layers = layersText ? JSON.parse(layersText) : {};
+    const dfs = dfsText ? csv(dfsText) : [];
+    const row = dfs.find(item => item.mapa === name);
+    const kinds = ['arvore', 'retorno', 'avanco', 'cruzamento'];
+    return {
+      camadas: layers[name] || null,
+      classificacao_arcos: row ? Object.fromEntries(kinds.map(kind => [kind, Number(row[kind])])) : null
+    };
+  }
   async function list() {
     let names = known;
     try {
@@ -92,11 +114,38 @@
       const text = await optional(output('solucoes.csv'));
       if (text !== null) row = csv(text).find(row => row.mapa === name && row.algoritmo === algorithm);
     }
+    if (algorithm === 'DFS' && (!row || row.status === 'PENDENTE')) {
+      const text = await optional(output('dfs_classificacao.csv'));
+      const found = text && csv(text).find(item => item.mapa === name);
+      if (found) row = dfsRow(found);
+    }
     if (!row) return null;
     if (row.mapa !== name || row.algoritmo !== algorithm) throw new Error('A saída selecionada pertence a outro mapa ou algoritmo.');
-    const statuses = {OK:'sucesso', RECUSA:'peso_negativo_recusado', SEM_SOLUCAO:'sem_caminho', CICLO_NEGATIVO:'ciclo_negativo', PENDENTE:'pendente'};
+    const statuses = {OK:'sucesso', RECUSA:'peso_negativo_recusado', SEM_SOLUCAO:'sem_caminho', CICLO_NEGATIVO:'ciclo_negativo', EXPLORACAO:'exploracao', CLASSIFICACAO:'classificacao', PENDENTE:'pendente'};
     if (!statuses[row.status]) throw new Error(`Status desconhecido: ${row.status}`);
-    const messages = {OK: algorithm === 'BFS' ? 'Menor número de movimentos.' : 'Percurso de menor custo.', RECUSA:'Dijkstra recusou o grafo com pesos negativos.', SEM_SOLUCAO:'Não há caminho até a saída.', CICLO_NEGATIVO:'O código oficial detectou um ciclo negativo, mas ainda não exporta os estados do ciclo.', PENDENTE:'A função oficial da DFS ainda não exporta um resultado para o front.'};
+    if (row.status === 'CLASSIFICACAO' || row.status === 'EXPLORACAO') {
+      const kinds = ['arvore', 'retorno', 'avanco', 'cruzamento'];
+      const source = row.classificacao_arcos;
+      if (algorithm !== 'DFS' || !source || kinds.some(kind => !Number.isSafeInteger(Number(source[kind])) || Number(source[kind]) < 0)) {
+        throw new Error('Classificação DFS inválida.');
+      }
+      const counts = Object.fromEntries(kinds.map(kind => [kind, Number(source[kind])]));
+      const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
+      // [IA[  ChatGPT (Codex) - usa a ordem de descoberta da DFS para animar estados, sem tratá-la como rota de solução.
+      const visits = row.status === 'EXPLORACAO' && Array.isArray(row.exploracao) ? row.exploracao.map(state) : [];
+      if (row.status === 'EXPLORACAO' && !visits.length) throw new Error('DFS sem estados de exploração.');
+      for (const visit of visits) {
+        if (!grade[visit.linha] || grade[visit.linha][visit.coluna] === undefined || grade[visit.linha][visit.coluna] === '#') {
+          throw new Error('Exploração DFS contém posição inválida no mapa.');
+        }
+      }
+      const animated = row.status === 'EXPLORACAO';
+      return {status:animated ? 'exploracao' : 'classificacao',
+        mensagem:animated ? `DFS descobriu ${visits.length} estados e classificou ${total} arcos. A animação mostra a ordem de descoberta, não uma rota até a saída.`
+          : `DFS classificou ${total} arcos. Inicie o servidor atualizado para animar a exploração.`,
+        passos:visits, ciclo_negativo:[], classificacao_arcos:counts, movimentos:null, custo_total:null, aviso:''};
+    }
+    const messages = {OK: algorithm === 'BFS' ? 'Menor número de movimentos.' : 'Percurso de menor custo.', RECUSA:'Dijkstra recusou o grafo com pesos negativos.', SEM_SOLUCAO:'Não há caminho até a saída.', CICLO_NEGATIVO:'O código oficial detectou um ciclo negativo, mas ainda não exporta os estados do ciclo.', PENDENTE:'Reinicie o servidor do front para carregar a classificação DFS atual.'};
     const steps = row.status === 'OK' ? String(row.caminho).split(/\s*->\s*/).filter(label => label && label !== 'ALVO').map(state) : [];
     const cycle = row.status === 'CICLO_NEGATIVO' && Array.isArray(row.ciclo) ? row.ciclo.map(state) : [];
     if (row.status === 'OK' && !steps.length) throw new Error('Resultado OK sem caminho exportado.');
@@ -123,9 +172,9 @@
   }
   async function importFile(file) {
     const rows = records(decode(await file.arrayBuffer()), file.name.toLowerCase());
-    for (const row of rows) if (!/^[\w-]+$/.test(row.mapa || '') || !['BFS','DFS','DIJKSTRA','BELLMAN_FORD'].includes(row.algoritmo) || !['OK','RECUSA','SEM_SOLUCAO','CICLO_NEGATIVO'].includes(row.status)) throw new Error('Use solucoes.csv ou a saída da CLI com mapa, algoritmo, status e caminho.');
+    for (const row of rows) if (!/^[\w-]+$/.test(row.mapa || '') || !['BFS','DFS','DIJKSTRA','BELLMAN_FORD'].includes(row.algoritmo) || !['OK','RECUSA','SEM_SOLUCAO','CICLO_NEGATIVO','CLASSIFICACAO','EXPLORACAO'].includes(row.status)) throw new Error('Use um CSV oficial ou a saída da CLI correspondente ao mapa e algoritmo.');
     for (const row of rows) imported.set(`${row.mapa}/${row.algoritmo}`, row);
     return rows;
   }
-  window.FrontData = {list, map, result, importFile, output};
+  window.FrontData = {list, map, result, analyses, importFile, output};
 })();

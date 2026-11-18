@@ -10,6 +10,9 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from src.graphs.algorithms import dfs
+from src.graphs.estados import ALVO, construir_g_est, estado_inicial, rotulo
+from src.graphs.io import ler_mapa
 from src.solve import resolver
 
 
@@ -44,8 +47,24 @@ class Handler(SimpleHTTPRequestHandler):
         if path is None:
             return self.send_json(404, {"erro": "Mapa não encontrado."})
         if algorithm == "DFS":
-            return self.send_json(200, {"mapa": name, "algoritmo": algorithm,
-                                        "status": "PENDENTE", "caminho": "", "custo": ""})
+            # [IA[  ChatGPT (Codex) - expõe a ordem de descoberta e a classificação calculadas pela DFS oficial.
+            try:
+                mapa = ler_mapa(str(path))
+                graph = construir_g_est(mapa)
+                discovered, _, _, classes, _ = dfs(graph, estado_inicial(mapa))
+                counts = {key: 0 for key in ("arvore", "retorno", "avanco", "cruzamento")}
+                for kind in classes.values():
+                    counts[kind] += 1
+                order = sorted((state for state in discovered if state != ALVO), key=discovered.__getitem__)
+            except (OSError, ValueError, KeyError) as error:
+                return self.send_json(422, {"erro": str(error)})
+            return self.send_json(200, {
+                "mapa": name,
+                "algoritmo": algorithm,
+                "status": "EXPLORACAO",
+                "exploracao": [rotulo(state) for state in order],
+                "classificacao_arcos": counts,
+            })
         if algorithm not in ALGORITHMS:
             return self.send_json(400, {"erro": "Algoritmo desconhecido."})
 
