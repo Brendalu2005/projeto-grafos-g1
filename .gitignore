@@ -7,4 +7,6 @@ __pycache__/
 # grafo exemplo
 mini.txt
 *.csv
+!out/parte1/*.csv
+!out/parte1/fonte_consumivel/*.csv
 raw/

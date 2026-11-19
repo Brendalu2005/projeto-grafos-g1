@@ -1,0 +1,233 @@
+{
+  "m01_terreno": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 24,
+        "tamanho": 46,
+        "densidade": 0.08333333333333333
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_que_mudam_de_camada": []
+  },
+  "m02_uma_chave": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 16,
+        "tamanho": 30,
+        "densidade": 0.125
+      },
+      {
+        "chaves": "a",
+        "ordem": 23,
+        "tamanho": 43,
+        "densidade": 0.08498023715415019
+      }
+    ],
+    "arcos_entre_camadas": 1,
+    "casas_que_mudam_de_camada": [
+      "(3,11) a"
+    ]
+  },
+  "m03_tres_chaves": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 12,
+        "tamanho": 22,
+        "densidade": 0.16666666666666666
+      },
+      {
+        "chaves": "a",
+        "ordem": 53,
+        "tamanho": 114,
+        "densidade": 0.041364296081277216
+      },
+      {
+        "chaves": "ab",
+        "ordem": 72,
+        "tamanho": 160,
+        "densidade": 0.03129890453834116
+      },
+      {
+        "chaves": "abc",
+        "ordem": 76,
+        "tamanho": 167,
+        "densidade": 0.029298245614035087
+      }
+    ],
+    "arcos_entre_camadas": 3,
+    "casas_que_mudam_de_camada": [
+      "(1,12) b",
+      "(6,6) c",
+      "(8,1) a"
+    ]
+  },
+  "m04_esteiras": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 17,
+        "tamanho": 30,
+        "densidade": 0.11029411764705882
+      },
+      {
+        "chaves": "a",
+        "ordem": 20,
+        "tamanho": 35,
+        "densidade": 0.09210526315789473
+      }
+    ],
+    "arcos_entre_camadas": 1,
+    "casas_que_mudam_de_camada": [
+      "(3,11) a"
+    ]
+  },
+  "m05_bonus": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 215,
+        "tamanho": 438,
+        "densidade": 0.009519669637035428
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_que_mudam_de_camada": []
+  },
+  "m06_fonte": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 40,
+        "tamanho": 76,
+        "densidade": 0.04871794871794872
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_que_mudam_de_camada": []
+  },
+  "m07_impossivel": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 16,
+        "tamanho": 38,
+        "densidade": 0.15833333333333333
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_que_mudam_de_camada": []
+  },
+  "m08_grande": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 165,
+        "tamanho": 356,
+        "densidade": 0.013155949741315596
+      },
+      {
+        "chaves": "a",
+        "ordem": 314,
+        "tamanho": 670,
+        "densidade": 0.006817118088764983
+      },
+      {
+        "chaves": "ab",
+        "ordem": 442,
+        "tamanho": 940,
+        "densidade": 0.004822441797231713
+      },
+      {
+        "chaves": "abc",
+        "ordem": 829,
+        "tamanho": 1818,
+        "densidade": 0.0026485550951906435
+      },
+      {
+        "chaves": "abcd",
+        "ordem": 1169,
+        "tamanho": 2574,
+        "densidade": 0.001885172902726836
+      }
+    ],
+    "arcos_entre_camadas": 6,
+    "casas_que_mudam_de_camada": [
+      "(3,23) b",
+      "(3,29) d",
+      "(5,37) c",
+      "(27,5) a"
+    ]
+  },
+  "grupo_armadilhas": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 101,
+        "tamanho": 101,
+        "densidade": 0.01
+      },
+      {
+        "chaves": "a",
+        "ordem": 53,
+        "tamanho": 55,
+        "densidade": 0.01995645863570392
+      },
+      {
+        "chaves": "ab",
+        "ordem": 55,
+        "tamanho": 59,
+        "densidade": 0.019865319865319864
+      },
+      {
+        "chaves": "abc",
+        "ordem": 58,
+        "tamanho": 64,
+        "densidade": 0.019358741681790685
+      }
+    ],
+    "arcos_entre_camadas": 3,
+    "casas_que_mudam_de_camada": [
+      "(1,3) a",
+      "(1,5) b",
+      "(1,7) c"
+    ]
+  },
+  "grupo_rotas": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 7,
+        "tamanho": 9,
+        "densidade": 0.21428571428571427
+      },
+      {
+        "chaves": "a",
+        "ordem": 9,
+        "tamanho": 14,
+        "densidade": 0.19444444444444445
+      },
+      {
+        "chaves": "ab",
+        "ordem": 12,
+        "tamanho": 20,
+        "densidade": 0.15151515151515152
+      },
+      {
+        "chaves": "abc",
+        "ordem": 16,
+        "tamanho": 27,
+        "densidade": 0.1125
+      }
+    ],
+    "arcos_entre_camadas": 3,
+    "casas_que_mudam_de_camada": [
+      "(1,3) a",
+      "(1,6) b",
+      "(1,9) c"
+    ]
+  }
+}

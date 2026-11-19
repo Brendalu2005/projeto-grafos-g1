@@ -161,5 +161,73 @@
       "(5,37) c",
       "(27,5) a"
     ]
+  },
+  "grupo_armadilhas": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 101,
+        "tamanho": 101,
+        "densidade": 0.01
+      },
+      {
+        "chaves": "a",
+        "ordem": 53,
+        "tamanho": 55,
+        "densidade": 0.01995645863570392
+      },
+      {
+        "chaves": "ab",
+        "ordem": 55,
+        "tamanho": 59,
+        "densidade": 0.019865319865319864
+      },
+      {
+        "chaves": "abc",
+        "ordem": 58,
+        "tamanho": 64,
+        "densidade": 0.019358741681790685
+      }
+    ],
+    "arcos_entre_camadas": 3,
+    "casas_que_mudam_de_camada": [
+      "(1,3) a",
+      "(1,5) b",
+      "(1,7) c"
+    ]
+  },
+  "grupo_rotas": {
+    "camadas": [
+      {
+        "chaves": "-",
+        "ordem": 7,
+        "tamanho": 9,
+        "densidade": 0.21428571428571427
+      },
+      {
+        "chaves": "a",
+        "ordem": 9,
+        "tamanho": 14,
+        "densidade": 0.19444444444444445
+      },
+      {
+        "chaves": "ab",
+        "ordem": 12,
+        "tamanho": 20,
+        "densidade": 0.15151515151515152
+      },
+      {
+        "chaves": "abc",
+        "ordem": 16,
+        "tamanho": 27,
+        "densidade": 0.1125
+      }
+    ],
+    "arcos_entre_camadas": 3,
+    "casas_que_mudam_de_camada": [
+      "(1,3) a",
+      "(1,6) b",
+      "(1,9) c"
+    ]
   }
 }

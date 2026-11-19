@@ -43,6 +43,8 @@ class Handler(SimpleHTTPRequestHandler):
         params = parse_qs(url.query)
         name = params.get("mapa", [""])[0]
         algorithm = params.get("alg", [""])[0]
+        # [IA] ChatGPT (Codex) - recebe a variante de regra da interface.
+        fonte_consumivel = params.get("fonte-consumivel", ["false"])[0].lower() in {"1", "true", "yes"}
         path = find_map(name)
         if path is None:
             return self.send_json(404, {"erro": "Mapa não encontrado."})
@@ -50,7 +52,7 @@ class Handler(SimpleHTTPRequestHandler):
             # [IA[  ChatGPT (Codex) - expõe a ordem de descoberta e a classificação calculadas pela DFS oficial.
             try:
                 mapa = ler_mapa(str(path))
-                graph = construir_g_est(mapa)
+                graph = construir_g_est(mapa, fonte_consumivel)
                 discovered, _, _, classes, _ = dfs(graph, estado_inicial(mapa))
                 counts = {key: 0 for key in ("arvore", "retorno", "avanco", "cruzamento")}
                 for kind in classes.values():
@@ -69,7 +71,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json(400, {"erro": "Algoritmo desconhecido."})
 
         try:
-            result = resolver(str(path), algorithm)
+            result = resolver(str(path), algorithm, fonte_consumivel)
         except (OSError, ValueError, KeyError) as error:
             return self.send_json(422, {"erro": str(error)})
         return self.send_json(200, result)

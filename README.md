@@ -31,21 +31,35 @@ pip install -r requirements.txt
 
 ## Como executar
 
-Os comandos seguem o formato do enunciado e passam a funcionar quando `src/cli.py` estiver pronto.
+Na raiz do repositório, a execução individual imprime e grava um JSON em `--out`:
 
 ```bash
-# Parte 1 (labirintos)
+# Parte 1: resolução individual
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg DIJKSTRA --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m05_bonus.txt --alg BELLMAN_FORD --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
-python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --out ./out/parte1/
-python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./out/parte1/
 
-# Parte 2 (dataset)
-python -m src.cli --dataset ./data/dataset_parte2/ --alg DIJKSTRA --source A --target Z --out ./out/parte2/
-python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte2/
+# Parte 1: exportações para os oito mapas e data/mapas_grupo/*.txt
+python -m src.cli --todos --out ./out/parte1/
+
+# Recalcular todas as exportações com fontes consumíveis; os arquivos ficam
+# separados em ./out/parte1/fonte_consumivel/ para não misturar regras.
+python -m src.cli --todos --fonte-consumivel --out ./out/parte1/
+
+# --armadilhas é um alias da execução em lote (que também gera as armadilhas).
+python -m src.cli --armadilhas --out ./out/parte1/
+
+# Gerar as figuras estáticas da Parte 1
+python -m src.viz
+
+# Abrir a interface interativa em http://127.0.0.1:8766/out/parte1/labirinto_interativo.html
+python -m src.front.server
 ```
+
+As exportações em lote incluem arestas, graus, métricas globais, camadas, soluções, classificação DFS, comparação das três modelagens, estados-armadilha, percurso do m03 e ciclo negativo do m06. A interface serve os resultados calculados pelo projeto; execute o servidor a partir da raiz para que mapas e CSVs sejam encontrados. O controle “Regra da fonte” permite comparar o cenário original com a fonte consumível.
+
+Os comandos de execução do dataset da Parte 2 ainda não estão implementados na CLI.
 
 ## Testes
 
@@ -82,7 +96,16 @@ projeto-grafos-g1/
 
 ## Interface dos algoritmos
 
-A definir pelo grupo: como `graph.py` representa o grafo e o que cada algoritmo recebe e devolve (distâncias, predecessores e status).
+`graph.py` representa o grafo dirigido por uma lista de adjacência: cada chave é um vértice e cada valor é uma lista de pares `(destino, peso)`. No grafo de estados, um vértice é `(linha, coluna, chaves, bônus_consumidos)`; a saída é ligada ao vértice virtual `ALVO`.
+
+| Algoritmo | Entrada | Retorno principal |
+|---|---|---|
+| `bfs(grafo, origem)` | Grafo e vértice de origem | Distâncias em arestas (passos) e predecessores |
+| `dfs(grafo, origem, cobrir_todos=False)` | Grafo dirigido e origem | Tempos de descoberta/finalização, predecessores, classificação de arcos e indicador de ciclo |
+| `dijkstra(grafo, origem)` | Grafo e origem | Distâncias de menor custo e predecessores; lança `ValueError` se encontrar peso negativo |
+| `bellman_ford(grafo, origem)` | Grafo e origem | Distâncias, predecessores e ciclo negativo (ou `None`) |
+
+`resolver()` converte esses retornos em status, custo, passos, caminho e sequência do ciclo, quando houver. A opção `--fonte-consumivel` altera a construção do grafo para que cada fonte `*` tenha peso `-2` na primeira entrada e `1` nas seguintes.
 
 ## Dataset da Parte 2
 

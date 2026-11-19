@@ -1,0 +1,62 @@
+[
+  {
+    "mapa": "m01_terreno",
+    "total_estados": 24,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
+  },
+  {
+    "mapa": "m02_uma_chave",
+    "total_estados": 39,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
+  },
+  {
+    "mapa": "m03_tres_chaves",
+    "total_estados": 213,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
+  },
+  {
+    "mapa": "m04_esteiras",
+    "total_estados": 37,
+    "total_armadilhas": 4,
+    "proporcao_armadilhas": 0.10810810810810811
+  },
+  {
+    "mapa": "m05_bonus",
+    "total_estados": 215,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
+  },
+  {
+    "mapa": "m06_fonte",
+    "total_estados": 24,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
+  },
+  {
+    "mapa": "m07_impossivel",
+    "total_estados": 16,
+    "total_armadilhas": 16,
+    "proporcao_armadilhas": 1.0
+  },
+  {
+    "mapa": "m08_grande",
+    "total_estados": 2919,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
+  },
+  {
+    "mapa": "grupo_armadilhas",
+    "total_estados": 267,
+    "total_armadilhas": 245,
+    "proporcao_armadilhas": 0.9176029962546817
+  },
+  {
+    "mapa": "grupo_rotas",
+    "total_estados": 44,
+    "total_armadilhas": 12,
+    "proporcao_armadilhas": 0.2727272727272727
+  }
+]

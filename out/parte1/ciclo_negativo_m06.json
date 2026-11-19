@@ -1,0 +1,10 @@
+{
+  "mapa": "m06_fonte",
+  "algoritmo": "BELLMAN_FORD",
+  "status": "CICLO_NEGATIVO",
+  "ciclo": [
+    "(3,5)|-|{}",
+    "(3,6)|-|{}",
+    "(3,5)|-|{}"
+  ]
+}

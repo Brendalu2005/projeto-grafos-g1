@@ -32,8 +32,9 @@ h1 { margin: 0 0 13px; font-size: clamp(32px, 4vw, 49px); font-weight: 500; line
 h1 em { font-family: Georgia, serif; font-weight: 400; color: var(--lime); }
 .intro-copy p { max-width: 570px; margin: 0; font-size: 13px; color: var(--muted); line-height: 1.8; }
 .intro-drawing { flex: 0 0 148px; width: 148px; height: 124px; color: #728978; }
-.control-panel { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(220px, 1.35fr) auto auto; gap: 18px; align-items: end; padding: 20px 22px; background: #18221d; border: 1px solid var(--line); border-radius: 6px; }
+.control-panel { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(220px, 1.35fr) minmax(180px, 1fr) auto auto; gap: 18px; align-items: end; padding: 20px 22px; background: #18221d; border: 1px solid var(--line); border-radius: 6px; }
 .control-field { display: flex; flex-direction: column; min-width: 0; gap: 8px; }
+.control-field input[type="checkbox"] { accent-color: var(--lime); vertical-align: middle; }
 .select-wrap { position: relative; display: block; }
 .select-wrap select { width: 100%; min-height: 44px; appearance: none; background: var(--panel); color: var(--text); border: 1px solid #3c5043; border-radius: 4px; padding: 10px 32px 10px 12px; font-size: 12px; }
 .select-arrow { position: absolute; right: 12px; top: 8px; font-size: 18px; color: var(--muted); pointer-events: none; }

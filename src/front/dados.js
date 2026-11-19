@@ -62,9 +62,11 @@
   const imported = new Map();
   const edgeCache = new Map();
   // [IA[  ChatGPT (Codex) - apresenta no front as camadas e a classificação DFS já exportadas pelo projeto.
-  async function analyses(name) {
+  // [IA] ChatGPT (Codex) - alterna as análises e os resultados entre as regras de fonte.
+  async function analyses(name, fonteConsumivel = false) {
+    const dir = fonteConsumivel ? 'fonte_consumivel/' : '';
     const [layersText, dfsText] = await Promise.all([
-      optional(output('camadas.json')), optional(output('dfs_classificacao.csv'))
+      optional(output(`${dir}camadas.json`)), optional(output(`${dir}dfs_classificacao.csv`))
     ]);
     const layers = layersText ? JSON.parse(layersText) : {};
     const dfs = dfsText ? csv(dfsText) : [];
@@ -91,31 +93,42 @@
     if (!grade.length || !grade.every(row => row.length === grade[0].length)) throw new Error('Grade vazia ou não retangular.');
     return {mapa: name, grade, colunas: grade[0].length};
   }
-  async function edges(name) {
-    if (!edgeCache.has(name)) {
-      const text = await optional(output(`arestas_${name}.csv`));
-      edgeCache.set(name, new Map(text ? csv(text).map(row => [`${row.origem}\n${row.destino}`, Number(row.peso)]) : []));
+  async function edges(name, fonteConsumivel = false) {
+    const cacheKey = `${name}/${fonteConsumivel}`;
+    if (!edgeCache.has(cacheKey)) {
+      const dir = fonteConsumivel ? 'fonte_consumivel/' : '';
+      const text = await optional(output(`${dir}arestas_${name}.csv`));
+      edgeCache.set(cacheKey, new Map(text ? csv(text).map(row => [`${row.origem}\n${row.destino}`, Number(row.peso)]) : []));
     }
-    return edgeCache.get(name);
+    return edgeCache.get(cacheKey);
   }
-  async function result(name, algorithm, grade) {
+  async function result(name, algorithm, grade, fonteConsumivel = false) {
+    const dir = fonteConsumivel ? 'fonte_consumivel/' : '';
     let row = imported.get(`${name}/${algorithm}`);
     if (!row) {
       try {
-        const response = await fetch(new URL(`api/resultado?mapa=${encodeURIComponent(name)}&alg=${encodeURIComponent(algorithm)}`, root));
+        const url = new URL('api/resultado', root);
+        url.searchParams.set('mapa', name); url.searchParams.set('alg', algorithm);
+        url.searchParams.set('fonte-consumivel', String(fonteConsumivel));
+        const response = await fetch(url);
         if (response.ok) row = await response.json();
       } catch { /* servidor comum: usar os arquivos exportados abaixo */ }
     }
     if (!row) {
-      const text = await optional(output(`solucao_${name}_${algorithm}.txt`));
+      const text = await optional(output(`${dir}solucao_${name}_${algorithm}.txt`));
       if (text !== null) row = cliRow(text);
     }
     if (!row) {
-      const text = await optional(output('solucoes.csv'));
+      const text = await optional(output(`${dir}solucoes.csv`));
       if (text !== null) row = csv(text).find(row => row.mapa === name && row.algoritmo === algorithm);
     }
+    // [IA] ChatGPT (Codex) – usa o JSON específico do m06 como fallback para a sequência do ciclo.
+    if (algorithm === 'BELLMAN_FORD' && row?.status === 'CICLO_NEGATIVO' && !Array.isArray(row.ciclo) && name === 'm06_fonte') {
+      const cycleText = await optional(output(`${dir}ciclo_negativo_m06.json`));
+      if (cycleText) row = {...row, ciclo: JSON.parse(cycleText).ciclo};
+    }
     if (algorithm === 'DFS' && (!row || row.status === 'PENDENTE')) {
-      const text = await optional(output('dfs_classificacao.csv'));
+      const text = await optional(output(`${dir}dfs_classificacao.csv`));
       const found = text && csv(text).find(item => item.mapa === name);
       if (found) row = dfsRow(found);
     }
@@ -145,11 +158,12 @@
           : `DFS classificou ${total} arcos. Inicie o servidor atualizado para animar a exploração.`,
         passos:visits, ciclo_negativo:[], classificacao_arcos:counts, movimentos:null, custo_total:null, aviso:''};
     }
-    const messages = {OK: algorithm === 'BFS' ? 'Menor número de movimentos.' : 'Percurso de menor custo.', RECUSA:'Dijkstra recusou o grafo com pesos negativos.', SEM_SOLUCAO:'Não há caminho até a saída.', CICLO_NEGATIVO:'O código oficial detectou um ciclo negativo, mas ainda não exporta os estados do ciclo.', PENDENTE:'Reinicie o servidor do front para carregar a classificação DFS atual.'};
+    // [IA] ChatGPT (Codex) – atualiza a mensagem para indicar que o ciclo é animável.
+    const messages = {OK: algorithm === 'BFS' ? 'Menor número de movimentos.' : 'Percurso de menor custo.', RECUSA:'Dijkstra recusou o grafo com pesos negativos.', SEM_SOLUCAO:'Não há caminho até a saída.', CICLO_NEGATIVO:'Ciclo negativo detectado. A sequência de estados do ciclo está disponível na animação.', PENDENTE:'Reinicie o servidor do front para carregar a classificação DFS atual.'};
     const steps = row.status === 'OK' ? String(row.caminho).split(/\s*->\s*/).filter(label => label && label !== 'ALVO').map(state) : [];
     const cycle = row.status === 'CICLO_NEGATIVO' && Array.isArray(row.ciclo) ? row.ciclo.map(state) : [];
     if (row.status === 'OK' && !steps.length) throw new Error('Resultado OK sem caminho exportado.');
-    const weights = await edges(name);
+    const weights = await edges(name, fonteConsumivel);
     let cost = 0, complete = true;
     function addCosts(sequence) { sequence.forEach((step, i) => {
       if (!grade[step.linha] || grade[step.linha][step.coluna] === undefined || grade[step.linha][step.coluna] === '#') throw new Error('O percurso contém posição inválida no mapa.');

@@ -5,6 +5,7 @@
   const $ = selector => document.querySelector(selector);
   const mapSelect = $('#map-select');
   const algorithmSelect = $('#algorithm-select');
+  const sourceConsumivel = $('#source-consumivel');
   const names = { BFS: 'BFS', DFS: 'DFS', DIJKSTRA: 'Dijkstra', BELLMAN_FORD: 'Bellman-Ford' };
   let maps = [], steps = [], index = 0, timer = null, cycle = false, analysis = false, exploring = false, request = 0;
   const algorithm = () => algorithmSelect.value.toUpperCase().replaceAll('-', '_');
@@ -135,7 +136,7 @@
       maps[maps.findIndex(item => item.mapa === name)] = map;
       extras(map); render();
       const [result, analysisData] = await Promise.all([
-        FrontData.result(name, algorithm(), map.grade), FrontData.analyses(name)
+        FrontData.result(name, algorithm(), map.grade, sourceConsumivel.checked), FrontData.analyses(name, sourceConsumivel.checked)
       ]);
       if (currentRequest !== request) return;
       map.classificacao_arcos = result?.classificacao_arcos || analysisData.classificacao_arcos;
@@ -190,6 +191,8 @@
   });
   mapSelect.addEventListener('change', load);
   algorithmSelect.addEventListener('change', load);
+  // [IA] ChatGPT (Codex) - atualiza a execução ao trocar a regra da fonte.
+  sourceConsumivel.addEventListener('change', load);
   let resizeFrame;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeFrame);

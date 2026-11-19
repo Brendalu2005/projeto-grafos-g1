@@ -1,0 +1,10 @@
+mapa,modelagem,passos,status,fonte_consumivel
+m02_uma_chave,portas_como_chao,11,OK,False
+m02_uma_chave,portas_como_parede,,SEM_SOLUCAO,False
+m02_uma_chave,grafo_de_estados,35,OK,False
+m03_tres_chaves,portas_como_chao,22,OK,False
+m03_tres_chaves,portas_como_parede,,SEM_SOLUCAO,False
+m03_tres_chaves,grafo_de_estados,88,OK,False
+m04_esteiras,portas_como_chao,15,OK,False
+m04_esteiras,portas_como_parede,,SEM_SOLUCAO,False
+m04_esteiras,grafo_de_estados,21,OK,False
