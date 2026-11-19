@@ -10,3 +10,27 @@ def test_mapa_com_dois_s_gera_erro_claro(tmp_path):
 
     with pytest.raises(ValueError, match="exatamente um S"):
         ler_mapa(caminho)
+
+
+def test_mapa_nao_retangular_gera_erro_claro(tmp_path):
+    caminho = tmp_path / "torto.txt"
+    caminho.write_text("#####\n#S.G#\n####\n")
+
+    with pytest.raises(ValueError, match="não retangular"):
+        ler_mapa(caminho)
+
+
+def test_mapa_sem_g_gera_erro_claro(tmp_path):
+    caminho = tmp_path / "sem_g.txt"
+    caminho.write_text("#####\n#S..#\n#####\n")
+
+    with pytest.raises(ValueError, match="pelo menos um G"):
+        ler_mapa(caminho)
+
+
+def test_simbolo_desconhecido_gera_erro_claro(tmp_path):
+    caminho = tmp_path / "simbolo.txt"
+    caminho.write_text("#####\n#SxG#\n#####\n")
+
+    with pytest.raises(ValueError, match="símbolo desconhecido"):
+        ler_mapa(caminho)
