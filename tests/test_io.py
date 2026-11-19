@@ -21,9 +21,16 @@ def test_mapa_sem_grade_gera_erro_claro(tmp_path):
 
 
 def test_mapa_nao_retangular_gera_erro_claro(tmp_path):
-    caminho = tmp_path / "irregular.txt"
-    caminho.write_text("#####\n#SG#\n")
+    caminho = tmp_path / "torto.txt"
+    caminho.write_text("#####\n#S.G#\n####\n")
     with pytest.raises(ValueError, match="não retangular"):
+        ler_mapa(caminho)
+
+
+def test_mapa_sem_g_gera_erro_claro(tmp_path):
+    caminho = tmp_path / "sem_g.txt"
+    caminho.write_text("#####\n#S..#\n#####\n")
+    with pytest.raises(ValueError, match="pelo menos um G"):
         ler_mapa(caminho)
 
 

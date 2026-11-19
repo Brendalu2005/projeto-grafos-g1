@@ -2,6 +2,8 @@
 import math
 
 from src.graphs.algorithms import bfs
+from src.graphs.estados import ALVO, construir_g_est, estado_inicial
+from src.graphs.io import ler_mapa
 
 
 def test_bfs_encontra_caminho_com_menor_numero_de_passos():
@@ -61,3 +63,21 @@ def test_bfs_inclui_vizinho_sem_chave_explicita_no_grafo():
 
 	assert distancias == {"S": 0, "ALVO": 1}
 	assert predecessores == {"S": None, "ALVO": "S"}
+
+
+def test_bfs_termina_em_grafo_com_ciclo():
+	grafo = {"A": [("B", 1)], "B": [("C", 1), ("A", 1)], "C": [("A", 1)]}
+
+	distancias, predecessores = bfs(grafo, "A")
+
+	assert distancias == {"A": 0, "B": 1, "C": 2}
+	assert predecessores == {"A": None, "B": "A", "C": "B"}
+
+
+def test_bfs_no_grafo_de_estados_do_m02():
+	mapa = ler_mapa("data/mapas/m02_uma_chave.txt")
+	grafo = construir_g_est(mapa)
+
+	distancias, _ = bfs(grafo, estado_inicial(mapa))
+
+	assert distancias[ALVO] == 35

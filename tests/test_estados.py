@@ -2,7 +2,7 @@
 from src.graphs.estados import construir_g_est, rotulo
 from src.graphs.graph import arcos
 from src.graphs.io import ler_mapa
-from src.graphs.estados import (ALVO, estado_inicial, movimentos)
+from src.graphs.estados import ALVO, estado_inicial, movimentos
 from src.solve import estados_armadilha_local
 
 
@@ -27,6 +27,14 @@ def test_mapa_minimo_tem_estados_e_arcos_calculados_a_mao(tmp_path):
     assert len([v for v in grafo if v != ALVO]) == 3
     assert sum(len(vizinhos) for estado, vizinhos in grafo.items() if estado != ALVO) == 4
     assert grafo[ALVO] == []
+
+
+def test_mapa_minimo_com_chave_tem_contagem_feita_a_mao(tmp_path):
+    caminho = tmp_path / "minimo_chave.txt"
+    caminho.write_text("######\n#SaAG#\n######\n")
+    grafo = construir_g_est(ler_mapa(caminho))
+    assert len(grafo) == 6
+    assert len(arcos(grafo)) == 7
 
 
 def test_vizinhos_sao_gerados_na_ordem_n_l_s_o(tmp_path):
@@ -59,6 +67,15 @@ def test_esteira_restringe_a_saida_e_g_nao_tem_saida(tmp_path):
     assert [v[:2] for v, _ in grafo[estado_esteira]] == [(1, 3)]
     estado_saida = next(v for v in grafo if v != ALVO and v[:2] == (1, 3))
     assert grafo[estado_saida] == [(ALVO, 0)]
+
+
+def test_esteira_apontando_para_parede_gera_estado_sem_saida(tmp_path):
+    caminho = tmp_path / "esteira_bloqueada.txt"
+    caminho.write_text("#####\n#S^G#\n#####\n")
+    grafo = construir_g_est(ler_mapa(caminho))
+    esteira = (1, 2, frozenset(), frozenset())
+    assert esteira in grafo
+    assert grafo[esteira] == []
 
 
 def test_armadilhas_consideram_estados_sem_caminho_ao_alvo(tmp_path):
