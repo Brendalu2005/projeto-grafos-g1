@@ -8,7 +8,7 @@ from src.solve import estados_armadilha_local
 
 def test_coletar_chave_muda_de_camada(tmp_path):
     caminho = tmp_path / "chave.txt"
-    caminho.write_text("######\n#SaAG#\n######\n")
+    caminho.write_text("######\n#SaAG#\n######\n", encoding="utf-8")
     grafo = construir_g_est(ler_mapa(caminho))
 
     pares = []
@@ -22,7 +22,7 @@ def test_coletar_chave_muda_de_camada(tmp_path):
 # [IA] ChatGPT (Codex) – amplia a cobertura das transições previstas no enunciado.
 def test_mapa_minimo_tem_estados_e_arcos_calculados_a_mao(tmp_path):
     caminho = tmp_path / "minimo.txt"
-    caminho.write_text("#####\n#S.G#\n#####\n")
+    caminho.write_text("#####\n#S.G#\n#####\n", encoding="utf-8")
     grafo = construir_g_est(ler_mapa(caminho))
     assert len([v for v in grafo if v != ALVO]) == 3
     assert sum(len(vizinhos) for estado, vizinhos in grafo.items() if estado != ALVO) == 4
@@ -31,7 +31,7 @@ def test_mapa_minimo_tem_estados_e_arcos_calculados_a_mao(tmp_path):
 
 def test_mapa_minimo_com_chave_tem_contagem_feita_a_mao(tmp_path):
     caminho = tmp_path / "minimo_chave.txt"
-    caminho.write_text("######\n#SaAG#\n######\n")
+    caminho.write_text("######\n#SaAG#\n######\n", encoding="utf-8")
     grafo = construir_g_est(ler_mapa(caminho))
     assert len(grafo) == 6
     assert len(arcos(grafo)) == 7
@@ -39,7 +39,7 @@ def test_mapa_minimo_com_chave_tem_contagem_feita_a_mao(tmp_path):
 
 def test_vizinhos_sao_gerados_na_ordem_n_l_s_o(tmp_path):
     caminho = tmp_path / "ordem.txt"
-    caminho.write_text("#####\n#..G#\n#.S.#\n#...#\n#####\n")
+    caminho.write_text("#####\n#..G#\n#.S.#\n#...#\n#####\n", encoding="utf-8")
     mapa = ler_mapa(caminho)
     vizinhos = movimentos(mapa, estado_inicial(mapa))
     assert [(v[0], v[1]) for v, _ in vizinhos] == [(1, 2), (2, 3), (3, 2), (2, 1)]
@@ -47,7 +47,7 @@ def test_vizinhos_sao_gerados_na_ordem_n_l_s_o(tmp_path):
 
 def test_bonus_e_fonte_consumivel_so_dao_peso_negativo_na_primeira_entrada(tmp_path):
     caminho = tmp_path / "itens.txt"
-    caminho.write_text("#######\n#S+*G.#\n#######\n")
+    caminho.write_text("#######\n#S+*G.#\n#######\n", encoding="utf-8")
     mapa = ler_mapa(caminho)
     inicial = estado_inicial(mapa)
     pos_bonus, peso_bonus = movimentos(mapa, inicial)[0]
@@ -61,7 +61,7 @@ def test_bonus_e_fonte_consumivel_so_dao_peso_negativo_na_primeira_entrada(tmp_p
 
 def test_esteira_restringe_a_saida_e_g_nao_tem_saida(tmp_path):
     caminho = tmp_path / "esteira.txt"
-    caminho.write_text("#######\n#S>G..#\n#######\n")
+    caminho.write_text("#######\n#S>G..#\n#######\n", encoding="utf-8")
     grafo = construir_g_est(ler_mapa(caminho))
     estado_esteira = next(v for v in grafo if v != ALVO and v[:2] == (1, 2))
     assert [v[:2] for v, _ in grafo[estado_esteira]] == [(1, 3)]
@@ -71,7 +71,7 @@ def test_esteira_restringe_a_saida_e_g_nao_tem_saida(tmp_path):
 
 def test_esteira_apontando_para_parede_gera_estado_sem_saida(tmp_path):
     caminho = tmp_path / "esteira_bloqueada.txt"
-    caminho.write_text("#####\n#S^G#\n#####\n")
+    caminho.write_text("#####\n#S^G#\n#####\n", encoding="utf-8")
     grafo = construir_g_est(ler_mapa(caminho))
     esteira = (1, 2, frozenset(), frozenset())
     assert esteira in grafo
@@ -80,7 +80,7 @@ def test_esteira_apontando_para_parede_gera_estado_sem_saida(tmp_path):
 
 def test_armadilhas_consideram_estados_sem_caminho_ao_alvo(tmp_path):
     caminho = tmp_path / "armadilha.txt"
-    caminho.write_text("########\n#S.G####\n#v######\n#>>>>>##\n########\n")
+    caminho.write_text("########\n#S.G####\n#v######\n#>>>>>##\n########\n", encoding="utf-8")
     mapa = ler_mapa(caminho)
     grafo = construir_g_est(mapa)
     armadilhas = estados_armadilha_local(grafo, estado_inicial(mapa))

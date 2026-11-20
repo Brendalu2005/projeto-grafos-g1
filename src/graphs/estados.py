@@ -187,7 +187,7 @@ def camada(estado):
     return texto
 
 
-def metricas_do_mapa(mapa, g_pos, g_est):
+def metricas_do_mapa(mapa, g_pos, g_est, fonte_consumivel=False):
     vertices, lista = sem_alvo(g_est)
     entrada, saida = graus(vertices, lista)
 
@@ -199,7 +199,10 @@ def metricas_do_mapa(mapa, g_pos, g_est):
                 casas_livres += 1
             if simbolo in "abcd":
                 chaves.add(simbolo)
-    teto = casas_livres * 2 ** len(chaves) * 2 ** len(mapa.bonus)
+    consumiveis = len(mapa.bonus)
+    if fonte_consumivel:
+        consumiveis += len(mapa.fontes)
+    teto = casas_livres * 2 ** len(chaves) * 2 ** consumiveis
 
     becos = []
     for v in vertices:

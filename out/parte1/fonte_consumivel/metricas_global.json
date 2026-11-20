@@ -239,8 +239,8 @@
       "tamanho": 76,
       "densidade": 0.04871794871794872
     },
-    "teto_teorico": 24,
-    "taxa_ocupacao": 1.6666666666666667,
+    "teto_teorico": 48,
+    "taxa_ocupacao": 0.8333333333333334,
     "maior_grau_saida": {
       "estado": "(1,1)|-|{}",
       "grau": 2

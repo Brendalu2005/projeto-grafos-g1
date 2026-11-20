@@ -201,7 +201,7 @@ def exportar_metricas_variante(pastas, pasta_saida, fonte_consumivel):
             g_est = construir_g_est(mapa, fonte_consumivel)
             exportar_arestas(g_est, mapa, pasta_saida / f"arestas_{mapa.nome}.csv")
             exportar_graus(g_est, pasta_saida / f"graus_{mapa.nome}.csv")
-            metricas.append(metricas_do_mapa(mapa, g_pos, g_est))
+            metricas.append(metricas_do_mapa(mapa, g_pos, g_est, fonte_consumivel))
             camadas[mapa.nome] = camadas_do_mapa(mapa, g_est)
     escrever_json(metricas, pasta_saida / "metricas_global.json")
     escrever_json(camadas, pasta_saida / "camadas.json")
