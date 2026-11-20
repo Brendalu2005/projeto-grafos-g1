@@ -10,3 +10,6 @@ mini.txt
 !out/parte1/*.csv
 !out/parte1/fonte_consumivel/*.csv
 raw/
+
+#docs
+docs/pendencias_parte2_reorganizacao.md

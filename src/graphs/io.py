@@ -3,10 +3,45 @@ import json
 from pathlib import Path
 
 from src.graphs.estados import (ALVO, camadas_do_mapa, construir_g_est, construir_g_pos, graus, metricas_do_mapa, nome_do_movimento, rotulo, sem_alvo)
-from src.graphs.graph import arcos
+from src.graphs.graph import adicionar_arco, arcos
 
 SIMBOLOS_VALIDOS = "#.SG,~abcdABCD><^v+*"
 
+def carregar_dataset(caminho_csv, coluna_peso="PESO"):
+    """Lê um CSV tratado e retorna {origem: [(destino, peso), ...]}.
+
+    O notebook deve exportar SOURCE, TARGET, VOTE, RESULT e a coluna de
+    peso ajustado (PESO por padrão). Não aplica tratamento nem incrementos.
+    Preserva identificadores, ordem dos arcos, laços e arcos paralelos.
+    Colunas adicionais, como um índice exportado pelo pandas, são ignoradas.
+    """
+    grafo = {}
+    with open(caminho_csv, newline="", encoding="utf-8-sig") as arquivo:
+        leitor = csv.DictReader(arquivo)
+        obrigatorias = {"SOURCE", "TARGET", "VOTE", "RESULT", coluna_peso}
+        faltantes = obrigatorias - set(leitor.fieldnames or [])
+        if faltantes:
+            raise ValueError(
+                "CSV tratado: faltam as colunas " + ", ".join(sorted(faltantes)) + "."
+            )
+
+        for linha in leitor:
+            origem = linha["SOURCE"]
+            destino = linha["TARGET"]
+            if not origem or not origem.strip() or not destino or not destino.strip():
+                raise ValueError(
+                    f"CSV tratado, linha {leitor.line_num}: SOURCE e TARGET devem estar preenchidos."
+                )
+            try:
+                peso = int(linha[coluna_peso])
+            except (TypeError, ValueError) as erro:
+                raise ValueError(
+                    f"CSV tratado, linha {leitor.line_num}: {coluna_peso} deve ser um inteiro."
+                ) from erro
+
+            adicionar_arco(grafo, origem, destino, peso)
+
+    return grafo
 
 class Mapa:
     def __init__(self, nome, grade):
@@ -65,10 +100,6 @@ def validar_grade(nome, grade):
         for simbolo in linha:
             if simbolo not in SIMBOLOS_VALIDOS:
                 raise ValueError(f"Mapa {nome}: símbolo desconhecido '{simbolo}' na linha {numero}.")
-
-    for porta in "ABCD":
-        if porta in casas and porta.lower() not in casas:
-            raise ValueError(f"Mapa {nome}: porta {porta} sem a chave {porta.lower()} correspondente.")
 
 
 def exportar_arestas(grafo, mapa, caminho):
