@@ -109,6 +109,12 @@ def bfs(grafo, origem):
 
 #DFS (André Avelino)
 def dfs(grafo, origem, cobrir_todos=False):
+    """Retorna d, f, p, classif e tem_ciclo.
+
+    # [IA] ChatGPT (Codex) – documentação da correção para arcos paralelos.
+    Cada chave de classif é (origem, destino, índice na adjacência da origem).
+    O índice começa em zero e distingue inclusive arcos de mesmo peso.
+    """
     d, f, p = {}, {}, {}
     classif = {}
     tempo = 0
@@ -127,19 +133,21 @@ def dfs(grafo, origem, cobrir_todos=False):
             if i < len(vizinhos):
                 topo[1] += 1
                 v = vizinhos[i][0]
+                # [IA] ChatGPT (Codex) – depuração: identifica cada arco para evitar sobrescrita entre paralelos.
+                arco = (u, v, i)
 
                 if v not in d:
-                    classif[(u, v)] = "arvore"
+                    classif[arco] = "arvore"
                     tempo += 1
                     d[v] = tempo
                     p[v] = u
                     pilha.append([v, 0])
                 elif v not in f:
-                    classif[(u, v)] = "retorno"
+                    classif[arco] = "retorno"
                 elif d[u] < d[v]:
-                    classif[(u, v)] = "avanco"
+                    classif[arco] = "avanco"
                 else:
-                    classif[(u, v)] = "cruzamento"
+                    classif[arco] = "cruzamento"
             else:
                 tempo += 1
                 f[u] = tempo

@@ -4,7 +4,7 @@
 
 O carregador `carregar_dataset(caminho_csv, coluna_peso="PESO")`, em `src/graphs/io.py`, recebe o caminho do CSV tratado exportado pelo notebook. O arquivo deve conter `SOURCE`, `TARGET`, `VOTE`, `RESULT` e `PESO`, com o peso ajustado inteiro já calculado. O nome da coluna de peso pode ser informado pelo argumento `coluna_peso`.
 
-O carregador preserva a direção, a ordem dos arcos, os laços e os arcos paralelos; inclui vértices que aparecem apenas como destino e não recalcula o incremento. O `VOTE` original permanece no CSV. A exportação do CSV com o peso ajustado ainda precisa ser implementada no notebook.
+O carregador preserva a direção, a ordem dos arcos, os laços e os arcos paralelos; inclui vértices que aparecem apenas como destino e não recalcula o incremento. O `VOTE` original permanece no CSV. A exportação do CSV com o peso ajustado está implementada no notebook e foi executada localmente em 21/11/2026.
 
 **Apoio de IA:** ChatGPT (Codex) implementou o carregador e os testes em `tests/test_dataset_io.py`, após André informar que a professora permitiu essa implementação. O grupo deve conferir os resultados esperados dos testes e compreender o código.
 
@@ -33,12 +33,27 @@ Optamos por manter os registros em que SOURCE e TARGET são iguais, pois não po
 
 **Apoio de IA:** ChatGPT (Codex) auxiliou na conferência dos registros usando pandas, no esclarecimento do conceito de laço e na revisão de clareza da justificativa. A decisão de manter os registros foi tomada por André.
 
-**### Validação dos valores**
+### Validação dos valores
 
 Conferimos os valores das colunas VOTE e RESULT após a retirada dos registros sem SOURCE e não encontramos valores fora dos conjuntos previstos. Também não encontramos dados ausentes nos registros restantes, logo não foi necessário realizar outro tratamento nessas colunas.
 
-**### Fechamento do tratamento — prévia a completar**
+### Fechamento do tratamento
 
 Após as conferências, optamos por retirar apenas os registros sem SOURCE, pois não seria possível identificar a origem desses arcos. Mantivemos as linhas repetidas e os registros em que SOURCE é igual a TARGET, pois não possuímos informações suficientes para assegurar que sejam erros. Com isso, passamos de 198.275 para 196.614 registros. Todos os pares repetidos serão mantidos como arcos paralelos. O incremento de peso será aplicado somente dentro dos grupos idênticos nas quatro colunas SOURCE, TARGET, VOTE e RESULT, seguindo a ordem original do CSV, conforme a regra registrada acima.
 
-**Apoio de IA nos dois textos acima:** ChatGPT (Codex) preparou as prévias a partir das contagens verificadas e das decisões já informadas por André. Os campos pendentes devem ser completados por André; o fechamento ainda não é definitivo.
+**Apoio de IA nos dois textos acima:** ChatGPT (Codex) preparou as prévias a partir das contagens verificadas e das decisões já informadas por André. As decisões são de André. Em 21/11/2026, a IA revisou a clareza do registro, sem acrescentar decisões ou interpretações.
+
+
+### Conferência da exportação local — 21/11/2026
+
+O CSV tratado foi gerado em `data/dataset_parte2/processed/wikiRfA_tratado.csv`, com 196.614 registros e as colunas `SOURCE`, `TARGET`, `VOTE`, `RESULT` e `PESO`, sem índice adicional. A conferência com pandas verificou a preservação da ordem e dos valores originais dos registros mantidos, a ausência de faltantes e a igualdade de `PESO` com `VOTE` mais o número da ocorrência dentro de cada grupo de quatro colunas idênticas. O CSV bruto permaneceu inalterado, conferido por SHA-256 antes e depois da execução.
+
+**Apoio de IA:** ChatGPT (Codex) executou as células existentes de tratamento e exportação usando o arquivo bruto local, sem novo download; acrescentou a conferência com pandas e revisou os registros de clareza e estado de execução. Não foram acrescentadas decisões de tratamento, interpretações ou conclusões analíticas.
+
+### Depuração do DFS para arcos paralelos — 21/11/2026
+
+O registro de classificação passou de `(origem, destino)` para `(origem, destino, indice_na_adjacencia)`, com índice começando em zero. Assim, cada ocorrência tem uma chave própria, inclusive quando os extremos e o peso são iguais. O retorno continua sendo `d, f, p, classif, tem_ciclo`; as consultas diretas às chaves nos testes foram adaptadas. Os consumidores em `solve.py` e no servidor do front usam os valores das classificações e não precisam de alteração de formato.
+
+**Apoio de IA:** ChatGPT (Codex) corrigiu a sobrescrita no código de DFS escrito por André, adaptou as consultas dos testes e reforçou as verificações dos dois casos de arcos paralelos já adicionados por André a partir de sugestões de IA. O grupo deve conferir os resultados e compreender a mudança de chave.
+
+**Verificação:** na suíte completa executada com Python em modo UTF-8, 41 testes passaram e um falhou: `test_porta_sem_chave_correspondente_gera_erro_claro`, pois a validação de mapas não lançou o erro esperado. A falha ocorre no IO de mapas, cujo código não foi alterado nesta depuração.
