@@ -1,0 +1,86 @@
+{
+  "algoritmo": "DIJKSTRA",
+  "arquivo_entrada": "data/dataset_parte2/processed/wikiRfA_tratado.csv",
+  "coluna_peso_base": "PESO",
+  "transformacao": "novo_peso = PESO + deslocamento",
+  "deslocamento": 1,
+  "vertices": 11376,
+  "buscas_por_origem": 3,
+  "resultados": [
+    {
+      "origem": "Siva1979",
+      "destino": "(aeropagitica)",
+      "status": "OK",
+      "caminho": [
+        "Siva1979",
+        "HighwayCello",
+        "ILovePlankton",
+        "(aeropagitica)"
+      ],
+      "quantidade_arcos": 3,
+      "custo_transformado": 0
+    },
+    {
+      "origem": "Siva1979",
+      "destino": "Dieter Simon",
+      "status": "OK",
+      "caminho": [
+        "Siva1979",
+        "Sceptre",
+        "Ed Poor",
+        "Snoyes",
+        "Maximus Rex",
+        "Dieter Simon"
+      ],
+      "quantidade_arcos": 5,
+      "custo_transformado": 6
+    },
+    {
+      "origem": "'sed",
+      "destino": "9cds",
+      "status": "OK",
+      "caminho": [
+        "'sed",
+        "Yanksox",
+        "9cds"
+      ],
+      "quantidade_arcos": 2,
+      "custo_transformado": 2
+    },
+    {
+      "origem": "'sed",
+      "destino": "Caltrop",
+      "status": "OK",
+      "caminho": [
+        "'sed",
+        "Yanksox",
+        "R. Baley",
+        "Everyking",
+        "Guanaco",
+        "Chancemill",
+        "Hemanshu",
+        "Caltrop"
+      ],
+      "quantidade_arcos": 7,
+      "custo_transformado": 8
+    },
+    {
+      "origem": "!---slappdash---!",
+      "destino": "Caltrop",
+      "status": "OK",
+      "caminho": [
+        "!---slappdash---!",
+        "Tedder",
+        "Unionhawk",
+        "Kww",
+        "Everyking",
+        "Guanaco",
+        "Chancemill",
+        "Hemanshu",
+        "Caltrop"
+      ],
+      "quantidade_arcos": 8,
+      "custo_transformado": 8
+    }
+  ]
+}
