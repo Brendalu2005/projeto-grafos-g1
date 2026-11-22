@@ -100,6 +100,9 @@ def validar_grade(nome, grade):
         for simbolo in linha:
             if simbolo not in SIMBOLOS_VALIDOS:
                 raise ValueError(f"Mapa {nome}: símbolo desconhecido '{simbolo}' na linha {numero}.")
+    for porta in "ABCD":
+        if porta in casas and porta.lower() not in casas:
+            raise ValueError(f"Mapa {nome}: porta {porta} sem a chave {porta.lower()} correspondente.")
 
 
 def exportar_arestas(grafo, mapa, caminho):

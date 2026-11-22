@@ -113,4 +113,4 @@ Wiki-RfA: votos de usuários da Wikipédia nas eleições para administrador, de
 
 ## Uso de IA
 
-Seguimos as regras de IA do enunciado. Todo trecho de código feito com apoio de IA leva a marca `# [IA] <ferramenta> – <finalidade>`, cada uso fica registrado em [`docs/registro_ia.md`](docs/registro_ia.md), e a declaração assinada por todos fica em `docs/DECLARACAO_IA.pdf`.
+Seguimos as regras de IA do enunciado. Todo trecho de código feito com apoio de IA leva a marca `# [IA] <ferramenta> – <finalidade>`, cada uso fica registrado em [`docs/registro_ia.md`](docs/DECLARACAO_IA.md), e a declaração assinada por todos fica em `docs/DECLARACAO_IA.pdf`.
