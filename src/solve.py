@@ -1,12 +1,14 @@
 import math
 import csv
 import shutil
+import hashlib
+import json
 from pathlib import Path
 
 from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra, reconstruir_caminho
 from src.graphs.estados import ALVO, construir_g_est, estado_inicial, rotulo
 from src.graphs.io import (exportar_parte1, exportar_arestas, exportar_graus,
-                           ler_mapa, escrever_json)
+                           ler_mapa, escrever_json, carregar_dataset)
 from src.graphs.estados import (camadas_do_mapa, construir_g_pos,
                                 graus, metricas_do_mapa, sem_alvo)
 
@@ -244,3 +246,245 @@ def resolver_todos(pastas, pasta_saida, fonte_consumivel=False):
         elif resultado["status"] == "CICLO_NEGATIVO":
             escrever_json({"mapa": resultado["mapa"], "algoritmo": algoritmo,
                            "status": resultado["status"], "ciclo": resultado["ciclo"]}, pasta_saida / nome)
+
+
+# [IA] ChatGPT (Codex) – integração da Parte 2 autorizada por André; escolhas copiadas do notebook.
+FONTES_DATASET = ["Siva1979", "'sed", "!---slappdash---!"]
+PARES_DATASET = [
+    ("Siva1979", "(aeropagitica)"),
+    ("Siva1979", "Dieter Simon"),
+    ("'sed", "9cds"),
+    ("'sed", "Caltrop"),
+    ("!---slappdash---!", "Caltrop"),
+]
+CASOS_BELLMAN = {
+    "negativo_sem_ciclo": {
+        "usuarios": ["Malleus Fatuorum", "BDD"],
+        "fonte": "Malleus Fatuorum",
+    },
+    "ciclo_negativo": {
+        "usuarios": ["Rcsprinter123", "Jasper Deng"],
+        "fonte": "Rcsprinter123",
+    },
+}
+
+
+# [IA] ChatGPT (Codex) – organização dos retornos dos algoritmos existentes, sem reimplementá-los.
+def resultado_busca_dataset(grafo, fonte, algoritmo):
+    if fonte not in grafo:
+        raise ValueError(f"Fonte não encontrada no grafo: {fonte}")
+    if algoritmo == "BFS":
+        distancias, predecessores = bfs(grafo, fonte)
+        finitas = [d for d in distancias.values() if d != math.inf]
+        return {
+            "fonte": fonte,
+            "grau_saida_fonte": len(grafo[fonte]),
+            "outros_usuarios_alcancados": len(finitas) - 1,
+            "maior_distancia_finita": max(finitas),
+            "distancias": {v: None if d == math.inf else d for v, d in distancias.items()},
+            "predecessores": predecessores,
+        }
+    if algoritmo != "DFS":
+        raise ValueError("A busca deve ser BFS ou DFS.")
+    descoberta, termino, predecessores, classificacao, tem_ciclo = dfs(grafo, fonte)
+    contagens = {tipo: 0 for tipo in ("arvore", "retorno", "avanco", "cruzamento")}
+    for tipo in classificacao.values():
+        contagens[tipo] += 1
+    return {
+        "fonte": fonte,
+        "vertices_alcancados_incluindo_fonte": len(descoberta),
+        "outros_usuarios_alcancados": len(descoberta) - 1,
+        "ordem_descoberta": list(descoberta),
+        "tempos_descoberta": descoberta,
+        "tempos_termino": termino,
+        "predecessores": predecessores,
+        "arcos_classificados": len(classificacao),
+        "classificacao_arcos": contagens,
+        "tem_ciclo": tem_ciclo,
+    }
+
+
+# [IA] ChatGPT (Codex) – aplica a transformação já definida por Brenda em uma cópia.
+def transformar_pesos_dataset(grafo, deslocamento):
+    if deslocamento < 0:
+        raise ValueError("O deslocamento deve ser não negativo.")
+    return {
+        origem: [(destino, peso + deslocamento) for destino, peso in vizinhos]
+        for origem, vizinhos in grafo.items()
+    }
+
+
+# [IA] ChatGPT (Codex) – exportação de um par a partir dos retornos do Dijkstra existente.
+def resultado_par_dataset(distancias, predecessores, origem, destino):
+    if destino not in distancias:
+        raise ValueError(f"Destino não encontrado no grafo: {destino}")
+    alcancavel = distancias[destino] != math.inf
+    caminho = reconstruir_caminho(distancias, predecessores, destino) if alcancavel else []
+    return {
+        "origem": origem,
+        "destino": destino,
+        "status": "OK" if alcancavel else "SEM_CAMINHO",
+        "caminho": caminho,
+        "quantidade_arcos": len(caminho) - 1 if alcancavel else None,
+        "custo_transformado": distancias[destino] if alcancavel else None,
+    }
+
+
+# [IA] ChatGPT (Codex) – reproduz os recortes e chamadas de Bellman-Ford já conferidos no notebook.
+def resultado_bellman_dataset(caminho_csv, caso):
+    if caso not in CASOS_BELLMAN:
+        raise ValueError(f"Caso de Bellman-Ford desconhecido: {caso}")
+    selecao = CASOS_BELLMAN[caso]
+    usuarios = selecao["usuarios"]
+    fonte = selecao["fonte"]
+    completo = carregar_dataset(caminho_csv)
+    if any(usuario not in completo for usuario in usuarios):
+        raise ValueError(f"O CSV não contém todos os usuários do caso {caso}.")
+    grafo = {usuario: [] for usuario in usuarios}
+    arcos = []
+    with open(caminho_csv, newline="", encoding="utf-8-sig") as arquivo:
+        for indice, linha in enumerate(csv.DictReader(arquivo)):
+            origem, destino = linha["SOURCE"], linha["TARGET"]
+            if origem not in grafo or destino not in grafo:
+                continue
+            peso = int(linha["PESO"])
+            arcos.append({
+                "indice_registro_csv_base_zero": indice,
+                "linha_csv_com_cabecalho": indice + 2,
+                "origem": origem, "destino": destino,
+                "indice_adjacencia": len(grafo[origem]),
+                "VOTE": int(linha["VOTE"]), "RESULT": int(linha["RESULT"]), "PESO": peso,
+            })
+            grafo[origem].append((destino, peso))
+    if not any(arco["PESO"] < 0 for arco in arcos):
+        raise ValueError(f"O recorte {caso} não contém peso negativo neste CSV.")
+    distancias, predecessores, ciclo = bellman_ford(grafo, fonte)
+    if (ciclo is not None) != (caso == "ciclo_negativo"):
+        raise ValueError(f"O recorte {caso} não reproduziu o comportamento registrado no notebook.")
+    if ciclo is None and any(d == math.inf for d in distancias.values()):
+        raise ValueError(f"O recorte {caso} contém usuário inalcançável pela fonte registrada.")
+    resultado = {
+        "id": caso, "fonte": fonte, "usuarios": usuarios,
+        "vertices": len(grafo), "arcos": arcos, "tem_ciclo_negativo": ciclo is not None,
+    }
+    if ciclo is None:
+        resultado.update({
+            "status": "OK",
+            "distancias": {v: None if d == math.inf else d for v, d in distancias.items()},
+            "predecessores": predecessores,
+            "caminhos": {
+                v: [] if distancias[v] == math.inf else reconstruir_caminho(distancias, predecessores, v)
+                for v in grafo
+            },
+        })
+        return resultado
+    arcos_ciclo = []
+    for origem, destino in zip(ciclo, ciclo[1:]):
+        candidatos = [a for a in arcos if a["origem"] == origem and a["destino"] == destino]
+        if len(candidatos) != 1:
+            raise ValueError("Ciclo com arcos paralelos: é necessário identificar a ocorrência utilizada.")
+        arcos_ciclo.append(candidatos[0])
+    resultado.update({
+        "status": "CICLO_NEGATIVO", "ciclo": ciclo, "arcos_ciclo": arcos_ciclo,
+        "custo_ciclo": sum(a["PESO"] for a in arcos_ciclo), "distancias": None,
+        "observacao_distancias": "Valores provisórios da execução com ciclo negativo não são apresentados como custos mínimos finitos.",
+    })
+    return resultado
+
+
+# [IA] ChatGPT (Codex) – execução individual da Parte 2 e validação de parâmetros.
+def resolver_dataset(caminho_csv, algoritmo, fonte=None, destino=None, caso=None, deslocamento=0):
+    if algoritmo not in ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD"):
+        raise ValueError(f"Algoritmo desconhecido: {algoritmo}")
+    if algoritmo == "BELLMAN_FORD":
+        if fonte is not None or destino is not None or deslocamento != 0:
+            raise ValueError("Os casos de Bellman-Ford já definem a fonte e usam PESO sem deslocamento.")
+        resultado = resultado_bellman_dataset(caminho_csv, caso)
+        return {"algoritmo": algoritmo, "arquivo_entrada": Path(caminho_csv).as_posix(),
+                "coluna_peso": "PESO", "resultado": resultado}
+    if caso is not None:
+        raise ValueError("--caso é exclusivo de BELLMAN_FORD.")
+    grafo = carregar_dataset(caminho_csv)
+    if fonte not in grafo:
+        raise ValueError(f"Fonte não encontrada no grafo: {fonte}")
+    relatorio = {"algoritmo": algoritmo, "arquivo_entrada": Path(caminho_csv).as_posix(),
+                 "coluna_peso_carregada": "PESO", "vertices": len(grafo)}
+    if algoritmo in ("BFS", "DFS"):
+        if destino is not None or deslocamento != 0:
+            raise ValueError("BFS e DFS recebem apenas a fonte e não aplicam deslocamento.")
+        relatorio["pesos_considerados_na_busca"] = False
+        if algoritmo == "BFS":
+            relatorio["unidade_distancia"] = "arcos"
+        else:
+            relatorio["cobrir_todos"] = False
+            relatorio["ordem_vizinhos"] = "ordem dos arcos no CSV tratado, preservada pelo carregador"
+            relatorio["identidade_arco"] = "(origem, destino, indice_na_adjacencia), com indice iniciando em zero"
+        relatorio["resultado"] = resultado_busca_dataset(grafo, fonte, algoritmo)
+    else:
+        if destino not in grafo:
+            raise ValueError(f"Destino não encontrado no grafo: {destino}")
+        transformado = transformar_pesos_dataset(grafo, deslocamento)
+        distancias, predecessores = dijkstra(transformado, fonte)
+        relatorio["transformacao"] = "novo_peso = PESO + deslocamento"
+        relatorio["deslocamento"] = deslocamento
+        relatorio["resultado"] = resultado_par_dataset(distancias, predecessores, fonte, destino)
+    return relatorio
+
+
+# [IA] ChatGPT (Codex) – JSON estrito: distâncias inalcançáveis são convertidas antes da gravação.
+def salvar_resultado_dataset(resultado, caminho):
+    caminho = Path(caminho)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    caminho.write_text(json.dumps(resultado, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+
+
+# [IA] ChatGPT (Codex) – reprodução dos experimentos existentes; não executa benchmark.
+def executar_experimentos_dataset(caminho_csv, pasta_saida):
+    grafo = carregar_dataset(caminho_csv)
+    entrada = Path(caminho_csv).as_posix()
+    saida = Path(pasta_saida)
+    arquivos = []
+    for algoritmo, nome in (("BFS", "bfs_fontes.json"), ("DFS", "dfs_fontes.json")):
+        relatorio = {
+            "algoritmo": algoritmo, "arquivo_entrada": entrada,
+            "coluna_peso_carregada": "PESO", "pesos_considerados_na_busca": False,
+            "vertices": len(grafo),
+            "resultados": [resultado_busca_dataset(grafo, fonte, algoritmo) for fonte in FONTES_DATASET],
+        }
+        if algoritmo == "BFS":
+            relatorio["unidade_distancia"] = "arcos"
+        else:
+            relatorio.update({
+                "cobrir_todos": False,
+                "ordem_vizinhos": "ordem dos arcos no CSV tratado, preservada pelo carregador",
+                "identidade_arco": "(origem, destino, indice_na_adjacencia), com indice iniciando em zero",
+            })
+        salvar_resultado_dataset(relatorio, saida / nome)
+        arquivos.append(saida / nome)
+    transformado = transformar_pesos_dataset(grafo, 1)
+    buscas = {}
+    pares = []
+    for fonte, destino in PARES_DATASET:
+        if fonte not in buscas:
+            buscas[fonte] = dijkstra(transformado, fonte)
+        distancias, predecessores = buscas[fonte]
+        pares.append(resultado_par_dataset(distancias, predecessores, fonte, destino))
+    relatorio = {
+        "algoritmo": "DIJKSTRA", "arquivo_entrada": entrada, "coluna_peso_base": "PESO",
+        "transformacao": "novo_peso = PESO + deslocamento", "deslocamento": 1,
+        "vertices": len(grafo), "buscas_por_origem": len(buscas), "resultados": pares,
+    }
+    salvar_resultado_dataset(relatorio, saida / "dijkstra_pares.json")
+    arquivos.append(saida / "dijkstra_pares.json")
+    relatorio = {
+        "algoritmo": "BELLMAN_FORD", "arquivo_entrada": entrada,
+        "sha256_entrada": hashlib.sha256(Path(caminho_csv).read_bytes()).hexdigest(),
+        "coluna_peso": "PESO",
+        "regra_recorte": "subgrafo induzido pelos usuários informados; todas as ocorrências entre eles são preservadas",
+        "selecao": "exemplos mínimos sugeridos por Codex para conferência e justificativa autoral de André",
+        "benchmark": False,
+        "resultados": [resultado_bellman_dataset(caminho_csv, caso) for caso in CASOS_BELLMAN],
+    }
+    salvar_resultado_dataset(relatorio, saida / "bellman_ford_casos.json")
+    arquivos.append(saida / "bellman_ford_casos.json")
+    return arquivos

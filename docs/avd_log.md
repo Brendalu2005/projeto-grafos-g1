@@ -71,3 +71,29 @@ As conferências técnicas verificaram a quantidade de arcos classificados, a qu
 Após André solicitar também sugestões de recortes e fontes, Codex sugeriu dois subgrafos induzidos de dois usuários, preservando todos os registros entre eles e a coluna PESO. O primeiro usa Malleus Fatuorum e BDD, com fonte Malleus Fatuorum. O segundo usa Rcsprinter123 e Jasper Deng, com fonte Rcsprinter123. Os registros selecionados pertencem ao CSV tratado; suas posições e o SHA-256 da entrada constam em `out/parte2/bellman_ford_casos.json`.
 
 Codex acrescentou e executou chamadas do Bellman-Ford existente, conferências técnicas e exportação no notebook de experimentos. A implementação do algoritmo não foi alterada. André informou autorização da professora para dispensar novos marcadores; os registros anteriores foram preservados. A escolha final, a conferência manual, as justificativas e a interpretação autoral permanecem com André. Não foram feitas medições de desempenho nem produzidas conclusões analíticas. Os dados e os JSONs anteriores foram preservados, conferidos por SHA-256.
+
+### Integração da Parte 2 na CLI — 23/11/2026
+
+Foram acrescentadas funções em `src/solve.py` para chamar os algoritmos existentes
+no CSV tratado e reproduzir os experimentos registrados no notebook. Em `src/cli.py`,
+foram adicionadas as opções `--dataset`, `--source`, `--target`, `--deslocamento`,
+`--caso` e `--experimentos`, com validação das combinações. A execução dos mapas
+permanece disponível. Fontes, pares, recortes e a transformação de Dijkstra são os
+mesmos já registrados pelo grupo; nenhum algoritmo foi reimplementado.
+
+O modo `--experimentos` reproduz as quatro saídas de BFS, DFS, Dijkstra e Bellman-Ford.
+Os resultados foram comparados com os JSONs existentes e coincidiram integralmente
+no campo `resultados`. Também foram executados comandos individuais dos quatro
+algoritmos no CSV local. Essas verificações usaram saídas temporárias; o CSV e os
+JSONs existentes permaneceram inalterados, conferidos por SHA-256.
+
+O README foi atualizado com os comandos e as convenções das saídas. Os testes em
+`tests/test_parte2_cli.py` cobrem integração, entradas inválidas, arcos paralelos,
+distâncias inalcançáveis, recortes de Bellman-Ford, reprodução dos experimentos e
+compatibilidade da CLI com mapas. O benchmark continua separado desta integração.
+
+**Apoio de IA:** ChatGPT (Codex) implementou esta integração, seus testes e a documentação
+após André autorizar expressamente a geração da implementação nesta conversa,
+pedindo código limpo, simples e direto. Foram inseridos marcadores nas funções e
+blocos correspondentes. O grupo deve compreender e conferir o código e registrar
+esse apoio na declaração conjunta. Não foram geradas interpretações ou conclusões analíticas.

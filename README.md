@@ -59,7 +59,58 @@ python -m src.front.server
 
 As exportações em lote incluem arestas, graus, métricas globais, camadas, soluções, classificação DFS, comparação das três modelagens, estados-armadilha, percurso do m03 e ciclo negativo do m06. A interface serve os resultados calculados pelo projeto; execute o servidor a partir da raiz para que mapas e CSVs sejam encontrados. O controle “Regra da fonte” permite comparar o cenário original com a fonte consumível.
 
-Os comandos de execução do dataset da Parte 2 ainda não estão implementados na CLI.
+### Parte 2: dataset
+
+Primeiro, execute `data/dataset_parte2/baixar_wikiRfA.ipynb` para obter o CSV bruto e
+exportar `data/dataset_parte2/processed/wikiRfA_tratado.csv`. O arquivo tratado deve
+conter `SOURCE`, `TARGET`, `VOTE`, `RESULT` e `PESO`. A CLI recebe o caminho desse
+arquivo, não a pasta, e não reaplica o tratamento nem o incremento das repetições.
+
+Na raiz do repositório:
+
+```powershell
+# Reproduzir os experimentos registrados: BFS/DFS em três fontes,
+# Dijkstra em cinco pares com PESO + 1 e os dois recortes de Bellman-Ford.
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --experimentos --out out/parte2/
+
+# Uma busca DFS ou BFS, sem considerar os pesos.
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --alg DFS --source Siva1979
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --alg BFS --source Siva1979
+
+# Dijkstra com a transformação documentada por Brenda.
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --alg DIJKSTRA --source Siva1979 --target "Dieter Simon" --deslocamento 1
+
+# Casos de Bellman-Ford já selecionados e conferidos no notebook.
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --alg BELLMAN_FORD --caso negativo_sem_ciclo
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --alg BELLMAN_FORD --caso ciclo_negativo
+```
+
+O destino padrão é `out/parte2/` para datasets e `out/parte1/` para mapas.
+Uma execução individual grava `solucao_dataset_<ALGORITMO>.json`; Bellman-Ford
+inclui também o nome do caso. Repetir a execução com o mesmo algoritmo e destino
+sobrescreve esse arquivo; use pastas diferentes em `--out` para guardar execuções
+individuais separadamente. `--experimentos` grava `bfs_fontes.json`, `dfs_fontes.json`,
+`dijkstra_pares.json` e `bellman_ford_casos.json`, reproduzindo os resultados do notebook.
+As métricas continuam sendo calculadas pelo notebook de tratamento.
+
+O deslocamento é exclusivo do Dijkstra e vale zero por padrão: sem a opção,
+o algoritmo recusa o grafo se houver peso negativo. Com `--deslocamento 1`, o custo
+exportado usa `PESO + 1`, não os pesos originais. BFS e DFS ignoram os pesos.
+O DFS exporta tempos de descoberta e término, que são contadores de eventos,
+não medições de desempenho. Usuários inalcançáveis têm distância `null`.
+
+Na CLI, Bellman-Ford executa somente os dois recortes registrados, com suas fontes
+fixas e PESO sem deslocamento. A saída identifica cada arco do ciclo e seu custo;
+não apresenta distâncias provisórias do caso com ciclo negativo como mínimos finitos.
+Outros recortes devem ser definidos e conferidos pelo grupo antes de serem integrados.
+
+Esta integração não executa o benchmark e não gera `parte2_report.json`.
+As opções `--dataset` e `--mapa` são mutuamente exclusivas. Parâmetros específicos
+dos mapas não são aceitos com dataset. Use `python -m src.cli --help` para consultar as opções.
+
+**Apoio de IA:** ChatGPT (Codex) auxiliou na integração, nos testes e na documentação
+da CLI da Parte 2, conforme autorização de André. Os algoritmos existentes não foram
+reescritos. As escolhas de fontes, pares, recortes e transformação seguem o notebook.
 
 ## Testes
 
