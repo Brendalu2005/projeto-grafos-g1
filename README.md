@@ -232,8 +232,51 @@ python -m pytest tests/test_benchmark.py -v
 | `dfs_fontes.json` | Resultados de DFS em três fontes. |
 | `bellman_ford_casos.json` | Casos pequenos com e sem ciclo negativo; não substituem o benchmark de escalabilidade. |
 | `benchmark_bfs_dijkstra.json` | 18 configurações, 90 tempos medidos, estatísticas e ambiente de BFS e Dijkstra. |
+| `benchmark_dfs_bellman.json` | 16 configurações, 80 tempos medidos, estatísticas e ambiente de DFS e Bellman-Ford; apenas uma fonte de Bellman-Ford em 100%, conforme decisão de André. |
 
-O relatório final `out/parte2/parte2_report.json` ainda depende das medições de DFS e Bellman-Ford e da consolidação. As visualizações e a discussão crítica também permanecem pendentes.
+O relatório final `out/parte2/parte2_report.json` ainda depende da consolidação das
+duas contribuições de benchmark. As medições de DFS e Bellman-Ford foram concluídas;
+o procedimento, a redução de escopo e os cuidados com os ambientes estão em
+[entrega_benchmark_andre.md](docs/entrega_benchmark_andre.md). As visualizações e a
+discussão crítica também permanecem pendentes.
+
+### Benchmark de DFS e Bellman-Ford
+
+Na raiz do projeto, com o CSV tratado disponível:
+
+```powershell
+python -m src.benchmark_dfs_bellman
+```
+
+O executor usa `criar_recortes`, `selecionar_fontes` e `medir_algoritmo`, de
+`src/benchmark.py`, com a mesma semente, recortes e fontes de BFS/Dijkstra.
+DFS e Bellman-Ford recebem `PESO`, sem deslocamento. Apenas a chamada do algoritmo
+entra no tempo: leitura, preparação, contagem de alcance e exportação ficam fora.
+Cada configuração tem um aquecimento e cinco repetições medidas.
+
+DFS usa três fontes nos três tamanhos. Por decisão de André durante a execução,
+Bellman-Ford preserva as três fontes em 10% e 50% e usa apenas `Siva1979` em 100%.
+São 16 configurações e 80 tempos medidos. Para reproduzir a alternativa de três
+fontes também em 100%, use `--fontes-bellman-completo 3` com outro arquivo de saída.
+
+As configurações concluídas são salvas em `out/parte2/benchmark_dfs_bellman.json`.
+O campo `completo` fica falso durante a execução e só muda para verdadeiro após
+concluir todas as configurações. Um arquivo parcial não atende à entrega completa.
+O executor registra seu próprio ambiente; preserve os ambientes de cada contribuição
+na consolidação. Ele não modifica o benchmark entregue por Brenda nem gera o
+relatório final `parte2_report.json`.
+
+Para preservar medições anteriores, o executor recusa uma saída que já existe.
+Em uma nova execução, use outro nome:
+
+```powershell
+python -m src.benchmark_dfs_bellman --out out/parte2/benchmark_dfs_bellman_nova_execucao.json
+```
+
+O Bellman-Ford atual faz todas as passagens pelo grafo; as configurações maiores
+podem demorar. Os dois casos mínimos de correção não substituem estas medições.
+
+<!-- [IA] ChatGPT (Codex) – documentação da execução de benchmark solicitada por André. -->
 
 <!-- [IA] ChatGPT (Codex) – organização da documentação da Parte 2 com as decisões e os resultados já registrados pela equipe. -->
 

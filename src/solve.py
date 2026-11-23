@@ -248,7 +248,7 @@ def resolver_todos(pastas, pasta_saida, fonte_consumivel=False):
                            "status": resultado["status"], "ciclo": resultado["ciclo"]}, pasta_saida / nome)
 
 
-# [IA] ChatGPT (Codex) – integração da Parte 2 autorizada por André; escolhas copiadas do notebook.
+# [IA] ChatGPT (Codex) – integração da Parte 2, escolhas copiadas do notebook.
 FONTES_DATASET = ["Siva1979", "'sed", "!---slappdash---!"]
 PARES_DATASET = [
     ("Siva1979", "(aeropagitica)"),

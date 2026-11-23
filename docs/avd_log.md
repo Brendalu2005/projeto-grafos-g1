@@ -97,3 +97,37 @@ após André autorizar expressamente a geração da implementação nesta conver
 pedindo código limpo, simples e direto. Foram inseridos marcadores nas funções e
 blocos correspondentes. O grupo deve compreender e conferir o código e registrar
 esse apoio na declaração conjunta. Não foram geradas interpretações ou conclusões analíticas.
+
+### Benchmark de DFS e Bellman-Ford e entrega para consolidação — 23/11/2026
+
+Por solicitação de André, foram executadas medições dos algoritmos existentes
+usando `criar_recortes`, `selecionar_fontes` e `medir_algoritmo`, de `src/benchmark.py`.
+Foram preservados semente 42, recortes de 10%, 50% e 100% das ocorrências de arcos,
+fontes Siva1979, Gwynand e John Carter e PESO sem deslocamento. Preparação, alcance
+e exportação ficaram fora do cronômetro. Cada configuração concluída tem um
+aquecimento completo e cinco repetições medidas.
+
+André inicialmente escolheu três fontes também para Bellman-Ford. Durante a
+execução, autorizou concluir somente Siva1979 em 100%, mantendo as três fontes
+já medidas em 10% e 50%. DFS manteve três fontes nos três tamanhos. O conjunto
+final contém 16 configurações e 80 tempos em `out/parte2/benchmark_dfs_bellman.json`,
+com `completo: true`. O processo foi encerrado depois de salvar a última configuração
+selecionada. O aquecimento iniciado para Gwynand em 100% foi interrompido e não
+integra as medições ou estatísticas. A redução consta nos metadados do JSON e no executor.
+
+As conferências verificaram o conjunto exato de configurações, cinco tempos finitos
+por configuração, as estatísticas recalculadas e o SHA-256 do CSV. Tamanhos,
+fontes, graus e alcances coincidiram com as configurações correspondentes do
+benchmark de BFS/Dijkstra. Os 75 testes da suíte passaram após a execução.
+
+O executor reproduzível está em `src/benchmark_dfs_bellman.py`; o roteiro de entrega
+para Brenda está em `docs/entrega_benchmark_andre.md`. A consolidação em
+`parte2_report.json` permanece com Brenda, conforme o cronograma. Os ambientes das
+duas contribuições são diferentes e devem permanecer identificados. Não foram
+produzidas interpretações de desempenho, comparações com a complexidade teórica
+ou conclusões analíticas.
+
+**Apoio de IA:** ChatGPT (Codex) preparou e executou as chamadas e exportações do
+benchmark, acrescentou testes de integração e registrou as decisões expressas de
+André. As implementações de DFS e Bellman-Ford não foram alteradas nesta tarefa.
+André deve conferir e compreender o código e elaborar sua análise autoral.
