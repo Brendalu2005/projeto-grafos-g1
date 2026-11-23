@@ -110,14 +110,14 @@ def escrever_csv(linhas, colunas, caminho):
 
 
 # [IA] ChatGPT (Codex) – IMPLEMENTA AS FUNÇÕES DE EXPORTAÇÃO
-def exportar_armadilhas(pastas, pasta_saida):
+def exportar_armadilhas(pastas, pasta_saida, fonte_consumivel=False):
     pasta_saida = Path(pasta_saida)
     pasta_saida.mkdir(parents=True, exist_ok=True)
     resumos = []
     for pasta in pastas:
         for caminho in sorted(Path(pasta).glob("*.txt")):
             mapa = ler_mapa(caminho)
-            grafo = construir_g_est(mapa)
+            grafo = construir_g_est(mapa, fonte_consumivel)
             armadilhas = estados_armadilha_local(grafo, estado_inicial(mapa))
             vertices, arcos_sem_alvo = sem_alvo(grafo)
             _, graus_saida = graus(vertices, arcos_sem_alvo)
@@ -231,7 +231,7 @@ def resolver_todos(pastas, pasta_saida, fonte_consumivel=False):
         exportar_metricas_variante(pastas, pasta_saida, True)
     else:
         exportar_parte1(pastas, pasta_saida)
-    exportar_armadilhas(pastas, pasta_saida)
+    exportar_armadilhas(pastas, pasta_saida, fonte_consumivel)
     exportar_comparacao(pastas, pasta_saida, fonte_consumivel)
     escrever_json({"fonte_consumivel": fonte_consumivel,
                    "mapas": [Path(p).name for p in pastas]}, pasta_saida / "configuracao_parte1.json")
