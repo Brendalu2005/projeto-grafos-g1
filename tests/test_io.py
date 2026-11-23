@@ -41,6 +41,14 @@ def test_mapa_com_simbolo_desconhecido_gera_erro_claro(tmp_path):
         ler_mapa(caminho)
 
 
+# [IA] Claude - testa a rejeição de portas sem chave correspondente.
+def test_mapa_com_porta_sem_chave_gera_erro_claro(tmp_path):
+    caminho = tmp_path / "porta_sem_chave.txt"
+    caminho.write_text("#####\n#SAG#\n#####\n")
+    with pytest.raises(ValueError, match="porta A sem a chave a"):
+        ler_mapa(caminho)
+
+
 def test_porta_sem_chave_correspondente_gera_erro_claro(tmp_path):
     caminho = tmp_path / "porta.txt"
     caminho.write_text("######\n#S.AG#\n######\n", encoding="utf-8")

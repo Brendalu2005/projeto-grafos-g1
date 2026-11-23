@@ -131,19 +131,21 @@ def percurso_colorido(caminho_mapa, resultado, caminho_png):
             continue
         pos, keys, _ = label.split("|")
         linha, coluna = map(int, pos.strip("()").split(","))
-        camada = 0 if keys == "-" else len(keys)
+        camada = "" if keys == "-" else keys
         estados.append((linha, coluna, camada))
     figura, eixo = plt.subplots(figsize=(max(9, mapa.colunas * .28), max(5, mapa.linhas * .28)))
     eixo.set_facecolor("#252a2e")
     grade = [[0 if mapa.casa(r, c) == "#" else 1 for c in range(mapa.colunas)] for r in range(mapa.linhas)]
     eixo.imshow(grade, cmap=ListedColormap(["#30363b", "#f3f0e8"]), vmin=0, vmax=1)
-    cores = ["#2878b5", "#ed9b40", "#51a66b", "#a564bd"]
-    for camada in range(4):
+    camadas_percurso = list(dict.fromkeys(k for _, _, k in estados))
+    paleta = plt.get_cmap("tab20", max(1, len(camadas_percurso)))
+    for indice, camada in enumerate(camadas_percurso):
         pontos = [(c, r) for r, c, k in estados if k == camada]
         if pontos:
             xs, ys = zip(*pontos)
-            eixo.plot(xs, ys, color=cores[camada], linewidth=3, marker="o", markersize=4,
-                      label=f"camada com {camada} chave(s)", zorder=3)
+            nome_camada = camada or "-"
+            eixo.plot(xs, ys, color=paleta(indice), linewidth=3, marker="o", markersize=4,
+                      label=f"chaves {nome_camada}", zorder=3)
     for r, linha in enumerate(mapa.grade):
         for c, simbolo in enumerate(linha):
             if simbolo in "SGabcdABCD><^v+*":
@@ -155,7 +157,7 @@ def percurso_colorido(caminho_mapa, resultado, caminho_png):
     eixo.set_xticks(range(mapa.colunas))
     eixo.set_yticks(range(mapa.linhas))
     eixo.grid(alpha=.12)
-    eixo.legend(loc="upper center", bbox_to_anchor=(.5, -0.08), ncol=4)
+    eixo.legend(loc="upper center", bbox_to_anchor=(.5, -0.08), ncol=min(5, max(1, len(camadas_percurso))))
     figura.tight_layout()
     figura.savefig(caminho_png, dpi=170, bbox_inches="tight")
     plt.close(figura)
@@ -194,8 +196,8 @@ def grafo_estados_camadas(caminho_mapa, caminho_png):
     eixo.scatter(*posicao[ALVO], s=250, marker="s", color="#d66c5c", label="ALVO", zorder=2)
     eixo.text(*posicao[ALVO], ALVO, ha="center", va="center", fontsize=7, color="white", zorder=3)
     for x, nome in enumerate(camadas):
-        eixo.text(x * 3, 1.0, f"Camada {nome}", ha="center", va="bottom", fontweight="bold")
-    eixo.set_title("Grafo de estados do m02 organizado por conjunto de chaves")
+        eixo.text(x * 3, 1.6, f"Camada {nome}", ha="center", va="bottom", fontweight="bold")
+    eixo.set_title("Grafo de estados do m02 organizado por conjunto de chaves", pad=24)
     eixo.legend(loc="upper center", bbox_to_anchor=(.5, -0.02), ncol=max(1, len(camadas) + 1))
     eixo.axis("off")
     figura.tight_layout()
