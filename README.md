@@ -212,7 +212,7 @@ Com o ambiente virtual e as dependências instalados, abra os notebooks no VS Co
 3. Execute em ordem as seções de BFS, transformação e Dijkstra para gerar os casos obrigatórios. As seções 8 a 11 contêm os experimentos de DFS e os casos de Bellman-Ford.
 4. Para o benchmark de BFS e Dijkstra, execute as seções 12 a 15, após 1 e 2. Elas preparam recortes e fontes, calculam alcance fora do cronômetro, fazem as medições e exportam o ambiente e os resultados. Não é necessário executar DFS ou Bellman-Ford para essas medições.
 
-O benchmark usa recortes aninhados de 10%, 50% e 100% dos arcos embaralhados com semente 42. As fontes selecionadas no menor recorte são `Siva1979`, `Gwynand` e `John Carter`. Cada configuração tem um aquecimento fora do cronômetro e cinco repetições medidas. As definições completas estão em [docs/benchmark_parte2.md](docs/benchmark_parte2.md).
+O benchmark usa recortes aninhados de 10%, 50% e 100% dos arcos embaralhados com semente 42. As fontes selecionadas no menor recorte são `Siva1979`, `Gwynand` e `John Carter`. Cada configuração tem um aquecimento fora do cronômetro e cinco repetições medidas. O procedimento está nas seções 12 a 15 do [notebook de experimentos](data/dataset_parte2/experimentos_parte2.ipynb), com as funções de preparação e medição em [src/benchmark.py](src/benchmark.py).
 
 A exportação do ambiente usa `psutil` opcionalmente para obter a memória. Se a biblioteca não estiver instalada, o campo fica `null` e deve ser completado antes da consolidação. Os CSVs são ignorados pelo Git; para uma nova instalação, gere o tratado pelo notebook. Executar as células de exportação novamente sobrescreve os respectivos arquivos de saída.
 
@@ -239,4 +239,4 @@ O relatório final `out/parte2/parte2_report.json` ainda depende das medições 
 
 ## Uso de IA
 
-Seguimos as regras de IA do enunciado. Todo trecho de código feito com apoio de IA leva a marca `# [IA] <ferramenta> – <finalidade>`, cada uso fica registrado em [`DECLARACAO_IA.md`], e a declaração assinada por todos fica em `docs/DECLARACAO_IA.pdf`.
+Seguimos as regras de IA do enunciado. Todo trecho de código feito com apoio de IA leva a marca `# [IA] <ferramenta> – <finalidade>`, cada uso fica registrado em [DECLARACAO_IA.md](docs/DECLARACAO_IA.md), e a declaração assinada por todos fica em `docs/DECLARACAO_IA.pdf`.
