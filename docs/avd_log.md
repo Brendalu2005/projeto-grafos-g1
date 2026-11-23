@@ -57,3 +57,17 @@ O registro de classificação passou de `(origem, destino)` para `(origem, desti
 **Apoio de IA:** ChatGPT (Codex) corrigiu a sobrescrita no código de DFS escrito por André, adaptou as consultas dos testes e reforçou as verificações dos dois casos de arcos paralelos já adicionados por André a partir de sugestões de IA. O grupo deve conferir os resultados e compreender a mudança de chave.
 
 **Verificação:** na suíte completa executada com Python em modo UTF-8, 41 testes passaram e um falhou: `test_porta_sem_chave_correspondente_gera_erro_claro`, pois a validação de mapas não lançou o erro esperado. A falha ocorre no IO de mapas, cujo código não foi alterado nesta depuração.
+
+### Execução técnica do DFS em três fontes — 22/11/2026
+
+O notebook `experimentos_parte2.ipynb` passou a chamar o DFS existente a partir das mesmas três fontes registradas no BFS: `Siva1979`, `'sed` e `!---slappdash---!`. A seleção foi reutilizada para adiantar a execução e deve ser confirmada por André. Foram exportados ordem de descoberta, tempos de descoberta e término, predecessores, contagens dos quatro tipos de arco e indicação de ciclos em `out/parte2/dfs_fontes.json`.
+
+As conferências técnicas verificaram a quantidade de arcos classificados, a quantidade de arcos de árvore, os conjuntos dos retornos e a concordância dos vértices alcançados com os resultados BFS salvos para cada fonte. O CSV e os JSONs anteriores de BFS, Dijkstra e métricas permaneceram inalterados, conferidos por SHA-256. Não foram realizadas medições de desempenho nem elaboradas interpretações dos resultados.
+
+**Apoio de IA:** ChatGPT (Codex) acrescentou e executou chamadas e exportação do DFS já escrito pelo grupo, com verificações técnicas e marcadores nas células. Não alterou a implementação do algoritmo. A confirmação das fontes, a conferência pelo grupo e a interpretação autoral ficam com André.
+
+### Casos mínimos de Bellman-Ford sugeridos — 22/11/2026
+
+Após André solicitar também sugestões de recortes e fontes, Codex sugeriu dois subgrafos induzidos de dois usuários, preservando todos os registros entre eles e a coluna PESO. O primeiro usa Malleus Fatuorum e BDD, com fonte Malleus Fatuorum. O segundo usa Rcsprinter123 e Jasper Deng, com fonte Rcsprinter123. Os registros selecionados pertencem ao CSV tratado; suas posições e o SHA-256 da entrada constam em `out/parte2/bellman_ford_casos.json`.
+
+Codex acrescentou e executou chamadas do Bellman-Ford existente, conferências técnicas e exportação no notebook de experimentos. A implementação do algoritmo não foi alterada. André informou autorização da professora para dispensar novos marcadores; os registros anteriores foram preservados. A escolha final, a conferência manual, as justificativas e a interpretação autoral permanecem com André. Não foram feitas medições de desempenho nem produzidas conclusões analíticas. Os dados e os JSONs anteriores foram preservados, conferidos por SHA-256.

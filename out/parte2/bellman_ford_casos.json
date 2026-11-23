@@ -1,0 +1,114 @@
+{
+  "algoritmo": "BELLMAN_FORD",
+  "arquivo_entrada": "data/dataset_parte2/processed/wikiRfA_tratado.csv",
+  "sha256_entrada": "de16066d90875782f2daffae3adbe5c513f0fa9743ad242d3e1fcbf5c635e7c2",
+  "coluna_peso": "PESO",
+  "regra_recorte": "subgrafo induzido pelos usuários informados; todas as ocorrências entre eles são preservadas",
+  "selecao": "exemplos mínimos sugeridos por Codex para conferência e justificativa autoral de André",
+  "benchmark": false,
+  "resultados": [
+    {
+      "id": "negativo_sem_ciclo",
+      "fonte": "Malleus Fatuorum",
+      "usuarios": [
+        "Malleus Fatuorum",
+        "BDD"
+      ],
+      "vertices": 2,
+      "arcos": [
+        {
+          "indice_registro_csv_base_zero": 119,
+          "linha_csv_com_cabecalho": 121,
+          "origem": "Malleus Fatuorum",
+          "destino": "BDD",
+          "indice_adjacencia": 0,
+          "VOTE": -1,
+          "RESULT": 1,
+          "PESO": -1
+        }
+      ],
+      "tem_ciclo_negativo": false,
+      "status": "OK",
+      "distancias": {
+        "Malleus Fatuorum": 0,
+        "BDD": -1
+      },
+      "predecessores": {
+        "Malleus Fatuorum": null,
+        "BDD": "Malleus Fatuorum"
+      },
+      "caminhos": {
+        "Malleus Fatuorum": [
+          "Malleus Fatuorum"
+        ],
+        "BDD": [
+          "Malleus Fatuorum",
+          "BDD"
+        ]
+      }
+    },
+    {
+      "id": "ciclo_negativo",
+      "fonte": "Rcsprinter123",
+      "usuarios": [
+        "Rcsprinter123",
+        "Jasper Deng"
+      ],
+      "vertices": 2,
+      "arcos": [
+        {
+          "indice_registro_csv_base_zero": 3090,
+          "linha_csv_com_cabecalho": 3092,
+          "origem": "Rcsprinter123",
+          "destino": "Jasper Deng",
+          "indice_adjacencia": 0,
+          "VOTE": -1,
+          "RESULT": -1,
+          "PESO": -1
+        },
+        {
+          "indice_registro_csv_base_zero": 9451,
+          "linha_csv_com_cabecalho": 9453,
+          "origem": "Jasper Deng",
+          "destino": "Rcsprinter123",
+          "indice_adjacencia": 0,
+          "VOTE": -1,
+          "RESULT": -1,
+          "PESO": -1
+        }
+      ],
+      "tem_ciclo_negativo": true,
+      "status": "CICLO_NEGATIVO",
+      "ciclo": [
+        "Jasper Deng",
+        "Rcsprinter123",
+        "Jasper Deng"
+      ],
+      "arcos_ciclo": [
+        {
+          "indice_registro_csv_base_zero": 9451,
+          "linha_csv_com_cabecalho": 9453,
+          "origem": "Jasper Deng",
+          "destino": "Rcsprinter123",
+          "indice_adjacencia": 0,
+          "VOTE": -1,
+          "RESULT": -1,
+          "PESO": -1
+        },
+        {
+          "indice_registro_csv_base_zero": 3090,
+          "linha_csv_com_cabecalho": 3092,
+          "origem": "Rcsprinter123",
+          "destino": "Jasper Deng",
+          "indice_adjacencia": 0,
+          "VOTE": -1,
+          "RESULT": -1,
+          "PESO": -1
+        }
+      ],
+      "custo_ciclo": -2,
+      "distancias": null,
+      "observacao_distancias": "Valores provisórios da execução com ciclo negativo não são apresentados como custos mínimos finitos."
+    }
+  ]
+}
