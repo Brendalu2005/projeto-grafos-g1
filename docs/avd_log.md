@@ -131,3 +131,26 @@ ou conclusões analíticas.
 benchmark, acrescentou testes de integração e registrou as decisões expressas de
 André. As implementações de DFS e Bellman-Ford não foram alteradas nesta tarefa.
 André deve conferir e compreender o código e elaborar sua análise autoral.
+
+### Três visualizações da Parte 2 — 23/11/2026
+
+Após André informar que a professora autorizou a produção com IA, ChatGPT (Codex)
+propôs e implementou três figuras em `src/viz.py`: distribuição dos graus de entrada
+e saída, distribuição de VOTE/PESO/PESO + 1 e tempos de DFS/Bellman-Ford na fonte
+Siva1979. A comparação de tempos usa somente as medições no mesmo ambiente e na
+mesma fonte para os três tamanhos. As imagens foram geradas em `out/parte2/` e
+inspecionadas visualmente. Os dados numéricos usados também foram exportados para
+conferência em `dados_visualizacoes_andre.json`. Os 75 testes existentes passaram.
+
+Finalidades, justificativas, notas e limites estão em
+`docs/visualizacoes_andre_parte2.md`. Esses textos são rascunhos gerados com IA para
+revisão de André, não análises atribuídas originalmente ao aluno. As demais figuras
+do grupo e a incorporação ao PDF continuam pendentes.
+
+**Apoio de IA efetivamente utilizado:** escolha dos gráficos, implementação em
+matplotlib e pandas, conferência dos dados, interpretação e redação das notas,
+além de ajustes visuais e documentação. André informou autorização da professora;
+essa informação não é apresentada como uma permissão escrita anexada ao repositório.
+A declaração conjunta deve registrar essas atividades, sem reduzi-las a apoio
+conceitual ou revisão gramatical. André deve conferir os dados, compreender os
+gráficos e revisar os textos antes da entrega.

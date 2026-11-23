@@ -1,8 +1,12 @@
 import csv
+import argparse
+import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.colors import ListedColormap
+from matplotlib.ticker import FuncFormatter
 
 from src.graphs.algorithms import bfs
 from src.graphs.estados import ALVO, construir_g_est, estado_inicial
@@ -217,5 +221,175 @@ def gerar_figuras_parte1(pasta_saida="out/parte1"):
     grafo_estados_camadas("data/mapas/m02_uma_chave.txt", pasta_saida / "grafo_estados_camadas_m02.png")
 
 
+# [IA] ChatGPT (Codex) – seleção e implementação das visualizações da Parte 2,
+# após André informar autorização da professora. Textos analíticos gerados por IA
+# ficam identificados como rascunhos para revisão, sem atribuição autoral ao aluno.
+def distribuicao_graus_dataset(metricas, caminho_png):
+    limites = [(0, 0), (1, 4), (5, 19), (20, 99), (100, 499), (500, None)]
+    rotulos = ["0", "1–4", "5–19", "20–99", "100–499", "500 ou mais"]
+    total = metricas["vertices"]
+    contagens = {}
+    figura, eixo = plt.subplots(figsize=(11.5, 6.6))
+    # [IA] ChatGPT (Codex) – padrões distinguem as séries sem depender só da cor.
+    for deslocamento, nome, campo, cor, padrao in (
+        (-0.19, "Entrada", "graus_entrada", "#0072B2", "///"),
+        (0.19, "Saída", "graus_saida", "#D55E00", ".."),
+    ):
+        graus = list(metricas[campo].values())
+        contagem = [sum(g >= minimo and (maximo is None or g <= maximo) for g in graus)
+                    for minimo, maximo in limites]
+        assert len(graus) == total and sum(contagem) == total
+        contagens[nome] = contagem
+        percentuais = [100 * quantidade / total for quantidade in contagem]
+        barras = eixo.bar([i + deslocamento for i in range(len(rotulos))], percentuais,
+                          width=0.36, color=cor, label=nome, hatch=padrao,
+                          edgecolor="#263238", linewidth=0.7)
+        eixo.bar_label(barras, labels=[(f"{p:.2f}%" if p < 1 else f"{p:.1f}%").replace(".", ",") for p in percentuais],
+                       padding=4, fontsize=9)
+    eixo.set_title("Como se distribuem os graus dos usuários do Wiki-RfA?", loc="left", pad=22)
+    eixo.set_xlabel("Grau — intervalos de quantidade de votos")
+    eixo.set_ylabel("Usuários em cada intervalo (%)")
+    eixo.set_xticks(range(len(rotulos)), rotulos)
+    eixo.set_ylim(0, max(100 * max(v) / total for v in contagens.values()) * 1.22)
+    eixo.legend(title="Direção do grau", frameon=False)
+    eixo.grid(axis="y", alpha=0.18)
+    eixo.set_axisbelow(True)
+    total_formatado = f"{total:,}".replace(",", ".")
+    figura.text(0.09, 0.03, f"Fonte: metricas_dataset.json • {total_formatado} usuários • Laços e arcos paralelos incluídos nos graus.", fontsize=9, color="#52606d")
+    figura.subplots_adjust(left=0.09, right=0.98, bottom=0.17, top=0.86)
+    figura.savefig(caminho_png, dpi=180)
+    plt.close(figura)
+    return {"intervalos": rotulos, "vertices": total, "contagens": contagens}
+
+
+# [IA] ChatGPT (Codex) – gráfico das três versões, preservando os votos e pesos existentes.
+def distribuicao_pesos_dataset(caminho_csv, caminho_png):
+    import pandas as pd
+
+    dados = pd.read_csv(caminho_csv, usecols=["VOTE", "PESO"])
+    series = {"VOTE original": dados["VOTE"], "PESO ajustado": dados["PESO"],
+              "PESO + 1 (Dijkstra)": dados["PESO"] + 1}
+    valores = list(range(int(min(s.min() for s in series.values())),
+                         int(max(s.max() for s in series.values())) + 1))
+    contagens = {}
+    figura, eixo = plt.subplots(figsize=(11.5, 6.6))
+    # [IA] ChatGPT (Codex) – padrões redundantes às cores para distinguir as três versões.
+    for deslocamento, (nome, serie), cor, padrao in zip(
+        (-0.26, 0, 0.26), series.items(), ("#595959", "#0072B2", "#D55E00"),
+        ("///", "xx", ".."),
+    ):
+        contagem = serie.value_counts().reindex(valores, fill_value=0)
+        contagens[nome] = {str(v): int(contagem[v]) for v in valores}
+        presentes = [v for v in valores if contagem[v] > 0]
+        eixo.bar([valores.index(v) + deslocamento for v in presentes],
+                 [contagem[v] for v in presentes], width=0.24, color=cor, label=nome,
+                 hatch=padrao, edgecolor="#263238", linewidth=0.7)
+    eixo.set_yscale("log")
+    eixo.set_ylim(0.7, len(dados) * 5)
+    eixo.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{int(valor):,}".replace(",", ".")))
+    eixo.set_xticks(range(len(valores)), valores)
+    eixo.set_xlabel("Valor inteiro na versão do peso")
+    eixo.set_ylabel("Registros (escala logarítmica)")
+    eixo.set_title("Do voto ao custo: três distribuições de valores", loc="left", pad=22)
+    eixo.legend(frameon=False, loc="upper right")
+    eixo.grid(axis="y", which="major", alpha=0.18)
+    eixo.set_axisbelow(True)
+    total_formatado = f"{len(dados):,}".replace(",", ".")
+    figura.text(0.09, 0.05, f"Fonte: CSV tratado • {total_formatado} registros em cada versão • Valores sem ocorrências não têm barra.", fontsize=9, color="#52606d")
+    figura.text(0.09, 0.025, "O eixo logarítmico permite observar também os valores raros; não mede diretamente diferenças absolutas de altura.", fontsize=8.5, color="#52606d")
+    figura.subplots_adjust(left=0.09, right=0.98, bottom=0.19, top=0.86)
+    figura.savefig(caminho_png, dpi=180)
+    plt.close(figura)
+    return {"registros": len(dados), "contagens": contagens,
+            "valores_modificados_no_incremento": int(dados["VOTE"].ne(dados["PESO"]).sum())}
+
+
+# [IA] ChatGPT (Codex) – comparação do benchmark no mesmo ambiente e na mesma fonte.
+def tempos_dfs_bellman_dataset(relatorio, caminho_png):
+    if not relatorio.get("completo"):
+        raise ValueError("O benchmark precisa estar completo para gerar a comparação.")
+    fonte = "Siva1979"
+    selecionadas = {}
+    for nome in ("DFS", "BELLMAN_FORD"):
+        selecionadas[nome] = sorted(
+            [m for m in relatorio["medicoes"] if m["algoritmo"] == nome and m["fonte"] == fonte],
+            key=lambda m: m["percentual"],
+        )
+        if [m["percentual"] for m in selecionadas[nome]] != [10, 50, 100]:
+            raise ValueError(f"Faltam configurações de {nome} para a fonte {fonte}.")
+    for dfs_medicao, bellman_medicao in zip(selecionadas["DFS"], selecionadas["BELLMAN_FORD"]):
+        assert (dfs_medicao["vertices"], dfs_medicao["arcos"]) == (bellman_medicao["vertices"], bellman_medicao["arcos"])
+    razao = selecionadas["BELLMAN_FORD"][-1]["media"] / selecionadas["DFS"][-1]["media"]
+    figura, eixo = plt.subplots(figsize=(11.5, 6.6))
+    # [IA] ChatGPT (Codex) – linhas, marcadores e rótulos redundantes à cor.
+    for nome, cor, rotulo, marcador, estilo in (
+        ("DFS", "#0072B2", "DFS", "o", "-"),
+        ("BELLMAN_FORD", "#D55E00", "Bellman-Ford", "s", "--"),
+    ):
+        medicoes = selecionadas[nome]
+        medias = [m["media"] for m in medicoes]
+        inferiores = [m["media"] - min(m["tempos"]) for m in medicoes]
+        superiores = [max(m["tempos"]) - m["media"] for m in medicoes]
+        eixo.errorbar([10, 50, 100], medias, yerr=[inferiores, superiores], color=cor,
+                      marker=marcador, linestyle=estilo, linewidth=2.2,
+                      capsize=5, markersize=7, label=rotulo)
+        for percentual, media in zip((10, 50, 100), medias):
+            texto = f"{media:.3f} s" if media < 1 else f"{media:.1f} s"
+            texto = texto.replace(".", ",")
+            if percentual == 100:
+                texto = f"{rotulo} · {texto}"
+            eixo.annotate(texto, (percentual, media),
+                          xytext=(-5, 13) if percentual == 100 else (0, 13),
+                          textcoords="offset points", ha="right" if percentual == 100 else "center",
+                          color="#263238", fontsize=10)
+    eixo.set_yscale("log")
+    eixo.set_ylim(0.004, 3000)
+    eixo.set_yticks([0.01, 0.1, 1, 10, 100, 1000], ["0,01", "0,1", "1", "10", "100", "1.000"])
+    eixo.set_xlim(0, 110)
+    eixo.set_xticks([10, 50, 100], ["10%\n19.661 arcos", "50%\n98.307 arcos", "100%\n196.614 arcos"])
+    eixo.set_xlabel("Tamanho do recorte — percentual dos arcos, não dos vértices")
+    eixo.set_ylabel("Tempo médio por execução (segundos, escala logarítmica)")
+    eixo.set_title(f"Neste ambiente, Bellman-Ford levou cerca de {razao / 1000:.0f} mil vezes\no tempo do DFS no grafo completo", loc="left", pad=22)
+    eixo.legend(frameon=False, loc="center right")
+    eixo.grid(axis="y", which="major", alpha=0.18)
+    eixo.set_axisbelow(True)
+    figura.text(0.09, 0.05, "Fonte: benchmark_dfs_bellman.json • Siva1979 • 5 repetições + 1 aquecimento • Barras: mínimo e máximo.", fontsize=9, color="#52606d")
+    figura.text(0.09, 0.025, "Mesmo ambiente; tarefas diferentes. A razão se refere a esta execução, sem garantia geral de desempenho.", fontsize=8.5, color="#52606d")
+    figura.subplots_adjust(left=0.09, right=0.98, bottom=0.22, top=0.80)
+    figura.savefig(caminho_png, dpi=180)
+    plt.close(figura)
+    return {"fonte": fonte, "razao_tempos_100_porcento": razao, "medicoes": selecionadas,
+            "ambiente": relatorio["ambiente"]}
+
+
+# [IA] ChatGPT (Codex) – geração reproduzível das três figuras e dos dados para conferência.
+def gerar_figuras_parte2(pasta_saida="out/parte2"):
+    pasta_saida = Path(pasta_saida)
+    pasta_saida.mkdir(parents=True, exist_ok=True)
+    pasta_dados = Path("out/parte2")
+    metricas = json.loads((pasta_dados / "metricas_dataset.json").read_text(encoding="utf-8"))
+    benchmark = json.loads((pasta_dados / "benchmark_dfs_bellman.json").read_text(encoding="utf-8"))
+    with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 10,
+                         "axes.spines.top": False, "axes.spines.right": False,
+                         "axes.titleweight": "bold", "figure.facecolor": "white"}):
+        dados = {
+            "graus": distribuicao_graus_dataset(metricas, pasta_saida / "andre_01_distribuicao_graus.png"),
+            "pesos": distribuicao_pesos_dataset("data/dataset_parte2/processed/wikiRfA_tratado.csv",
+                                               pasta_saida / "andre_02_distribuicao_pesos.png"),
+            "tempos": tempos_dfs_bellman_dataset(benchmark, pasta_saida / "andre_03_tempos_dfs_bellman.png"),
+        }
+    (pasta_saida / "dados_visualizacoes_andre.json").write_text(
+        json.dumps(dados, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8"
+    )
+    return dados
+
+
 if __name__ == "__main__":
-    gerar_figuras_parte1()
+    parser = argparse.ArgumentParser(description="Gera as figuras do projeto.")
+    parser.add_argument("--parte2", action="store_true", help="gera as três visualizações de André da Parte 2")
+    parser.add_argument("--out", help="pasta das imagens")
+    argumentos = parser.parse_args()
+    if argumentos.parte2:
+        gerar_figuras_parte2(argumentos.out or "out/parte2")
+    else:
+        gerar_figuras_parte1(argumentos.out or "out/parte1")

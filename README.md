@@ -280,6 +280,27 @@ podem demorar. Os dois casos mínimos de correção não substituem estas mediç
 
 <!-- [IA] ChatGPT (Codex) – organização da documentação da Parte 2 com as decisões e os resultados já registrados pela equipe. -->
 
+### Visualizações da Parte 2 — André
+
+Com o CSV tratado, as métricas e o benchmark já disponíveis, gere as figuras sem
+executar novamente os algoritmos:
+
+```powershell
+python -m src.viz --parte2
+```
+
+As saídas são `andre_01_distribuicao_graus.png`, `andre_02_distribuicao_pesos.png`,
+`andre_03_tempos_dfs_bellman.png` e `dados_visualizacoes_andre.json`, em `out/parte2/`.
+As duas primeiras são exploratórias; a terceira comunica os tempos de DFS e
+Bellman-Ford para a fonte comum Siva1979 no mesmo ambiente. A comparação não mistura
+as máquinas das duas contribuições de benchmark.
+
+Finalidade, justificativas, fontes e notas estão em
+[visualizacoes_andre_parte2.md](docs/visualizacoes_andre_parte2.md). Os textos são
+rascunhos gerados com IA para revisão de André, conforme a autorização da professora
+informada por ele. O registro de IA inclui escolha, código e interpretação.
+As demais figuras e a consolidação do relatório continuam pendentes.
+
 ## Uso de IA
 
 Seguimos as regras de IA do enunciado. Todo trecho de código feito com apoio de IA leva a marca `# [IA] <ferramenta> – <finalidade>`, cada uso fica registrado em [DECLARACAO_IA.md](docs/DECLARACAO_IA.md), e a declaração assinada por todos fica em `docs/DECLARACAO_IA.pdf`.
