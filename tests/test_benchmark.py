@@ -167,6 +167,36 @@ def test_medicao_exclui_aquecimento_e_calcula_estatisticas(monkeypatch):
     }
 
 
+# [IA] ChatGPT (Codex) – confere registro fora do cronômetro, sem chamadas adicionais.
+@pytest.mark.parametrize("ciclo", [None, ["A", "B", "A"]])
+def test_registra_ciclo_do_aquecimento_sem_alterar_medicoes(monkeypatch, ciclo):
+    eventos = []
+    instantes = iter(range(10))
+
+    class RetornoBellman:
+        def __getitem__(self, indice):
+            assert indice == 2
+            eventos.append("leitura_ciclo")
+            return ciclo
+
+    def algoritmo(grafo, fonte):
+        eventos.append("algoritmo")
+        return RetornoBellman()
+
+    def relogio():
+        eventos.append("relogio")
+        return next(instantes)
+
+    monkeypatch.setattr("src.benchmark.perf_counter", relogio)
+    resultado = medir_algoritmo(algoritmo, {"A": []}, "A", registrar_ciclo_negativo=True)
+
+    assert eventos == ["algoritmo", "leitura_ciclo"] + ["relogio", "algoritmo", "relogio"] * 5
+    assert resultado["tempos"] == [1] * 5
+    assert resultado["tem_ciclo_negativo"] is (ciclo is not None)
+    assert resultado["ciclo_negativo"] == ciclo
+    assert resultado["status"] == ("OK" if ciclo is None else "CICLO_NEGATIVO")
+
+
 def test_medicao_aceita_mais_de_cinco_repeticoes(monkeypatch):
     chamadas = []
     instantes = iter(range(12))

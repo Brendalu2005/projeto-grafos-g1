@@ -100,10 +100,11 @@ def selecionar_fontes(recortes):
 
 
 # [IA] ChatGPT (Codex) – medição com aquecimento e estatísticas conforme aprovado pela equipe.
-def medir_algoritmo(algoritmo, grafo, fonte, repeticoes=5):
+def medir_algoritmo(algoritmo, grafo, fonte, repeticoes=5, registrar_ciclo_negativo=False):
     """Mede chamadas algoritmo(grafo, fonte), sem preparar ou exportar dados.
 
     Faz um aquecimento sem cronômetro e pelo menos cinco repetições medidas.
+    registrar_ciclo_negativo usa o retorno do aquecimento de Bellman-Ford.
     O algoritmo deve preservar o grafo. Erros são propagados, sem gerar
     estatísticas parciais. O desvio padrão é amostral; tempos são em segundos.
     """
@@ -113,6 +114,15 @@ def medir_algoritmo(algoritmo, grafo, fonte, repeticoes=5):
         raise ValueError("A fonte deve estar presente no grafo.")
 
     resultado = algoritmo(grafo, fonte)
+    # [IA] ChatGPT (Codex) – registra o retorno de Bellman-Ford fora do cronômetro.
+    dados_ciclo = {}
+    if registrar_ciclo_negativo:
+        ciclo = resultado[2]
+        dados_ciclo = {
+            "status": "CICLO_NEGATIVO" if ciclo is not None else "OK",
+            "tem_ciclo_negativo": ciclo is not None,
+            "ciclo_negativo": ciclo,
+        }
     del resultado
 
     tempos = []
@@ -133,6 +143,7 @@ def medir_algoritmo(algoritmo, grafo, fonte, repeticoes=5):
         "minimo": min(tempos),
         "mediana": median(tempos),
         "desvio_padrao_amostral": stdev(tempos),
+        **dados_ciclo,
     }
 
 

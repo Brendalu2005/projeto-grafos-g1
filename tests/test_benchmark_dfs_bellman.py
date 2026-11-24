@@ -7,8 +7,11 @@ import pytest
 import src.benchmark_dfs_bellman as executor
 
 
-def test_executor_exporta_16_configuracoes_sem_modificar_grafos(tmp_path, monkeypatch):
+@pytest.mark.parametrize("com_ciclo", [False, True])
+def test_executor_exporta_16_configuracoes_sem_modificar_grafos(tmp_path, monkeypatch, com_ciclo):
     grafo = {"A": [("B", -1)], "B": [("C", 2)], "C": []}
+    if com_ciclo:
+        grafo["B"].append(("A", 0))
     original = deepcopy(grafo)
     recortes = [{"percentual": p, "grafo": grafo, "vertices": 3, "arcos": 2}
                 for p in (10, 50, 100)]
@@ -32,6 +35,18 @@ def test_executor_exporta_16_configuracoes_sem_modificar_grafos(tmp_path, monkey
         assert len(medicao["tempos"]) == 5
         assert medicao["media"] >= 0
         assert medicao["versao_pesos"] == "PESO"
+        if medicao["algoritmo"] == "BELLMAN_FORD":
+            esperado = com_ciclo and medicao["fonte"] in ("A", "B")
+            assert medicao["tem_ciclo_negativo"] is esperado
+            assert medicao["status"] == ("CICLO_NEGATIVO" if esperado else "OK")
+            if esperado:
+                ciclo = medicao["ciclo_negativo"]
+                assert ciclo[0] == ciclo[-1]
+                assert set(ciclo) == {"A", "B"}
+            else:
+                assert medicao["ciclo_negativo"] is None
+        else:
+            assert "tem_ciclo_negativo" not in medicao
     assert grafo == original
 
     antes = saida.read_bytes()
@@ -61,9 +76,9 @@ def test_complemento_mede_somente_fontes_pendentes(tmp_path, monkeypatch):
     chamadas = []
     medir = executor.medir_algoritmo
 
-    def registrar(algoritmo, entrada, fonte, repeticoes):
+    def registrar(algoritmo, entrada, fonte, repeticoes, **opcoes):
         chamadas.append((algoritmo, fonte))
-        return medir(algoritmo, entrada, fonte, repeticoes)
+        return medir(algoritmo, entrada, fonte, repeticoes, **opcoes)
 
     monkeypatch.setattr(executor, "medir_algoritmo", registrar)
     saida = tmp_path / "completo.json"

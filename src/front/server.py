@@ -26,23 +26,21 @@ COMPARACOES = {}
 
 
 def medir(funcao, grafo, origem):
+    # [IA] ChatGPT (Codex) – aquecimento separado e cinco medições, inclusive de recusas.
+    try:
+        funcao(grafo, origem)
+    except ValueError:
+        pass
+
     tempos = []
     saida = None
-    inicio = time.perf_counter()
-    try:
-        saida = funcao(grafo, origem)
-    except ValueError:
-        return None, [(time.perf_counter() - inicio) * 1000]
-    aquecimento = (time.perf_counter() - inicio) * 1000
-    if aquecimento > 100:
-        tempos.append(aquecimento)
-    while len(tempos) < 5 and sum(tempos) < 1000:
+    for _ in range(5):
+        saida = None
         inicio = time.perf_counter()
         try:
             saida = funcao(grafo, origem)
         except ValueError:
-            tempos.append((time.perf_counter() - inicio) * 1000)
-            return None, tempos
+            pass
         tempos.append((time.perf_counter() - inicio) * 1000)
     return saida, tempos
 

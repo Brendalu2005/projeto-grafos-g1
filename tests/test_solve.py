@@ -1,4 +1,5 @@
 from src.solve import resolver
+import pytest
 
 def test_resolver_preserva_ciclo_negativo_do_m06():
     resultado = resolver("data/mapas/m06_fonte.txt", "BELLMAN_FORD")
@@ -33,3 +34,30 @@ def test_exportador_armadilhas_encaminha_regra_consumivel(tmp_path, monkeypatch)
     assert argumentos == [True]
     assert resumos[0]["mapa"] == "teste"
     assert (tmp_path / "out" / "armadilhas_teste.csv").is_file()
+
+
+# [IA] ChatGPT (Codex) – regressão da medição da interface, com relógio simulado.
+@pytest.mark.parametrize("recusa", [False, True])
+def test_interface_exclui_aquecimento_e_mede_cinco_execucoes_lentas(monkeypatch, recusa):
+    from src.front import server
+
+    eventos = []
+    instantes = iter([0, 2, 10, 13, 20, 24, 30, 35, 40, 46])
+    retorno = ({"A": 0}, {"A": None})
+
+    def algoritmo(grafo, origem):
+        eventos.append("algoritmo")
+        if recusa:
+            raise ValueError("Peso negativo")
+        return retorno
+
+    def relogio():
+        eventos.append("relogio")
+        return next(instantes)
+
+    monkeypatch.setattr(server.time, "perf_counter", relogio)
+    saida, tempos = server.medir(algoritmo, {"A": []}, "A")
+
+    assert eventos == ["algoritmo"] + ["relogio", "algoritmo", "relogio"] * 5
+    assert tempos == [2000, 3000, 4000, 5000, 6000]
+    assert saida == (None if recusa else retorno)

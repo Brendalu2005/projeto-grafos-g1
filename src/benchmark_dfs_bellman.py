@@ -86,7 +86,12 @@ def executar_benchmark(caminho_csv, caminho_saida, fontes_bellman_completo=1, co
                 distancias, _ = bfs(grafo_recorte, fonte)
                 alcance = sum(v != fonte and d != math.inf for v, d in distancias.items())
                 print(f"Iniciando {nome} | {recorte['percentual']}% | {fonte}", flush=True)
-                medicao = medir_algoritmo(algoritmo, grafo_recorte, fonte, repeticoes=5)
+                # [IA] ChatGPT (Codex) – reutiliza o aquecimento para registrar o ciclo, sem outra execução.
+                if nome == "BELLMAN_FORD":
+                    medicao = medir_algoritmo(algoritmo, grafo_recorte, fonte, repeticoes=5,
+                                             registrar_ciclo_negativo=True)
+                else:
+                    medicao = medir_algoritmo(algoritmo, grafo_recorte, fonte, repeticoes=5)
                 medicao.update({
                     "algoritmo": nome, "tarefa": "busca_completa_por_fonte",
                     "fonte": fonte, "percentual": recorte["percentual"],
