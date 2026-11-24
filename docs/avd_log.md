@@ -1,3 +1,27 @@
+## Ligação entre exploração e figura explanatória B03 — 23/11/2026
+
+Brenda confirmou que a observação da distribuição de PESO e PESO + 1 motivou
+a dúvida sobre a preservação dos caminhos mínimos. Aprovou o texto abaixo,
+incluído na seção B03 de [visualizacoes_brenda_parte2.md](visualizacoes_brenda_parte2.md).
+
+> Ao observar a distribuição de PESO e PESO + 1, surgiu a dúvida sobre se eliminar os pesos negativos também alteraria os caminhos mínimos. Para investigar essa questão, comparei os custos de dois caminhos antes e depois da transformação no subgrafo selecionado. A figura explanatória apresenta esse exemplo e mostra como caminhos com quantidades diferentes de arcos recebem acréscimos diferentes, chegando ao empate observado.
+
+**Checklist atualizado das atividades de Brenda:**
+- [x] Conferir o BFS e preparar/testar o comando do benchmark.
+- [x] Commit do benchmark — realizado por Brenda, conforme sua confirmação.
+- [ ] Confirmar push e envio das instruções ao André.
+- [ ] Consultar as professoras sobre Bellman-Ford com uma fonte em 100% — adiado.
+- [ ] Juntar os resultados no `parte2_report.json` — aguarda novas medições.
+- [ ] Reclassificar B02 como análise visual de desempenho — adiado.
+- [x] Registrar a ligação entre achados exploratórios e a figura explanatória B03.
+- [ ] Integrar ao PDF as seções de BFS, Dijkstra, transformação e resposta à pesquisa.
+- [ ] Conferir BFS à mão e executar testes em clone limpo.
+- [ ] Concluir registro de IA e reflexão.
+
+**Apoio de IA:** ChatGPT (Codex) organizou o texto a partir da ligação confirmada
+por Brenda e o registrou após sua aprovação. As figuras e os resultados não foram
+alterados. Os checklists anteriores permanecem como histórico.
+
 ## Revisão do BFS e comando do benchmark — 23/11/2026
 
 Seguindo a nova divisão de tarefas informada por Brenda, foi revisado o BFS

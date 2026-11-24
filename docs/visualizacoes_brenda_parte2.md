@@ -155,6 +155,14 @@ O valor zero é escrito, embora sua barra tenha altura zero.
 
 > Neste exemplo, a transformação elimina a vantagem do caminho via 9cds, que tinha menor custo em PESO. Como esse caminho possui dois arcos, seu custo aumenta em 2, enquanto o direto aumenta em 1. Os caminhos passam a empatar, e o Dijkstra retorna o direto, cujo custo nos pesos anteriores à transformação é maior. Isso ilustra que somar uma constante a cada arco pode alterar o caminho retornado, sem preservar a preferência pelo caminho originalmente mais barato.
 
+**Da exploração à explicação — texto aprovado.**
+
+> Ao observar a distribuição de PESO e PESO + 1, surgiu a dúvida sobre se eliminar os pesos negativos também alteraria os caminhos mínimos. Para investigar essa questão, comparei os custos de dois caminhos antes e depois da transformação no subgrafo selecionado. A figura explanatória apresenta esse exemplo e mostra como caminhos com quantidades diferentes de arcos recebem acréscimos diferentes, chegando ao empate observado.
+
+**Apoio de IA nesta nota.** Brenda confirmou que a dúvida surgiu da observação
+da distribuição dos pesos. ChatGPT (Codex) organizou a redação acima, incluída
+após sua aprovação.
+
 **Limites e relação com a pesquisa.** O caminho direto foi retornado em uma situação
 de empate nos pesos transformados; não se tornou exclusivamente melhor.
 Ambas as alternativas são ótimas em PESO + 1. A figura ilustra um único par em um
