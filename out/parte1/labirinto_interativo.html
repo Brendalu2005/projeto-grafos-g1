@@ -1,66 +1,154 @@
 <!doctype html>
-<!-- [IA[  Vercel v0 - geração original da interface visual. -->
-<!-- [IA[  ChatGPT (Codex) - adaptação da interface para este projeto. -->
+<!-- [IA] Claude – nova interface (layout, comparação dos quatro algoritmos e galeria de mapas) a partir da versão do grupo. -->
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0c1110">
-  <meta name="description" content="Visualizador interativo de labirintos e algoritmos de teoria dos grafos.">
-  <title>Labirintos — Explorador de Grafos</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Explore os labirintos do projeto de Teoria dos Grafos e compare BFS, DFS, Dijkstra e Bellman-Ford.">
+  <title>Labirintos</title>
   <link rel="stylesheet" href="../../src/front/style.css">
-  <!-- [IA[  ChatGPT (Codex) - carregamento dos dados antes da interface. -->
   <script src="../../src/front/dados.js" defer></script>
   <script src="../../src/front/script.js" defer></script>
-  <!-- [IA[  ChatGPT (Codex) - animação do botão baseada no componente Arrow Reveal Button do Originkit. -->
-  <script src="../../src/front/interface-motion.js" defer></script>
 </head>
 <body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#inicio" aria-label="Labirintos, início">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 2h16v16H2zM6 2v8h4M14 6v12M6 14h4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span>Labirintos</span>
+      </a>
+      <nav class="nav-links" aria-label="Seções">
+        <a href="#mapas">Mapas</a>
+        <a href="#palco" data-mode-link="single">Explorar</a>
+        <a href="#palco" data-mode-link="compare">Comparar</a>
+        <a href="#analises">Análises</a>
+      </nav>
+      <span class="server-pill" id="server-pill" title="Situação do servidor de resultados"><i></i><span>Conectando</span></span>
+    </div>
+  </header>
+
   <main id="inicio">
-    <section class="intro">
-      <div class="intro-copy"><h1>Desvende o <em>labirinto.</em></h1><p>Explore os estados, acompanhe cada decisão e veja os algoritmos em ação — sem perder nenhum passo pelo caminho.</p></div>
-      <svg class="intro-drawing" viewBox="0 0 148 124" fill="none" aria-hidden="true">
-        <path d="M4 20h140M4 48h140M4 76h140M4 104h140M18 6v112M46 6v112M74 6v112M102 6v112M130 6v112" stroke="currentColor" opacity=".28"/>
-        <path d="M18 20h56v28h28V20h28v84H74V76H46v28H18V48h28" stroke="currentColor" stroke-width="2"/>
-        <path d="M18 20h28v56h28v28h56" stroke="#d9a37d" stroke-width="2" stroke-dasharray="3 4"/>
-        <circle cx="18" cy="20" r="4" fill="#b3d6a5"/><circle cx="130" cy="104" r="4" fill="#d9a37d"/>
-      </svg>
+    <section class="hero">
+      <p class="eyebrow">Teoria dos Grafos · Parte 1</p>
+      <h1>Desvende o labirinto.</h1>
+      <p class="hero-sub">Cada casa pode virar vários estados. Escolha um mapa, siga um algoritmo passo a passo ou coloque os quatro para correr lado a lado.</p>
+      <div class="hero-links">
+        <a class="link-cta" href="#palco" data-mode-link="single">Explorar um algoritmo <span aria-hidden="true">›</span></a>
+        <a class="link-cta" href="#palco" data-mode-link="compare">Comparar os quatro <span aria-hidden="true">›</span></a>
+      </div>
     </section>
 
-    <section class="control-panel" aria-label="Controles de visualização">
-      <label class="control-field"><span class="field-label">MAPA</span><span class="select-wrap"><select id="map-select" aria-label="Selecionar mapa"><option value="m01">m01</option><option value="m02">m02</option><option value="m03">m03</option><option value="m04">m04</option><option value="m05">m05</option><option value="m06">m06</option><option value="m07">m07</option><option value="m08">m08</option><option value="grupo-01">Mapa do grupo 01</option><option value="grupo-02">Mapa do grupo 02</option><option value="demo">Demonstração</option></select><span class="select-arrow">⌄</span></span></label>
-      <label class="control-field"><span class="field-label">ALGORITMO</span><span class="select-wrap"><select id="algorithm-select" aria-label="Selecionar algoritmo"><option value="bfs">BFS · menor número de movimentos</option><option value="dfs">DFS · exploração</option><option value="dijkstra">Dijkstra · menor custo</option><option value="bellman-ford">Bellman-Ford · menor custo</option></select><span class="select-arrow">⌄</span></span></label>
-      <!-- [IA] ChatGPT (Codex) - controle para comparar a regra da fonte consumível. -->
-      <label class="control-field"><span class="field-label">REGRA DA FONTE</span><span><input id="source-consumivel" type="checkbox"> Consumir * após a primeira entrada</span></label>
-      <span class="origin-button-wrap">
-        <button class="button button-primary origin-button" id="load-button" type="button" aria-controls="analises" aria-expanded="false"><span class="origin-label">Ver análises</span><span class="origin-slot" aria-hidden="true"></span><span class="origin-badge" aria-hidden="true"></span><span class="origin-arrow" aria-hidden="true">→</span></button>
-        <span class="origin-stroke" aria-hidden="true"></span>
-      </span>
-      <label class="file-button" for="data-file">＋ <span>Abrir dados</span></label><input class="sr-only" id="data-file" type="file" accept=".json,.csv,application/json,text/csv" aria-label="Abrir arquivo de dados local">
+    <section class="maps" id="mapas" aria-labelledby="mapas-titulo">
+      <div class="section-head">
+        <h2 id="mapas-titulo">Escolha um mapa.</h2>
+        <div class="toolbar">
+          <div class="segmented" role="radiogroup" aria-label="Regra da fonte de energia">
+            <button type="button" role="radio" aria-checked="true" data-fonte="false">Fonte original</button>
+            <button type="button" role="radio" aria-checked="false" data-fonte="true">Fonte consumível</button>
+          </div>
+          <label class="ghost-button" for="data-file">Abrir resultado</label>
+          <input class="sr-only" id="data-file" type="file" accept=".csv,.txt,.json,text/csv,text/plain,application/json">
+        </div>
+      </div>
+      <h3 class="group-title">Mapas oficiais</h3>
+      <div class="map-row" id="mapas-oficiais" role="listbox" aria-label="Mapas oficiais"></div>
+      <h3 class="group-title">Mapas da equipe <span class="badge">Novos</span></h3>
+      <div class="map-row" id="mapas-equipe" role="listbox" aria-label="Mapas da equipe"></div>
     </section>
 
-    <div id="status-message" class="status-message" role="status" aria-live="polite"><span class="status-icon">⌁</span><span><strong>Pronto para explorar</strong><small>Selecione um mapa e algoritmo; a visualização será atualizada automaticamente.</small></span></div>
+    <section class="stage-section" id="palco" aria-labelledby="palco-titulo">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" id="palco-mapa">—</p>
+          <h2 id="palco-titulo">Siga cada passo.</h2>
+        </div>
+        <div class="segmented segmented-large" role="radiogroup" aria-label="Modo de visualização">
+          <button type="button" role="radio" aria-checked="true" data-mode="single">Um algoritmo</button>
+          <button type="button" role="radio" aria-checked="false" data-mode="compare">Os quatro lado a lado</button>
+        </div>
+      </div>
 
-    <section class="workspace" aria-label="Visualização do mapa e do percurso">
-      <article class="panel map-panel"><div class="panel-heading"><h2>Terreno de exploração</h2><span class="map-chip" id="map-label">M01</span></div>
-        <div id="maze-container" class="maze-container"><div class="empty-state"><span class="empty-symbol">▦</span><strong>O mapa aparecerá aqui</strong><span>Carregue os arquivos de dados para começar.</span></div></div>
-        <div class="legend" aria-label="Legenda do mapa"><span><i class="legend-cell wall"></i> Parede</span><span><i class="legend-cell start">S</i> Início</span><span><i class="legend-cell goal">G</i> Saída</span><span><i class="legend-cell key">a</i> Chave</span><span><i class="legend-cell door">A</i> Porta</span><span><i class="legend-cell bonus">+</i> Bônus</span><span><i class="legend-cell path"></i> Percurso</span></div>
-      </article>
-      <aside class="panel stats-panel"><div class="panel-heading"><h2>Diário da jornada</h2></div>
-        <div class="current-position"><div><span class="field-label">POSIÇÃO · LINHA / COLUNA</span><strong id="position-value">— / —</strong></div></div>
-        <div class="stat-grid"><div class="stat-card"><span>CHAVES</span><strong id="keys-value">—</strong></div><div class="stat-card"><span>BÔNUS USADOS</span><strong id="bonus-value">—</strong></div><div class="stat-card"><span>CUSTO ACUMULADO</span><strong id="cost-value">—</strong></div><div class="stat-card"><span>MOVIMENTOS</span><strong id="moves-value">—</strong></div></div>
-        <div class="algorithm-note"><span class="note-mark">✳</span><p id="algorithm-note">Os dados reais do algoritmo serão exibidos após o carregamento.</p></div>
-      </aside>
+      <div id="status-message" class="status" role="status" aria-live="polite"><strong>Carregando</strong><span>Lendo os mapas do projeto.</span></div>
+
+      <div class="mode" id="modo-single">
+        <div class="alg-pills" role="radiogroup" aria-label="Algoritmo" id="alg-pills"></div>
+        <div class="stage">
+          <figure class="stage-map">
+            <div class="canvas-wrap" id="single-wrap"><canvas id="single-canvas" aria-label="Mapa com o percurso do algoritmo"></canvas></div>
+            <figcaption class="legend" id="legenda"></figcaption>
+          </figure>
+          <aside class="journal" aria-label="Estado atual">
+            <p class="journal-title">Agora</p>
+            <dl class="facts">
+              <div><dt>Posição</dt><dd id="position-value">—</dd></div>
+              <div><dt>Chaves</dt><dd id="keys-value">—</dd></div>
+              <div><dt>Bônus usados</dt><dd id="bonus-value">—</dd></div>
+              <div><dt>Custo acumulado</dt><dd id="cost-value">—</dd></div>
+              <div><dt id="moves-label">Movimentos</dt><dd id="moves-value">—</dd></div>
+            </dl>
+            <p class="journal-note" id="algorithm-note">O resultado do algoritmo aparece aqui.</p>
+          </aside>
+        </div>
+      </div>
+
+      <div class="mode" id="modo-compare" hidden>
+        <div class="race" id="race"></div>
+        <div class="scoreboard" aria-labelledby="placar-titulo">
+          <div class="score-head">
+            <h3 id="placar-titulo">Quem foi mais rápido?</h3>
+            <p id="placar-nota">Tempo de execução de cada algoritmo, medido no servidor.</p>
+          </div>
+          <div class="highlights" id="destaques"></div>
+          <ol class="bars" id="barras"></ol>
+          <p class="fineprint">O tempo conta só o algoritmo: o grafo de estados é montado uma vez antes da medição. A animação anda um passo por vez para todos, então ela mostra o tamanho de cada percurso, não o tempo.</p>
+        </div>
+      </div>
+
+      <div class="player" aria-label="Controles de animação">
+        <div class="player-buttons">
+          <button class="round" id="restart-button" type="button" aria-label="Voltar ao início" title="Voltar ao início"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4v5h5M4.6 9A6 6 0 1 1 6 14.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button class="round" id="back-button" type="button" aria-label="Passo anterior" title="Passo anterior"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="play" id="play-button" type="button" aria-label="Reproduzir"><svg id="play-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 4.2v11.6L16 10z" fill="currentColor"/></svg></button>
+          <button class="round" id="next-button" type="button" aria-label="Próximo passo" title="Próximo passo"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="timeline">
+          <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Progresso da animação">
+          <div class="timeline-labels"><span>Início</span><span id="step-label">0 de 0</span><span id="end-label">Alvo</span></div>
+        </div>
+        <label class="speed"><span>Velocidade</span><input id="speed-range" type="range" min="60" max="900" value="420" step="20" aria-label="Velocidade da animação"><span id="speed-value">Normal</span></label>
+      </div>
     </section>
 
-    <section class="playback-panel" aria-label="Controles de animação"><div class="playback-title"><h2>Acompanhe cada passo</h2></div><div class="playback-controls"><button class="icon-button" id="restart-button" type="button" aria-label="Reiniciar" title="Reiniciar">↺</button><button class="icon-button" id="back-button" type="button" aria-label="Voltar um passo" title="Voltar um passo">←</button><button class="play-button" id="play-button" type="button" aria-label="Iniciar animação"><span id="play-icon">▶</span></button><button class="icon-button" id="next-button" type="button" aria-label="Avançar um passo" title="Avançar um passo">→</button><div class="step-counter"><strong id="step-value">0</strong><span> / <span id="step-total">0</span> passos</span></div></div><div class="timeline-wrap"><input id="timeline" type="range" min="0" max="0" value="0" aria-label="Progresso da animação"><div class="timeline-labels"><span>INÍCIO</span><span id="timeline-percent">0%</span><span>ALVO</span></div></div><label class="speed-control"><span>VELOCIDADE</span><input id="speed-range" type="range" min="120" max="1100" value="600" step="40" aria-label="Velocidade da animação"><span id="speed-value">Normal</span></label></section>
-
-    <section class="visualizations" id="analises" tabindex="-1" aria-label="Visualizações dos grafos" hidden><div class="section-heading"><h2>Além do caminho</h2></div><div class="viz-grid">
-      <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">01</span><h3>Camadas do grafo de estados</h3></div><span class="viz-tag" id="graph-tag">CAMADAS</span></div><div class="viz-content" id="graph-view"><div class="viz-empty">Aguardando dados do grafo de estados.</div></div></article>
-      <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">02</span><h3>Árvore de exploração</h3></div><span class="viz-tag">BFS</span></div><div class="viz-content" id="tree-view"><div class="viz-empty">Aguardando dados da árvore BFS.</div></div></article>
-      <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">03</span><h3>Estados por posição</h3></div><span class="viz-tag">HEATMAP</span></div><div class="viz-content" id="heatmap-view"><div class="viz-empty">Aguardando contagens de estados por casa.</div></div></article>
-      <article class="viz-card"><div class="viz-card-head"><div><span class="viz-number">04</span><h3>Classificação dos arcos</h3></div><span class="viz-tag">DFS</span></div><div class="viz-content arc-legend"><span><i class="arc-dot tree"></i>Árvore</span><span><i class="arc-dot back"></i>Retorno</span><span><i class="arc-dot forward"></i>Avanço</span><span><i class="arc-dot cross"></i>Cruzamento</span><p>As classificações são apresentadas quando constarem nos resultados DFS.</p></div></article>
-    </div></section>
+    <section class="analyses" id="analises" aria-labelledby="analises-titulo">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Além do caminho</p>
+          <h2 id="analises-titulo">O grafo por trás do mapa.</h2>
+        </div>
+      </div>
+      <div class="analysis-grid">
+        <article class="card">
+          <h3>Camadas do grafo de estados</h3>
+          <p class="card-sub">Um andar por conjunto de chaves.</p>
+          <div id="graph-view" class="card-body">Carregando…</div>
+        </article>
+        <article class="card">
+          <h3>Classificação dos arcos</h3>
+          <p class="card-sub">Como a DFS enxerga cada arco.</p>
+          <div id="arc-view" class="card-body">Carregando…</div>
+        </article>
+        <article class="card card-wide" id="figuras-card">
+          <h3>Figuras do projeto</h3>
+          <p class="card-sub" id="figuras-sub">Geradas pelo src/viz.py a partir das saídas em out/parte1.</p>
+          <div id="figures-view" class="figures"></div>
+        </article>
+      </div>
+    </section>
   </main>
+
+  <footer class="footer">
+    <p>Projeto Teoria dos Grafos 2026.2. Para medir os tempos e animar a DFS, rode na raiz do projeto: <code>python -m src.front.server</code>.</p>
+  </footer>
 </body>
 </html>

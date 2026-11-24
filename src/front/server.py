@@ -6,11 +6,13 @@ Execute na raiz do repositório: python -m src.front.server
 # [IA[  ChatGPT (Codex) - ponte HTTP entre src.solve e a interface originalmente gerada pelo Vercel v0.
 import json
 import argparse
+import math
+import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from src.graphs.algorithms import dfs
+from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra
 from src.graphs.estados import ALVO, construir_g_est, estado_inicial, rotulo
 from src.graphs.io import ler_mapa
 from src.solve import resolver
@@ -19,6 +21,68 @@ from src.solve import resolver
 ROOT = Path(__file__).resolve().parents[2]
 MAP_DIRS = (ROOT / "data" / "mapas", ROOT / "data" / "mapas_grupo")
 ALGORITHMS = {"BFS", "DIJKSTRA", "BELLMAN_FORD"}
+FUNCOES = {"BFS": bfs, "DFS": dfs, "DIJKSTRA": dijkstra, "BELLMAN_FORD": bellman_ford}
+COMPARACOES = {}
+
+
+def medir(funcao, grafo, origem):
+    tempos = []
+    saida = None
+    inicio = time.perf_counter()
+    try:
+        saida = funcao(grafo, origem)
+    except ValueError:
+        return None, [(time.perf_counter() - inicio) * 1000]
+    aquecimento = (time.perf_counter() - inicio) * 1000
+    if aquecimento > 100:
+        tempos.append(aquecimento)
+    while len(tempos) < 5 and sum(tempos) < 1000:
+        inicio = time.perf_counter()
+        try:
+            saida = funcao(grafo, origem)
+        except ValueError:
+            tempos.append((time.perf_counter() - inicio) * 1000)
+            return None, tempos
+        tempos.append((time.perf_counter() - inicio) * 1000)
+    return saida, tempos
+
+
+def explorar_dfs(grafo, origem):
+    descoberta, _, _, classes, _ = dfs(grafo, origem)
+    contagem = {tipo: 0 for tipo in ("arvore", "retorno", "avanco", "cruzamento")}
+    for tipo in classes.values():
+        contagem[tipo] += 1
+    ordem = sorted((estado for estado in descoberta if estado != ALVO), key=descoberta.__getitem__)
+    return [rotulo(estado) for estado in ordem], contagem
+
+
+def comparar(caminho, nome, fonte_consumivel):
+    chave = (nome, fonte_consumivel)
+    if chave in COMPARACOES:
+        return COMPARACOES[chave]
+    mapa = ler_mapa(str(caminho))
+    grafo = construir_g_est(mapa, fonte_consumivel)
+    origem = estado_inicial(mapa)
+    linhas = []
+    for algoritmo, funcao in FUNCOES.items():
+        saida, tempos = medir(funcao, grafo, origem)
+        if algoritmo == "DFS":
+            exploracao, contagem = explorar_dfs(grafo, origem)
+            linha = {"mapa": nome, "algoritmo": "DFS", "status": "EXPLORACAO",
+                     "exploracao": exploracao, "classificacao_arcos": contagem}
+            alcancados = len(exploracao)
+        else:
+            linha = resolver(str(caminho), algoritmo, fonte_consumivel)
+            alcancados = None
+            if saida is not None:
+                alcancados = sum(1 for estado, valor in saida[0].items() if estado != ALVO and valor != math.inf)
+        linha["tempo_ms"] = sum(tempos) / len(tempos)
+        linha["execucoes"] = len(tempos)
+        linha["estados_alcancados"] = alcancados
+        linhas.append(linha)
+    resposta = {"mapa": nome, "fonte_consumivel": fonte_consumivel, "algoritmos": linhas}
+    COMPARACOES[chave] = resposta
+    return resposta
 
 
 def find_map(name):
@@ -37,6 +101,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path == "/api/comparar":
+            params = parse_qs(url.query)
+            name = params.get("mapa", [""])[0]
+            fonte_consumivel = params.get("fonte-consumivel", ["false"])[0].lower() in {"1", "true", "yes"}
+            path = find_map(name)
+            if path is None:
+                return self.send_json(404, {"erro": "Mapa não encontrado."})
+            try:
+                return self.send_json(200, comparar(path, name, fonte_consumivel))
+            except (OSError, ValueError, KeyError) as error:
+                return self.send_json(422, {"erro": str(error)})
         if url.path != "/api/resultado":
             return super().do_GET()
 
@@ -75,6 +150,10 @@ class Handler(SimpleHTTPRequestHandler):
         except (OSError, ValueError, KeyError) as error:
             return self.send_json(422, {"erro": str(error)})
         return self.send_json(200, result)
+
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-store")
+        super().end_headers()
 
     def send_json(self, status, value):
         body = json.dumps(value, ensure_ascii=False).encode("utf-8")

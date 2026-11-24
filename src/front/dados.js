@@ -1,9 +1,11 @@
 ﻿// [IA[  ChatGPT (Codex) - leitura das saídas oficiais para a interface originalmente gerada pelo Vercel v0.
+// [IA] Claude – separação da normalização dos resultados e leitura da comparação dos quatro algoritmos.
 (() => {
   'use strict';
   const root = new URL('../../', document.currentScript.src);
   const output = name => new URL(`out/parte1/${name}`, root);
   const known = ['m01_terreno','m02_uma_chave','m03_tres_chaves','m04_esteiras','m05_bonus','m06_fonte','m07_impossivel','m08_grande'];
+  const ALGORITHMS = ['BFS', 'DFS', 'DIJKSTRA', 'BELLMAN_FORD'];
   const decode = buffer => {
     const bytes = new Uint8Array(buffer);
     const encoding = bytes[0] === 255 && bytes[1] === 254 ? 'utf-16le' : bytes[0] === 254 && bytes[1] === 255 ? 'utf-16be' : 'utf-8';
@@ -37,14 +39,12 @@
     if (!match) throw new Error(`Rótulo de estado inválido: ${label}`);
     return {estado: label.trim(), linha: Number(match[1]), coluna: Number(match[2]), chaves: match[3] === '-' ? [] : [...match[3]], bonus_consumidos: match[4].trim() ? match[4].split(',').map(Number) : []};
   }
-  // [IA[  ChatGPT (Codex) - normaliza o CSV e a saída textual da DFS oficial para a interface.
   function dfsRow(row) {
     const kinds = ['arvore', 'retorno', 'avanco', 'cruzamento'];
     if (!row?.mapa || !kinds.every(kind => Object.hasOwn(row, kind))) return row;
     return {...row, algoritmo:'DFS', status:'CLASSIFICACAO',
       classificacao_arcos:Object.fromEntries(kinds.map(kind => [kind, row[kind]]))};
   }
-  // O CLI atual imprime repr(dict). Leitura limitada a campos escalares, sem eval.
   function cliRow(text) {
     const row = {};
     const fields = /'([a-z_]+)'\s*:\s*(?:'((?:\\.|[^'\\])*)'|(-?\d+(?:\.\d+)?))/g;
@@ -61,10 +61,11 @@
   }
   const imported = new Map();
   const edgeCache = new Map();
-  // [IA[  ChatGPT (Codex) - apresenta no front as camadas e a classificação DFS já exportadas pelo projeto.
-  // [IA] ChatGPT (Codex) - alterna as análises e os resultados entre as regras de fonte.
+  const compareCache = new Map();
+  const dirOf = fonteConsumivel => fonteConsumivel ? 'fonte_consumivel/' : '';
+
   async function analyses(name, fonteConsumivel = false) {
-    const dir = fonteConsumivel ? 'fonte_consumivel/' : '';
+    const dir = dirOf(fonteConsumivel);
     const [layersText, dfsText] = await Promise.all([
       optional(output(`${dir}camadas.json`)), optional(output(`${dir}dfs_classificacao.csv`))
     ]);
@@ -86,24 +87,24 @@
     return names.filter(name => /^[\w-]+$/.test(name));
   }
   async function map(name) {
+    let grupo = false;
     let text = await optional(new URL(`data/mapas/${name}.txt`, root));
-    if (text === null) text = await optional(new URL(`data/mapas_grupo/${name}.txt`, root));
+    if (text === null) { text = await optional(new URL(`data/mapas_grupo/${name}.txt`, root)); grupo = true; }
     if (text === null) throw new Error(`Mapa ${name} não encontrado em data/mapas/ ou data/mapas_grupo/.`);
     const grade = text.replace(/\r/g, '').split('\n').filter(row => row && !row.startsWith(';'));
     if (!grade.length || !grade.every(row => row.length === grade[0].length)) throw new Error('Grade vazia ou não retangular.');
-    return {mapa: name, grade, colunas: grade[0].length};
+    return {mapa: name, grade, colunas: grade[0].length, linhas: grade.length, grupo};
   }
   async function edges(name, fonteConsumivel = false) {
     const cacheKey = `${name}/${fonteConsumivel}`;
     if (!edgeCache.has(cacheKey)) {
-      const dir = fonteConsumivel ? 'fonte_consumivel/' : '';
-      const text = await optional(output(`${dir}arestas_${name}.csv`));
+      const text = await optional(output(`${dirOf(fonteConsumivel)}arestas_${name}.csv`));
       edgeCache.set(cacheKey, new Map(text ? csv(text).map(row => [`${row.origem}\n${row.destino}`, Number(row.peso)]) : []));
     }
     return edgeCache.get(cacheKey);
   }
-  async function result(name, algorithm, grade, fonteConsumivel = false) {
-    const dir = fonteConsumivel ? 'fonte_consumivel/' : '';
+  async function rawResult(name, algorithm, fonteConsumivel) {
+    const dir = dirOf(fonteConsumivel);
     let row = imported.get(`${name}/${algorithm}`);
     if (!row) {
       try {
@@ -122,17 +123,19 @@
       const text = await optional(output(`${dir}solucoes.csv`));
       if (text !== null) row = csv(text).find(row => row.mapa === name && row.algoritmo === algorithm);
     }
-    // [IA] ChatGPT (Codex) – usa o JSON específico do m06 como fallback para a sequência do ciclo.
-    if (algorithm === 'BELLMAN_FORD' && row?.status === 'CICLO_NEGATIVO' && !Array.isArray(row.ciclo) && name === 'm06_fonte') {
-      const cycleText = await optional(output(`${dir}ciclo_negativo_m06.json`));
-      if (cycleText) row = {...row, ciclo: JSON.parse(cycleText).ciclo};
-    }
     if (algorithm === 'DFS' && (!row || row.status === 'PENDENTE')) {
       const text = await optional(output(`${dir}dfs_classificacao.csv`));
       const found = text && csv(text).find(item => item.mapa === name);
       if (found) row = dfsRow(found);
     }
-    if (!row) return null;
+    return row || null;
+  }
+  async function normalize(row, name, algorithm, grade, fonteConsumivel) {
+    const dir = dirOf(fonteConsumivel);
+    if (algorithm === 'BELLMAN_FORD' && row?.status === 'CICLO_NEGATIVO' && !(Array.isArray(row.ciclo) && row.ciclo.length) && name === 'm06_fonte') {
+      const cycleText = await optional(output(`${dir}ciclo_negativo_m06.json`));
+      if (cycleText) row = {...row, ciclo: JSON.parse(cycleText).ciclo};
+    }
     if (row.mapa !== name || row.algoritmo !== algorithm) throw new Error('A saída selecionada pertence a outro mapa ou algoritmo.');
     const statuses = {OK:'sucesso', RECUSA:'peso_negativo_recusado', SEM_SOLUCAO:'sem_caminho', CICLO_NEGATIVO:'ciclo_negativo', EXPLORACAO:'exploracao', CLASSIFICACAO:'classificacao', PENDENTE:'pendente'};
     if (!statuses[row.status]) throw new Error(`Status desconhecido: ${row.status}`);
@@ -144,7 +147,6 @@
       }
       const counts = Object.fromEntries(kinds.map(kind => [kind, Number(source[kind])]));
       const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
-      // [IA[  ChatGPT (Codex) - usa a ordem de descoberta da DFS para animar estados, sem tratá-la como rota de solução.
       const visits = row.status === 'EXPLORACAO' && Array.isArray(row.exploracao) ? row.exploracao.map(state) : [];
       if (row.status === 'EXPLORACAO' && !visits.length) throw new Error('DFS sem estados de exploração.');
       for (const visit of visits) {
@@ -154,14 +156,13 @@
       }
       const animated = row.status === 'EXPLORACAO';
       return {status:animated ? 'exploracao' : 'classificacao',
-        mensagem:animated ? `DFS descobriu ${visits.length} estados e classificou ${total} arcos. A animação mostra a ordem de descoberta, não uma rota até a saída.`
-          : `DFS classificou ${total} arcos. Inicie o servidor atualizado para animar a exploração.`,
+        mensagem:animated ? `A DFS descobriu ${visits.length} estados e classificou ${total} arcos. A animação mostra a ordem de descoberta, não uma rota até a saída.`
+          : `A DFS classificou ${total} arcos. Rode o servidor do front para animar a exploração.`,
         passos:visits, ciclo_negativo:[], classificacao_arcos:counts, movimentos:null, custo_total:null, aviso:''};
     }
-    // [IA] ChatGPT (Codex) – atualiza a mensagem para indicar que o ciclo é animável.
-    const messages = {OK: algorithm === 'BFS' ? 'Menor número de movimentos.' : 'Percurso de menor custo.', RECUSA:'Dijkstra recusou o grafo com pesos negativos.', SEM_SOLUCAO:'Não há caminho até a saída.', CICLO_NEGATIVO:'Ciclo negativo detectado. A sequência de estados do ciclo está disponível na animação.', PENDENTE:'Reinicie o servidor do front para carregar a classificação DFS atual.'};
+    const messages = {OK: algorithm === 'BFS' ? 'Caminho com o menor número de movimentos.' : 'Caminho de menor custo.', RECUSA:'O Dijkstra recusou o grafo porque ele tem pesos negativos.', SEM_SOLUCAO:'Não existe caminho até a saída.', CICLO_NEGATIVO:'Ciclo negativo encontrado. A animação percorre os estados do ciclo.', PENDENTE:'Reinicie o servidor do front para carregar a classificação DFS atual.'};
     const steps = row.status === 'OK' ? String(row.caminho).split(/\s*->\s*/).filter(label => label && label !== 'ALVO').map(state) : [];
-    const cycle = row.status === 'CICLO_NEGATIVO' && Array.isArray(row.ciclo) ? row.ciclo.map(state) : [];
+    const cycle = row.status === 'CICLO_NEGATIVO' && Array.isArray(row.ciclo) ? row.ciclo.filter(label => label !== 'ALVO').map(state) : [];
     if (row.status === 'OK' && !steps.length) throw new Error('Resultado OK sem caminho exportado.');
     const weights = await edges(name, fonteConsumivel);
     let cost = 0, complete = true;
@@ -173,7 +174,7 @@
       step.custo_acumulado = complete ? cost : null;
     }); }
     addCosts(steps);
-    const total = row.custo === '' ? null : Number(row.custo);
+    const total = row.custo === '' || row.custo === undefined ? null : Number(row.custo);
     if (complete && steps.length && total !== null && cost !== total) {
       complete = false;
       steps.forEach((step, i) => { step.custo_acumulado = i ? null : 0; });
@@ -182,13 +183,47 @@
     return {status: statuses[row.status], mensagem: messages[row.status], passos:steps,
       ciclo_negativo:cycle, classificacao_arcos:row.classificacao_arcos || null,
       movimentos:steps.length ? steps.length-1 : null, custo_total:total,
-      aviso: !complete ? 'Os CSVs de arestas estão ausentes ou não correspondem ao custo desta execução. O custo por passo fica indisponível; o custo total vem da saída oficial.' : ''};
+      aviso: !complete ? 'Os CSVs de arestas estão ausentes ou não batem com o custo desta execução. O custo por passo fica indisponível; o custo total vem da saída oficial.' : ''};
+  }
+  async function result(name, algorithm, grade, fonteConsumivel = false) {
+    const row = await rawResult(name, algorithm, fonteConsumivel);
+    return row ? normalize(row, name, algorithm, grade, fonteConsumivel) : null;
+  }
+  async function compare(name, grade, fonteConsumivel = false) {
+    const key = `${name}/${fonteConsumivel}`;
+    if (compareCache.has(key)) return compareCache.get(key);
+    let rows = null;
+    try {
+      const url = new URL('api/comparar', root);
+      url.searchParams.set('mapa', name);
+      url.searchParams.set('fonte-consumivel', String(fonteConsumivel));
+      const response = await fetch(url);
+      if (response.ok) rows = (await response.json()).algoritmos;
+    } catch { /* sem servidor: os tempos ficam indisponíveis */ }
+    const measured = Array.isArray(rows);
+    const entries = await Promise.all(ALGORITHMS.map(async algorithm => {
+      const row = measured ? rows.find(item => item.algoritmo === algorithm) : await rawResult(name, algorithm, fonteConsumivel);
+      if (!row) return {algoritmo: algorithm, resultado: null, tempo_ms: null, execucoes: 0, estados_alcancados: null};
+      return {algoritmo: algorithm, resultado: await normalize(row, name, algorithm, grade, fonteConsumivel),
+        tempo_ms: measured ? Number(row.tempo_ms) : null, execucoes: measured ? Number(row.execucoes) : 0,
+        estados_alcancados: measured ? Number(row.estados_alcancados) : null};
+    }));
+    const value = {medido: measured, algoritmos: entries};
+    if (measured) compareCache.set(key, value);
+    return value;
+  }
+  async function online() {
+    try {
+      const url = new URL('api/resultado', root);
+      const response = await fetch(url);
+      return response.headers.get('content-type')?.includes('application/json') ?? false;
+    } catch { return false; }
   }
   async function importFile(file) {
     const rows = records(decode(await file.arrayBuffer()), file.name.toLowerCase());
-    for (const row of rows) if (!/^[\w-]+$/.test(row.mapa || '') || !['BFS','DFS','DIJKSTRA','BELLMAN_FORD'].includes(row.algoritmo) || !['OK','RECUSA','SEM_SOLUCAO','CICLO_NEGATIVO','CLASSIFICACAO','EXPLORACAO'].includes(row.status)) throw new Error('Use um CSV oficial ou a saída da CLI correspondente ao mapa e algoritmo.');
+    for (const row of rows) if (!/^[\w-]+$/.test(row.mapa || '') || !ALGORITHMS.includes(row.algoritmo) || !['OK','RECUSA','SEM_SOLUCAO','CICLO_NEGATIVO','CLASSIFICACAO','EXPLORACAO'].includes(row.status)) throw new Error('Use um CSV oficial ou a saída da CLI correspondente ao mapa e algoritmo.');
     for (const row of rows) imported.set(`${row.mapa}/${row.algoritmo}`, row);
     return rows;
   }
-  window.FrontData = {list, map, result, analyses, importFile, output};
+  window.FrontData = {list, map, result, compare, analyses, importFile, output, online};
 })();
