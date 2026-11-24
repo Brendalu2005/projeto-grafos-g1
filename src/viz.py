@@ -231,10 +231,10 @@ def distribuicao_graus_dataset(metricas, caminho_png):
     total = metricas["vertices"]
     contagens = {}
     figura, eixo = plt.subplots(figsize=(11.5, 6.6))
-    # [IA] ChatGPT (Codex) – padrões distinguem as séries sem depender só da cor.
-    for deslocamento, nome, campo, cor, padrao in (
-        (-0.19, "Entrada", "graus_entrada", "#0072B2", "///"),
-        (0.19, "Saída", "graus_saida", "#D55E00", ".."),
+    # [IA] ChatGPT (Codex) – paleta solicitada, com preenchimentos sólidos.
+    for deslocamento, nome, campo, cor in (
+        (-0.19, "Entrada", "graus_entrada", "#0081CF"),
+        (0.19, "Saída", "graus_saida", "#8C1F4E"),
     ):
         graus = list(metricas[campo].values())
         contagem = [sum(g >= minimo and (maximo is None or g <= maximo) for g in graus)
@@ -243,7 +243,7 @@ def distribuicao_graus_dataset(metricas, caminho_png):
         contagens[nome] = contagem
         percentuais = [100 * quantidade / total for quantidade in contagem]
         barras = eixo.bar([i + deslocamento for i in range(len(rotulos))], percentuais,
-                          width=0.36, color=cor, label=nome, hatch=padrao,
+                          width=0.36, color=cor, label=nome,
                           edgecolor="#263238", linewidth=0.7)
         eixo.bar_label(barras, labels=[(f"{p:.2f}%" if p < 1 else f"{p:.1f}%").replace(".", ",") for p in percentuais],
                        padding=4, fontsize=9)
@@ -274,17 +274,16 @@ def distribuicao_pesos_dataset(caminho_csv, caminho_png):
                          int(max(s.max() for s in series.values())) + 1))
     contagens = {}
     figura, eixo = plt.subplots(figsize=(11.5, 6.6))
-    # [IA] ChatGPT (Codex) – padrões redundantes às cores para distinguir as três versões.
-    for deslocamento, (nome, serie), cor, padrao in zip(
-        (-0.26, 0, 0.26), series.items(), ("#595959", "#0072B2", "#D55E00"),
-        ("///", "xx", ".."),
+    # [IA] ChatGPT (Codex) – três cores solicitadas, sem hachuras.
+    for deslocamento, (nome, serie), cor in zip(
+        (-0.26, 0, 0.26), series.items(), ("#3E4756", "#0081CF", "#8C1F4E"),
     ):
         contagem = serie.value_counts().reindex(valores, fill_value=0)
         contagens[nome] = {str(v): int(contagem[v]) for v in valores}
         presentes = [v for v in valores if contagem[v] > 0]
         eixo.bar([valores.index(v) + deslocamento for v in presentes],
                  [contagem[v] for v in presentes], width=0.24, color=cor, label=nome,
-                 hatch=padrao, edgecolor="#263238", linewidth=0.7)
+                 edgecolor="#263238", linewidth=0.7)
     eixo.set_yscale("log")
     eixo.set_ylim(0.7, len(dados) * 5)
     eixo.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{int(valor):,}".replace(",", ".")))
@@ -324,8 +323,8 @@ def tempos_dfs_bellman_dataset(relatorio, caminho_png):
     figura, eixo = plt.subplots(figsize=(11.5, 6.6))
     # [IA] ChatGPT (Codex) – linhas, marcadores e rótulos redundantes à cor.
     for nome, cor, rotulo, marcador, estilo in (
-        ("DFS", "#0072B2", "DFS", "o", "-"),
-        ("BELLMAN_FORD", "#D55E00", "Bellman-Ford", "s", "--"),
+        ("DFS", "#0081CF", "DFS", "o", "-"),
+        ("BELLMAN_FORD", "#8C1F4E", "Bellman-Ford", "s", "--"),
     ):
         medicoes = selecionadas[nome]
         medias = [m["media"] for m in medicoes]
@@ -367,7 +366,11 @@ def tempos_dfs_bellman_dataset(relatorio, caminho_png):
 def gerar_figuras_parte2(pasta_saida="out/parte2"):
     pasta_saida = Path(pasta_saida)
     pasta_saida.mkdir(parents=True, exist_ok=True)
-    pasta_dados = Path("out/parte2")
+    # [IA] ChatGPT (Codex) – entradas independentes da pasta de execução do notebook.
+    raiz_projeto = Path(__file__).resolve().parents[1]
+    pasta_dados = raiz_projeto / "out" / "parte2"
+    csv_tratado = raiz_projeto / "data/dataset_parte2/processed/wikiRfA_tratado.csv"
+    csv_bruto = raiz_projeto / "data/dataset_parte2/raw/wikiRfA.csv"
     metricas = json.loads((pasta_dados / "metricas_dataset.json").read_text(encoding="utf-8"))
     benchmark = json.loads((pasta_dados / "benchmark_dfs_bellman.json").read_text(encoding="utf-8"))
     with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 10,
@@ -375,13 +378,13 @@ def gerar_figuras_parte2(pasta_saida="out/parte2"):
                          "axes.titleweight": "bold", "figure.facecolor": "white"}):
         dados = {
             "graus": distribuicao_graus_dataset(metricas, pasta_saida / "andre_01_distribuicao_graus.png"),
-            "pesos": distribuicao_pesos_dataset("data/dataset_parte2/processed/wikiRfA_tratado.csv",
+            "pesos": distribuicao_pesos_dataset(csv_tratado,
                                                pasta_saida / "andre_02_distribuicao_pesos.png"),
             "tempos": tempos_dfs_bellman_dataset(benchmark, pasta_saida / "andre_03_tempos_dfs_bellman.png"),
-            "result": atributos_por_result_dataset("data/dataset_parte2/processed/wikiRfA_tratado.csv",
+            "result": atributos_por_result_dataset(csv_tratado,
                                                    pasta_saida / "andre_04_atributos_result.png"),
         }
-        faltantes_por_faixa("data/dataset_parte2/raw/wikiRfA.csv",
+        faltantes_por_faixa(csv_bruto,
                            pasta_saida / "brenda_01_faltantes_por_faixa.png")
         tempo_bfs_dijkstra(pasta_dados / "benchmark_bfs_dijkstra_mesmo_ambiente.json",
                            pasta_saida / "brenda_02_tempos_bfs_dijkstra.png")
@@ -405,11 +408,9 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
 
     figura, eixos = plt.subplots(1, 3, figsize=(15, 6), sharex=True, sharey=True)
     percentuais = [10, 50, 100]
-    estilos = [("BFS", "#0072B2", "o", "-"), ("DIJKSTRA", "#D55E00", "s", "--")]
+    estilos = [("BFS", "#0081CF", "o", "-"), ("DIJKSTRA", "#8C1F4E", "s", "--")]
 
     for eixo, fonte in zip(eixos, fontes):
-        tamanhos = {}
-        alcances = {}
         for algoritmo, cor, marcador, linha in estilos:
             medias = []
             erros_inferiores = []
@@ -428,20 +429,14 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
                 medias.append(media)
                 erros_inferiores.append(media - min(medicao["tempos"]))
                 erros_superiores.append(max(medicao["tempos"]) - media)
-                tamanhos[percentual] = medicao["arcos"]
-                alcances[percentual] = medicao["outros_usuarios_alcancados"]
 
             eixo.errorbar(percentuais, medias,
                           yerr=[erros_inferiores, erros_superiores],
                           color=cor, marker=marcador, linestyle=linha, label=algoritmo,
                           linewidth=2.2, capsize=5, markersize=7)
 
-        rotulos = []
-        for percentual in percentuais:
-            arcos = f"{tamanhos[percentual]:,}".replace(",", ".")
-            alcance = f"{alcances[percentual]:,}".replace(",", ".")
-            rotulos.append(f"{percentual}%\n{arcos} arcos\n{alcance} alcançados")
-        eixo.set_xticks(percentuais, rotulos)
+        # [IA] ChatGPT (Codex) – rótulos simplificados conforme solicitação de Brenda.
+        eixo.set_xticks(percentuais, [f"{percentual}%" for percentual in percentuais])
         eixo.set_title(fonte, fontsize=12, fontweight="bold")
         eixo.set_xlabel("Recorte por quantidade de arcos", labelpad=10)
         eixo.grid(axis="y", alpha=0.18)
@@ -457,7 +452,7 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
                    fontsize=15, fontweight="bold")
     ambiente = relatorio["ambiente"]
     figura.text(0.07, 0.07,
-                f"Fonte: {Path(caminho_json).name} • 5 repetições + 1 aquecimento • Barras: mínimo e máximo • Alcance exclui a fonte.",
+                f"Fonte: {Path(caminho_json).name} • 5 repetições + 1 aquecimento • Barras: mínimo e máximo.",
                 fontsize=9, color="#52606d")
     figura.text(0.07, 0.03,
                 f"Mesmo ambiente: Python {ambiente['python']} · {ambiente['processador']} · BFS: PESO; Dijkstra: PESO + 1. Escala vertical comum e linear.",
@@ -469,9 +464,9 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
     plt.close(figura)
 
 
-# [IA] ChatGPT (Codex) – barras por faixas e proporção agregada escolhidas pelo grupo.
+# [IA] ChatGPT (Codex) – barras 100% empilhadas conforme alteração solicitada por Brenda.
 def faltantes_por_faixa(caminho_csv, caminho_png):
-    """Agrupa candidatos por votos no CSV original e desenha a proporção sem SOURCE."""
+    """Mostra a composição dos votos com e sem SOURCE em cada faixa."""
     dados = pd.read_csv(caminho_csv, index_col=0)
     candidatos = dados.groupby("TARGET").size().rename("votos").to_frame()
     candidatos["sem_source"] = dados["SOURCE"].isna().groupby(dados["TARGET"]).sum()
@@ -490,18 +485,17 @@ def faltantes_por_faixa(caminho_csv, caminho_png):
 
     figura, eixo = plt.subplots(figsize=(12, 7))
     percentuais = resumo["percentual_sem_source"]
-    eixo.bar(range(5), percentuais, color="#0072B2", width=0.65,
-             hatch="///", edgecolor="#263238", linewidth=0.7)
-    maior_percentual = percentuais.max()
-    if pd.isna(maior_percentual) or maior_percentual == 0:
-        maior_percentual = 1
-    eixo.set_ylim(0, maior_percentual * 1.35)
+    com_source = 100 - percentuais
+    eixo.bar(range(5), com_source, color="#0081CF", width=0.65,
+             label="Com SOURCE", edgecolor="#263238", linewidth=0.7)
+    eixo.bar(range(5), percentuais, bottom=com_source, color="#8C1F4E", width=0.65,
+             label="Sem SOURCE", edgecolor="#263238", linewidth=0.7)
+    eixo.set_ylim(0, 100)
 
     etiquetas = []
     for posicao, (faixa, grupo) in enumerate(resumo.iterrows()):
-        quantidade_candidatos = f"{int(grupo['candidatos']):,}".replace(",", ".")
         quantidade_votos = f"{int(grupo['votos']):,}".replace(",", ".")
-        etiquetas.append(f"{faixa}\n{quantidade_candidatos} candidatos\n{quantidade_votos} votos")
+        etiquetas.append(f"{faixa}\n{quantidade_votos} votos")
         percentual = grupo["percentual_sem_source"]
         if pd.isna(percentual):
             texto = "Sem dados"
@@ -509,17 +503,19 @@ def faltantes_por_faixa(caminho_csv, caminho_png):
         else:
             quantidade_sem_source = f"{int(grupo['sem_source']):,}".replace(",", ".")
             percentual_formatado = f"{percentual:.2f}%".replace(".", ",")
-            texto = f"{percentual_formatado}\n{quantidade_sem_source} sem SOURCE"
-            altura = percentual
+            texto = f"{quantidade_sem_source} sem SOURCE\n{percentual_formatado}"
+            altura = 100
         eixo.annotate(texto, (posicao, altura), xytext=(0, 7),
                       textcoords="offset points", ha="center", fontsize=11, color="#263238")
 
     eixo.set_xticks(range(5), etiquetas)
     eixo.set_xlabel("Faixa do total de votos recebidos por candidato (antes do tratamento)", labelpad=14)
-    eixo.set_ylabel("Votos sem SOURCE / total de votos da faixa (%)")
+    eixo.set_ylabel("Proporção do total de votos da faixa (%)")
     eixo.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{valor:.1f}%".replace(".", ",")))
     eixo.set_title("Votos sem origem identificada por faixa de votos recebidos", fontsize=15,
-                   fontweight="bold", loc="left", pad=22)
+                   fontweight="bold", loc="left", pad=60)
+    figura.legend(*eixo.get_legend_handles_labels(), loc="upper left",
+                   bbox_to_anchor=(0.09, 0.89), ncol=2, frameon=False)
     eixo.grid(axis="y", alpha=0.18)
     eixo.set_axisbelow(True)
     eixo.spines[["top", "right"]].set_visible(False)
@@ -527,9 +523,9 @@ def faltantes_por_faixa(caminho_csv, caminho_png):
                 "Fonte: wikiRfA.csv original • Todos os candidatos com TARGET identificado; nenhum limite mínimo adicional.",
                 fontsize=9, color="#52606d")
     figura.text(0.09, 0.03,
-                "Proporção agregada por faixa: soma dos votos sem SOURCE ÷ soma dos votos × 100. Não é a média dos percentuais por candidato.",
+                "Cada barra representa 100% dos votos da faixa. Com SOURCE + sem SOURCE = total; os rótulos destacam os votos sem SOURCE.",
                 fontsize=9, color="#52606d")
-    figura.tight_layout(rect=(0, 0.13, 1, 1))
+    figura.subplots_adjust(left=0.09, right=0.98, bottom=0.24, top=0.78)
     caminho_png = Path(caminho_png)
     caminho_png.parent.mkdir(parents=True, exist_ok=True)
     figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
@@ -546,14 +542,17 @@ def efeito_transformacao(caminho_json, caminho_png):
     if estudo["tem_ciclo_negativo"] or len(alternativas) != 2:
         raise ValueError("A figura espera dois caminhos de um caso sem ciclo negativo.")
 
-    figura, eixo = plt.subplots(figsize=(12, 7))
-    estilos = [("custo_peso", "PESO", "#0072B2", "///", -0.18),
-               ("custo_transformado", "PESO + 1", "#D55E00", "..", 0.18)]
-    for campo, nome, cor, hachura, deslocamento in estilos:
+    # [IA] ChatGPT (Codex) – identifica os algoritmos e exibe os pesos por arco conforme solicitado.
+    figura, (eixo, eixo_tabela) = plt.subplots(
+        1, 2, figsize=(15, 8), gridspec_kw={"width_ratios": [1.8, 1.2]}
+    )
+    estilos = [("custo_peso", "Antes: PESO", "#0081CF", -0.18),
+               ("custo_transformado", "Depois: PESO + 1", "#8C1F4E", 0.18)]
+    for campo, nome, cor, deslocamento in estilos:
         custos = [alternativa[campo] for alternativa in alternativas]
         posicoes = [posicao + deslocamento for posicao in range(2)]
         barras = eixo.bar(posicoes, custos, width=0.36, label=nome, color=cor,
-                          hatch=hachura, edgecolor="#263238", linewidth=0.7)
+                          edgecolor="#263238", linewidth=0.7)
         eixo.bar_label(barras, labels=[str(custo) for custo in custos], padding=6, fontsize=12)
 
     rotulos = []
@@ -561,29 +560,56 @@ def efeito_transformacao(caminho_json, caminho_png):
         caminho = alternativa["caminho"]
         quantidade = len(caminho) - 1
         arcos = "1 arco" if quantidade == 1 else f"{quantidade} arcos"
-        rotulos.append(f"{' → '.join(caminho)}\n({arcos})")
+        algoritmos = []
+        if caminho == estudo["caminho_bellman_ford"]:
+            algoritmos.append("Bellman-Ford (PESO)")
+        if caminho == estudo["caminho_dijkstra"]:
+            algoritmos.append("Dijkstra (PESO + 1)")
+        rotulos.append(f"Retornado por {' e '.join(algoritmos)}\n{' → '.join(caminho)}\n({arcos})")
     maior_custo = max(alternativa[campo] for alternativa in alternativas
                       for campo in ("custo_peso", "custo_transformado"))
-    eixo.set_xticks(range(2), rotulos)
+    eixo.set_xticks(range(2), rotulos, fontsize=9)
     eixo.set_ylim(0, max(1, maior_custo) * 1.4)
     eixo.set_yticks(range(int(maior_custo) + 1))
     eixo.set_ylabel("Custo do caminho (soma dos pesos)")
-    eixo.set_xlabel("Caminhos do estudo de caso", labelpad=14)
-    eixo.set_title("Custos dos dois caminhos antes e depois de somar 1 aos pesos",
-                   fontsize=15, fontweight="bold", loc="left", pad=22)
+    eixo.set_title("Custo de cada caminho nas duas versões", fontsize=12, loc="left", pad=20)
     eixo.grid(axis="y", alpha=0.18)
     eixo.set_axisbelow(True)
     eixo.legend(title="Versão dos pesos", frameon=False)
-    figura.text(0.09, 0.10,
+
+    eixo_tabela.axis("off")
+    eixo_tabela.set_title("Pesos dos arcos do subgrafo", fontsize=12, loc="left", pad=20)
+    linhas_tabela = [[arco["origem"], arco["destino"], arco["PESO"], arco["PESO"] + 1]
+                     for arco in estudo["arcos"]]
+    tabela = eixo_tabela.table(
+        cellText=linhas_tabela, colLabels=["Origem", "Destino", "PESO", "PESO + 1"],
+        colWidths=[0.31, 0.29, 0.18, 0.22], loc="center", cellLoc="center",
+    )
+    tabela.auto_set_font_size(False)
+    tabela.set_fontsize(10)
+    tabela.scale(1, 2)
+    for (linha, coluna), celula in tabela.get_celld().items():
+        celula.set_edgecolor("#d8dce2")
+        if linha == 0:
+            celula.set_facecolor("#3E4756")
+            celula.set_text_props(color="white", weight="bold")
+    eixo_tabela.text(0, 0.22, "Cada linha representa um arco dirigido.\nO acréscimo de +1 é aplicado a cada arco,\nantes da execução do Dijkstra.",
+                     transform=eixo_tabela.transAxes, fontsize=10, color="#3E4756", va="top")
+    figura.suptitle("Bellman-Ford e Dijkstra: efeito de somar 1 a cada arco",
+                    x=0.07, ha="left", fontsize=16, fontweight="bold", y=0.97)
+    figura.text(0.07, 0.14,
+                "Bellman-Ford usa PESO e retorna o caminho por 9cds: custo −1 + 1 = 0. Dijkstra usa PESO + 1 e retorna o direto: custo 2.",
+                fontsize=10, color="#263238")
+    figura.text(0.07, 0.10,
+                "Após somar 1 por arco, os dois caminhos empatam em 2. O direto foi retornado no desempate; em PESO, ele custa 1.",
+                fontsize=10, color="#263238")
+    figura.text(0.07, 0.055,
                 "Fonte: estudo_transformacao.json • Subgrafo de três usuários, sem ciclo negativo; exemplo selecionado.",
                 fontsize=9, color="#52606d")
-    figura.text(0.09, 0.06,
-                "Retornos salvos: Bellman-Ford em PESO passa por 9cds; Dijkstra em PESO + 1 retorna o caminho direto.",
+    figura.text(0.07, 0.025,
+                "Este caso ilustra uma mudança no caminho retornado e não estima a frequência de mudanças na rede.",
                 fontsize=9, color="#52606d")
-    figura.text(0.09, 0.02,
-                "Em PESO + 1, os dois caminhos empatam em custo 2. Este caso não estima a frequência de mudanças na rede.",
-                fontsize=9, color="#52606d")
-    figura.tight_layout(rect=(0, 0.17, 1, 1))
+    figura.subplots_adjust(left=0.07, right=0.98, bottom=0.31, top=0.85, wspace=0.24)
     caminho_png = Path(caminho_png)
     caminho_png.parent.mkdir(parents=True, exist_ok=True)
     figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
@@ -615,9 +641,9 @@ def atributos_por_result_dataset(caminho_csv, caminho_png):
     figura, eixos = plt.subplots(1, 3, figsize=(15, 6.5), sharey=True)
     for eixo, (campo, categorias, rotulos) in zip(eixos, paineis):
         resumo["distribuicoes"][campo] = {}
-        for resultado, cor, padrao, deslocamento, nome in (
-            (-1, "#0072B2", "///", -0.19, "RESULT −1 · rejeição"),
-            (1, "#D55E00", "..", 0.19, "RESULT 1 · aprovação"),
+        for resultado, cor, deslocamento, nome in (
+            (-1, "#0081CF", -0.19, "RESULT −1 · rejeição"),
+            (1, "#8C1F4E", 0.19, "RESULT 1 · aprovação"),
         ):
             contagem = dados.loc[dados["RESULT"] == resultado, campo].value_counts().reindex(categorias, fill_value=0)
             percentuais = [100 * int(n) / int(totais[resultado]) for n in contagem]
@@ -625,7 +651,7 @@ def atributos_por_result_dataset(caminho_csv, caminho_png):
                 str(c): {"registros": int(n), "percentual": p}
                 for c, n, p in zip(categorias, contagem, percentuais)}
             barras = eixo.bar([i + deslocamento for i in range(len(categorias))], percentuais,
-                              width=0.36, color=cor, hatch=padrao, edgecolor="#263238",
+                              width=0.36, color=cor, edgecolor="#263238",
                               linewidth=0.7, label=nome)
             eixo.bar_label(barras, labels=[f"{p:.1f}%".replace(".", ",") for p in percentuais],
                            padding=4, fontsize=8)
