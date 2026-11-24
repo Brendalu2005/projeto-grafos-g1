@@ -1,3 +1,273 @@
+## Organização das visualizações de Brenda em documento próprio — 23/11/2026
+
+A pedido de Brenda, as classificações, fontes, justificativas e notas já aprovadas
+foram reunidas em [visualizacoes_brenda_parte2.md](visualizacoes_brenda_parte2.md),
+seguindo a estrutura do documento de André: uso de IA, organização, paleta,
+seções por figura, limites e reprodução. Os textos aprovados foram preservados;
+os detalhes técnicos descrevem os dados e a implementação existentes.
+
+**Checklist desta organização:**
+- [x] Documento das três figuras criado no padrão do documento de André.
+- [x] Justificativas e notas aprovadas reunidas, com fontes e limites.
+- [x] Referência ao documento acrescentada ao README.
+- [ ] Integração das figuras e textos ao PDF técnico.
+- [ ] Conferência manual de BFS e conclusão da declaração de IA.
+
+**Apoio de IA:** ChatGPT (Codex) organizou o documento solicitado a partir dos
+registros existentes, sem alterar gráficos, algoritmos, medições ou interpretações
+aprovadas. O histórico do log foi preservado.
+
+## Justificativa aprovada das faixas de votos — 23/11/2026
+
+**Figura:** `out/parte2/brenda_01_faltantes_por_faixa.png`.
+
+**Faixas:** 1–4, 5–19, 20–99, 100–499 e 500 ou mais votos recebidos por candidato.
+
+> Adotei as faixas sugeridas durante a discussão com apoio de IA para comparar candidatos com diferentes volumes de votos em cinco grupos legíveis, mantendo também aqueles com poucos votos. Os cortes são uma escolha de apresentação, não limites estatísticos. Como sua definição influencia a aparência do gráfico, apresento os intervalos e as quantidades de candidatos, votos e registros sem SOURCE para contextualizar os percentuais.
+
+**Checklist atualizado desta etapa:**
+- [x] Três figuras implementadas e conferidas.
+- [x] Notas analíticas das três figuras aprovadas e registradas.
+- [x] Justificativas das três figuras aprovadas e registradas, incluindo os cortes das faixas.
+- [x] Classificação das figuras e resposta à pesquisa registradas.
+- [x] README atualizado.
+- [ ] Conferência manual de BFS.
+- [ ] Consolidação do registro de IA para revisão — ainda não iniciada.
+
+**Apoio de IA:** ChatGPT (Codex) sugeriu os cortes na discussão anterior e organizou a justificativa acima. Brenda aprovou as faixas e posteriormente aprovou este texto para registro. Não foram alterados os dados, as faixas ou a imagem nesta etapa. As pendências de justificativa nas entradas anteriores representam o histórico e foram resolvidas por esta aprovação.
+
+## Classificação aprovada das visualizações — 23/11/2026
+
+Brenda aprovou a classificação das suas três figuras conforme a finalidade de cada uma:
+
+| Figura | Classificação | Finalidade |
+|---|---|---|
+| [Faltantes por faixa](../out/parte2/brenda_01_faltantes_por_faixa.png) | Exploratória | Examinar a qualidade dos dados. |
+| [Tempos de BFS e Dijkstra](../out/parte2/brenda_02_tempos_bfs_dijkstra.png) | Exploratória | Comparar o comportamento das implementações nos recortes. |
+| [Transformação dos pesos](../out/parte2/brenda_03_efeito_transformacao.png) | Explanatória | Explicar, no exemplo selecionado, como somar 1 por arco elimina a vantagem do caminho antes mais barato. |
+
+Somadas às duas exploratórias e à explanatória registradas em `visualizacoes_andre_parte2.md`, as seis figuras ficam organizadas em quatro exploratórias e duas explanatórias. Essa contagem descreve a classificação aprovada, sem atestar o atendimento de todos os demais critérios de AVD. A figura de transformação ilustra um único caso e não sustenta uma conclusão sobre a frequência do comportamento na rede inteira.
+
+**Checklist atualizado desta etapa:**
+- [x] Três figuras implementadas e conferidas.
+- [x] Notas analíticas das três figuras aprovadas e registradas.
+- [x] Justificativas da segunda e terceira figuras aprovadas e registradas.
+- [x] README atualizado com as aprovações e pendências.
+- [x] Resposta à pergunta de pesquisa incluída no notebook.
+- [x] Classificação das três figuras aprovada e registrada.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** ChatGPT (Codex) propôs a classificação conforme as finalidades discutidas e a registrou após aprovação de Brenda.
+
+## Resposta à pergunta de pesquisa registrada no notebook — 23/11/2026
+
+Brenda aprovou a síntese abaixo e sua inclusão ao final do estudo de caso no notebook de experimentos. No arquivo atual, o estudo está numerado como seção 18, anteriormente referido na conversa como seção 20. Foi acrescentada somente uma célula Markdown, sem executar código ou alterar resultados.
+
+> No exemplo analisado, somar 1 a cada arco altera a preferência entre os caminhos: o caminho via 9cds, inicialmente mais barato, passa a empatar com o direto. O Dijkstra retorna um caminho ótimo nos pesos transformados, mas esse caminho tem custo maior em PESO do que o encontrado por Bellman-Ford. Portanto, a transformação permite executar Dijkstra, porém não garante preservar os caminhos mínimos anteriores. Como analisamos um único par em um subgrafo, não podemos afirmar com que frequência isso acontece na rede inteira.
+
+**Checklist atualizado desta etapa:**
+- [x] Três figuras implementadas e conferidas.
+- [x] Notas analíticas das três figuras aprovadas e registradas.
+- [x] Justificativas da segunda e terceira figuras aprovadas e registradas.
+- [x] README atualizado com as aprovações e pendências.
+- [x] Resposta à pergunta de pesquisa incluída no notebook.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** ChatGPT (Codex) organizou a síntese com base nas interpretações discutidas e aprovadas por Brenda e inseriu o texto após sua aprovação.
+
+## Justificativa aprovada da figura de transformação dos pesos — 23/11/2026
+
+**Figura:** `out/parte2/brenda_03_efeito_transformacao.png`.
+
+> Escolhi barras agrupadas para facilitar a comparação dos custos de cada caminho antes e depois de somar 1 a cada arco. Como o exemplo possui apenas dois caminhos e duas versões dos pesos, a figura permite visualizar os valores e o empate após a transformação com poucos elementos.
+
+A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a ampliação para vários pares. Permanece o limite de ilustração de um exemplo selecionado, sem generalização para a rede inteira.
+
+**Checklist atualizado:**
+- [x] Três figuras implementadas e conferidas.
+- [x] Notas analíticas das três figuras aprovadas e registradas.
+- [x] Justificativa da segunda figura aprovada e registrada.
+- [x] Justificativa da terceira figura aprovada e registrada.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** Brenda explicou que as barras facilitam a comparação antes e depois da transformação por haver poucos elementos no exemplo. ChatGPT (Codex) organizou a redação e registrou o texto após sua aprovação.
+
+## Justificativa aprovada da figura de tempos BFS e Dijkstra — 23/11/2026
+
+**Figura:** `out/parte2/brenda_02_tempos_bfs_dijkstra.png`.
+
+> Escolhi três painéis, um por fonte, para facilitar a comparação dos tempos de BFS e Dijkstra em cada fonte e nos diferentes tamanhos de recorte. A mesma escala vertical permite também comparar os tempos entre os painéis.
+
+**Checklist atualizado:**
+- [x] Figuras atualizadas com contagens e alcance conferido.
+- [x] Notas analíticas das três figuras aprovadas e registradas.
+- [x] Justificativa da figura de tempos aprovada e registrada.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Justificativa da terceira figura.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** Brenda informou que escolheu a apresentação para comparação e aprovou a redação acima. ChatGPT (Codex) organizou e registrou o texto.
+
+## Nota aprovada da figura de transformação dos pesos — 23/11/2026
+
+**Figura:** `out/parte2/brenda_03_efeito_transformacao.png`.
+
+**Nota analítica aprovada:**
+
+> Neste exemplo, a transformação elimina a vantagem do caminho via 9cds, que tinha menor custo em PESO. Como esse caminho possui dois arcos, seu custo aumenta em 2, enquanto o direto aumenta em 1. Os caminhos passam a empatar, e o Dijkstra retorna o direto, cujo custo nos pesos anteriores à transformação é maior. Isso ilustra que somar uma constante a cada arco pode alterar o caminho retornado, sem preservar a preferência pelo caminho originalmente mais barato.
+
+**Limite do estudo:** trata-se de um exemplo selecionado, sem ciclo negativo, que não estima a frequência desse comportamento na rede inteira. O caminho direto não se tornou exclusivamente melhor nos pesos transformados: ambas as alternativas têm custo 2.
+
+**Checklist atualizado:**
+- [x] Figuras atualizadas com contagens e alcance conferido.
+- [x] Nota analítica da primeira figura aprovada e registrada.
+- [x] Nota analítica da segunda figura aprovada e registrada.
+- [x] Nota analítica da terceira figura aprovada e registrada.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Demais justificativas de escolha das figuras.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** Brenda levantou a possibilidade de a transformação deixar de favorecer caminhos originalmente mais baratos. ChatGPT (Codex) explicou a diferença entre custo anterior e transformado, esclareceu o empate e organizou a nota acima, registrada após aprovação de Brenda.
+
+## Nota aprovada da figura de tempos BFS e Dijkstra — 23/11/2026
+
+**Figura:** `out/parte2/brenda_02_tempos_bfs_dijkstra.png`.
+
+**Nota analítica aprovada:**
+
+> Para Siva1979, BFS e Dijkstra apresentam tempos médios próximos no recorte de 10%. Nos recortes de 50% e 100%, a média do BFS fica acima da do Dijkstra. Para Gwynand e John Carter, o BFS apresenta média maior nos três tamanhos. Entretanto, há sobreposição entre alguns intervalos mínimo–máximo e grande variação do BFS em Gwynand a 10%. Esses resultados descrevem as implementações e o ambiente medidos, sem demonstrar uma vantagem geral de Dijkstra. Os conjuntos de usuários alcançados foram iguais entre os algoritmos em cada configuração.
+
+**Checklist atualizado:**
+- [x] Figuras atualizadas com contagens e alcance conferido.
+- [x] Nota analítica da primeira figura aprovada e registrada.
+- [x] Nota analítica da segunda figura aprovada e registrada.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Nota analítica da terceira figura e demais justificativas.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** Brenda descreveu a proximidade inicial dos tempos para Siva1979 e as diferenças entre as médias nas outras configurações. ChatGPT (Codex) organizou a redação, acrescentou as ressalvas sobre variação, sobreposição dos intervalos e alcance conferido, e registrou o texto após aprovação de Brenda.
+
+## Nota aprovada da figura de faltantes — 23/11/2026
+
+**Figura:** `out/parte2/brenda_01_faltantes_por_faixa.png`.
+
+**Nota analítica aprovada:**
+
+> A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: a barra mais alta não representa a maior quantidade de registros sem origem.
+
+**Justificativa da escolha das faixas:** aprovada e registrada na entrada “Justificativa aprovada das faixas de votos”, acima.
+
+**Checklist atualizado:**
+- [x] Figuras atualizadas com contagens e alcance conferido.
+- [x] Nota analítica da primeira figura aprovada e registrada.
+- [ ] Justificativa das faixas da primeira figura — adiada.
+- [ ] Justificativas e notas analíticas da segunda e terceira figuras.
+- [ ] Conferência manual de BFS.
+
+**Apoio de IA:** Brenda levantou a preocupação com o percentual da primeira faixa e aprovou o texto acima. ChatGPT (Codex) esclareceu o cálculo agregado, organizou a redação e registrou a versão aprovada.
+
+## Contagens e alcance nos rótulos — 23/11/2026
+
+Após aprovação de Brenda, a figura de faltantes passou a mostrar a quantidade absoluta sem SOURCE acima de cada barra, junto ao percentual: 23, 147, 829, 642 e 20 registros, totalizando 1.661. As faixas e a proporção agregada foram mantidas.
+
+Na figura de tempos, cada rótulo do eixo horizontal agora informa percentual do recorte, quantidade de arcos e quantidade de outros usuários alcançados. O rodapé esclarece que o alcance exclui a fonte. Os valores foram conferidos independentemente entre BFS e Dijkstra na etapa anterior. As medições, os algoritmos, os ambientes separados e a escala comum dos três painéis foram mantidos.
+
+**Checklist da revisão das figuras:**
+- [x] Conferir independentemente os conjuntos alcançados por BFS e Dijkstra.
+- [x] Acrescentar números absolutos sem SOURCE à figura de faltantes.
+- [x] Acrescentar alcance aos rótulos da figura de tempos.
+- [ ] Registrar justificativas e notas analíticas autorais, incluindo a variabilidade das medições e o empate no estudo de caso.
+- [ ] Fazer a conferência manual de BFS.
+
+**Apoio de IA:** ChatGPT (Codex) ajustou os rótulos aprovados em `src/viz.py` e atualizou este registro, sem novas medições ou interpretação analítica.
+
+## Conferência independente do alcance — 23/11/2026
+
+Após aprovação de Brenda, foi executada uma conferência separada de BFS em PESO e Dijkstra em PESO + 1 nos recortes do benchmark, com a mesma semente e as mesmas fontes. A conferência compara os conjuntos completos de usuários com distância finita, excluindo a fonte, e não apenas suas quantidades. Não mede tempos e não altera os algoritmos ou o benchmark existente.
+
+As nove comparações passaram. Para cada uma das três fontes, foram alcançados 2.661 outros usuários em 10%, 3.360 em 50% e 3.443 em 100%. Os conjuntos são iguais entre os algoritmos, e contagens e tamanhos conferem com o benchmark. O arquivo do benchmark permaneceu idêntico em bytes durante a conferência.
+
+A pedido de Brenda, o script separado e seu JSON adicional foram removidos. A conferência foi incorporada à célula existente da seção 13 do notebook de experimentos: executa os dois algoritmos e usa `assert` para comparar os conjuntos, mantendo `alcances_benchmark` para as etapas seguintes. Para repetir, execute a preparação da seção 12 e a célula da seção 13. Nenhum arquivo adicional é criado. Esta conferência automática não substitui a conferência manual de BFS, que continua pendente.
+
+**Checklist da revisão das figuras:**
+- [x] Conferir independentemente os conjuntos alcançados por BFS e Dijkstra.
+- [ ] Acrescentar números absolutos sem SOURCE à figura de faltantes.
+- [ ] Acrescentar alcance aos rótulos da figura de tempos.
+- [ ] Registrar justificativas e notas analíticas autorais, incluindo a variabilidade das medições e o empate no estudo de caso.
+- [ ] Fazer a conferência manual de BFS.
+
+**Apoio de IA:** ChatGPT (Codex) executou a conferência aprovada, registrou o resultado técnico e, a pedido de Brenda, transferiu a verificação para a célula existente da seção 13, removendo os arquivos extras. Não alterou algoritmos ou medições.
+
+## Figura do estudo de caso implementada — 23/11/2026
+
+Brenda aprovou barras agrupadas por caminho, comparando PESO (azul `#0072B2`, hachura `///`) e PESO + 1 (laranja-avermelhado `#D55E00`, hachura `..`), com valores escritos inclusive no custo zero. A função `efeito_transformacao`, em `src/viz.py`, lê somente `out/parte2/estudo_transformacao.json` e salva `brenda_03_efeito_transformacao.png`. O comando `python -m src.viz --parte2` agora gera as seis figuras, sem executar novamente algoritmos ou benchmarks.
+
+Os valores salvos são 1 e 2 para o caminho direto e 0 e 2 para o caminho via 9cds, respectivamente em PESO e PESO + 1. O rodapé identifica o empate, os caminhos retornados no experimento e o escopo de exemplo selecionado. A figura não apresenta uma estimativa de frequência para a rede inteira.
+
+**Checklist desta etapa:**
+- [x] Centralizar as seis figuras em `src/viz.py`.
+- [x] Implementar a terceira figura com os dados já exportados.
+- [x] Executar o gerador conjunto e conferir visualmente os rótulos, o zero e o empate da terceira figura.
+- [ ] Registrar a justificativa autoral da escolha e escrever a nota analítica de cada uma das três figuras adicionais.
+- [ ] Fazer a conferência manual de BFS, mantida pendente a pedido de Brenda.
+
+**Apoio de IA:** ChatGPT (Codex) implementou o desenho aprovado e atualizou as instruções de geração e este registro. As justificativas e interpretações autorais continuam pendentes.
+
+## Geração conjunta das figuras em viz.py — 23/11/2026
+
+Brenda aprovou manter as funções de todas as figuras em `src/viz.py`, gerar as cinco figuras implementadas pelo comando `python -m src.viz --parte2` e retirar apenas as quatro células de título e desenho das seções 18 e 19 do notebook. O estudo de caso da seção 20 e todos os experimentos foram preservados. A figura do estudo de caso continua pendente.
+
+O comando usa os CSVs bruto e tratado e os JSONs já salvos. Não executa algoritmos ou novas medições. Mantém a paleta e os arquivos de André e acrescenta `brenda_01_faltantes_por_faixa.png` e `brenda_02_tempos_bfs_dijkstra.png`. O arquivo `dados_visualizacoes_andre.json` continua contendo os dados das três figuras de André. As chamadas pelo notebook descritas nos registros anteriores foram substituídas por essa geração conjunta.
+
+**Apoio de IA:** ChatGPT (Codex) integrou as chamadas existentes, removeu as quatro células autorizadas e atualizou a documentação, sem mudar as medidas ou escrever novas interpretações.
+
+## Padronização visual e nomes das figuras — 23/11/2026
+
+Brenda pediu que suas figuras acompanhassem a paleta e a nomeação das figuras de André e confirmou os nomes `brenda_01_faltantes_por_faixa.png` e `brenda_02_tempos_bfs_dijkstra.png`. As referências do notebook e deste log foram atualizadas.
+
+O padrão usa azul `#0072B2`, laranja-avermelhado `#D55E00`, texto escuro e rodapés `#52606d`. A figura de faltantes usa azul com hachuras; a de tempos distingue BFS por círculo e linha contínua e Dijkstra por quadrado e linha tracejada. Títulos alinhados à esquerda e separadores decimais com vírgula acompanham o padrão existente. Foram mantidas as medidas, as faixas e as escalas previamente aprovadas, incluindo a escala linear comum dos três painéis de BFS/Dijkstra.
+
+**Apoio de IA:** ChatGPT (Codex) ajustou a apresentação e as referências de arquivos e gerou novamente as duas imagens com os mesmos dados, sem novas medições ou interpretação analítica. As saídas antigas das duas células de figuras foram limpas para não exibir imagens incorporadas desatualizadas; as demais células foram preservadas.
+
+## Preparação do estudo de caso da transformação — 23/11/2026
+
+Brenda aprovou simplificar a comparação para um único recorte pequeno, com origem, destino e dois caminhos alternativos. Foi apresentado e aprovado o subgrafo induzido de `Siva1979`, `9cds` e `Pilotguy`, contendo exatamente três arcos reais: Siva1979 → Pilotguy (PESO 1), Siva1979 → 9cds (PESO -1) e 9cds → Pilotguy (PESO 1). Todos os arcos entre esses usuários são preservados. Não há ciclos nessa estrutura.
+
+A busca do exemplo usou a fonte Siva1979, intermediários e destinos em ordem lexicográfica e selecionou o primeiro subgrafo induzido com exatamente os três arcos do triângulo dirigido, algum peso negativo e nenhuma outra ocorrência. Não foi exigida mudança do caminho para selecionar o caso.
+
+As células da seção 20 chamam os algoritmos existentes no mesmo recorte: Bellman-Ford em PESO e Dijkstra em PESO + 1. O caminho de Dijkstra é avaliado também em PESO e comparado ao mínimo de Bellman-Ford. As duas alternativas são registradas para explicitar o empate nos custos transformados. O resultado previsto para exportação é `out/parte2/estudo_transformacao.json`, separado dos casos obrigatórios e do benchmark. Essas células foram adicionadas sem execução nesta etapa; a figura ainda não foi implementada.
+
+**Justificativa da escolha:** aprovada e registrada na entrada “Justificativa aprovada da figura de transformação dos pesos”, acima. **Nota analítica:** aprovada e registrada na entrada “Nota aprovada da figura de transformação dos pesos”, acima. O estudo é um exemplo selecionado e não uma estimativa do comportamento dos caminhos na rede inteira.
+
+**Apoio de IA:** ChatGPT (Codex) localizou o exemplo no CSV por leitura, apresentou os arcos para aprovação e acrescentou as chamadas, conferências e exportação no notebook. Não reimplementou os algoritmos e não executou essas novas células.
+
+## Visualização de faltantes por faixa de votos — 23/11/2026
+
+Brenda escolheu agrupamento dos candidatos por faixas e confirmou barras simples nas faixas 1–4, 5–19, 20–99, 100–499 e 500 ou mais votos. A medida aprovada é a proporção agregada: 100 × soma dos votos sem SOURCE / soma dos votos da faixa. Não é a média dos percentuais individuais dos candidatos. A quantidade de candidatos e de votos é indicada em cada faixa, sem limite mínimo adicional.
+
+As faixas usam o total de registros por TARGET no CSV original, antes da exclusão dos registros sem SOURCE. A função `faltantes_por_faixa`, em `src/viz.py`, não altera os dados e devolve a tabela usada para desenhar as barras. Valores ausentes são identificados pela leitura do CSV em pandas, de forma consistente com o notebook de tratamento. Faixas vazias ficam sem percentual.
+
+Saída: `out/parte2/brenda_01_faltantes_por_faixa.png`. A geração foi conferida quanto à legibilidade e à preservação dos totais: 198.275 votos, 1.661 registros sem SOURCE e 3.497 candidatos. A seção 19 do notebook de experimentos contém a chamada reproduzível e a exibição da tabela; essa nova célula foi adicionada sem execução no notebook. O CSV original permaneceu apenas como entrada de leitura.
+
+**Justificativa da escolha das faixas:** aprovada e registrada na entrada “Justificativa aprovada das faixas de votos”, acima. **Nota analítica:** aprovada e registrada na entrada “Nota aprovada da figura de faltantes”, acima. A figura não determina, por si só, o mecanismo ou a causa dos dados ausentes.
+
+**Apoio de IA:** ChatGPT (Codex) implementou a agregação e o desenho em pandas e matplotlib, gerou a prévia, conferiu totais e legibilidade e acrescentou a chamada ao notebook após a aprovação explícita das faixas e da proporção. As justificativas e interpretações permanecem com o grupo.
+
+## Visualização de desempenho de BFS e Dijkstra — 23/11/2026
+
+Brenda escolheu três painéis, um por fonte, para apresentar BFS e Dijkstra. A escolha foi informada na conversa antes da implementação. A figura lê apenas `out/parte2/benchmark_bfs_dijkstra.json`, mantendo os dois algoritmos no mesmo ambiente. Não mistura os tempos de DFS e Bellman-Ford obtidos em outra máquina.
+
+A função `tempo_bfs_dijkstra`, em `src/viz.py`, mostra médias e barras de mínimo–máximo das cinco repetições, em segundos, nos recortes de 10%, 50% e 100% dos arcos. A escala vertical é linear e comum aos painéis. As barras não são intervalos de confiança. Cores e marcadores distinguem as séries, e o rodapé identifica a fonte dos dados, os pesos e o ambiente.
+
+Saída: `out/parte2/brenda_02_tempos_bfs_dijkstra.png`. A seção 18 do notebook de experimentos contém a chamada reproduzível, adicionada sem execução no notebook. A figura foi gerada separadamente e inspecionada para conferir legibilidade; nenhum algoritmo ou benchmark foi executado nessa geração.
+
+**Justificativa da escolha:** aprovada e registrada na entrada “Justificativa aprovada da figura de tempos BFS e Dijkstra”, acima. **Nota analítica:** aprovada e registrada na entrada “Nota aprovada da figura de tempos BFS e Dijkstra”, acima.
+
+**Apoio de IA:** ChatGPT (Codex) implementou o desenho em matplotlib, gerou a prévia, conferiu a legibilidade e acrescentou a chamada ao notebook após a escolha da apresentação. As escolhas e interpretações finais devem ser conferidas e registradas pelo grupo.
+
 ## Etapa 2 — Tratamento de Dados
 
 ### Carregamento do CSV tratado — 20/11/2026

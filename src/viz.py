@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from matplotlib.patches import Patch
 from matplotlib.colors import ListedColormap
 from matplotlib.ticker import FuncFormatter
@@ -362,7 +363,7 @@ def tempos_dfs_bellman_dataset(relatorio, caminho_png):
             "ambiente": relatorio["ambiente"]}
 
 
-# [IA] ChatGPT (Codex) – geração reproduzível das três figuras e dos dados para conferência.
+# [IA] ChatGPT (Codex) – geração conjunta das seis figuras; preserva os dados de conferência de André.
 def gerar_figuras_parte2(pasta_saida="out/parte2"):
     pasta_saida = Path(pasta_saida)
     pasta_saida.mkdir(parents=True, exist_ok=True)
@@ -378,15 +379,218 @@ def gerar_figuras_parte2(pasta_saida="out/parte2"):
                                                pasta_saida / "andre_02_distribuicao_pesos.png"),
             "tempos": tempos_dfs_bellman_dataset(benchmark, pasta_saida / "andre_03_tempos_dfs_bellman.png"),
         }
+        faltantes_por_faixa("data/dataset_parte2/raw/wikiRfA.csv",
+                           pasta_saida / "brenda_01_faltantes_por_faixa.png")
+        tempo_bfs_dijkstra(pasta_dados / "benchmark_bfs_dijkstra.json",
+                           pasta_saida / "brenda_02_tempos_bfs_dijkstra.png")
+        efeito_transformacao(pasta_dados / "estudo_transformacao.json",
+                             pasta_saida / "brenda_03_efeito_transformacao.png")
     (pasta_saida / "dados_visualizacoes_andre.json").write_text(
         json.dumps(dados, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8"
     )
     return dados
 
 
+# [IA] ChatGPT (Codex) – desenho da comparação por fonte escolhida pelo grupo; sem interpretação dos resultados.
+def tempo_bfs_dijkstra(caminho_json, caminho_png):
+    """Desenha três painéis com médias e intervalos mínimo–máximo em segundos."""
+    with open(caminho_json, encoding="utf-8") as arquivo:
+        relatorio = json.load(arquivo)
+
+    fontes = relatorio["fontes"]
+    if len(fontes) != 3:
+        raise ValueError("A figura espera três fontes.")
+
+    figura, eixos = plt.subplots(1, 3, figsize=(15, 6), sharex=True, sharey=True)
+    percentuais = [10, 50, 100]
+    estilos = [("BFS", "#0072B2", "o", "-"), ("DIJKSTRA", "#D55E00", "s", "--")]
+
+    for eixo, fonte in zip(eixos, fontes):
+        tamanhos = {}
+        alcances = {}
+        for algoritmo, cor, marcador, linha in estilos:
+            medias = []
+            erros_inferiores = []
+            erros_superiores = []
+            for percentual in percentuais:
+                registros = []
+                for medicao in relatorio["medicoes"]:
+                    if (medicao["algoritmo"] == algoritmo
+                            and medicao["fonte"] == fonte
+                            and medicao["percentual"] == percentual):
+                        registros.append(medicao)
+                if len(registros) != 1:
+                    raise ValueError(f"Configuração ausente ou duplicada: {algoritmo}, {fonte}, {percentual}%.")
+                medicao = registros[0]
+                media = medicao["media"]
+                medias.append(media)
+                erros_inferiores.append(media - min(medicao["tempos"]))
+                erros_superiores.append(max(medicao["tempos"]) - media)
+                tamanhos[percentual] = medicao["arcos"]
+                alcances[percentual] = medicao["outros_usuarios_alcancados"]
+
+            eixo.errorbar(percentuais, medias,
+                          yerr=[erros_inferiores, erros_superiores],
+                          color=cor, marker=marcador, linestyle=linha, label=algoritmo,
+                          linewidth=2.2, capsize=5, markersize=7)
+
+        rotulos = []
+        for percentual in percentuais:
+            arcos = f"{tamanhos[percentual]:,}".replace(",", ".")
+            alcance = f"{alcances[percentual]:,}".replace(",", ".")
+            rotulos.append(f"{percentual}%\n{arcos} arcos\n{alcance} alcançados")
+        eixo.set_xticks(percentuais, rotulos)
+        eixo.set_title(fonte, fontsize=12, fontweight="bold")
+        eixo.set_xlabel("Recorte por quantidade de arcos", labelpad=10)
+        eixo.grid(axis="y", alpha=0.18)
+        eixo.set_axisbelow(True)
+        eixo.spines[["top", "right"]].set_visible(False)
+
+    maior_tempo = max(max(medicao["tempos"]) for medicao in relatorio["medicoes"])
+    eixos[0].set_ylim(0, maior_tempo * 1.15)
+    eixos[0].set_ylabel("Tempo médio por execução (segundos)")
+    eixos[0].yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{valor:.2f}".replace(".", ",")))
+    eixos[-1].legend(title="Algoritmo", frameon=False)
+    figura.suptitle("Tempo de BFS e Dijkstra por tamanho do grafo e fonte", x=0.07, ha="left",
+                   fontsize=15, fontweight="bold")
+    ambiente = relatorio["ambiente"]
+    figura.text(0.07, 0.07,
+                "Fonte: benchmark_bfs_dijkstra.json • 5 repetições + 1 aquecimento • Barras: mínimo e máximo • Alcance exclui a fonte.",
+                fontsize=9, color="#52606d")
+    figura.text(0.07, 0.03,
+                f"Mesmo ambiente: Python {ambiente['python']} · {ambiente['processador']} · BFS: PESO; Dijkstra: PESO + 1. Escala vertical comum e linear.",
+                fontsize=9, color="#52606d")
+    figura.tight_layout(rect=(0, 0.13, 1, 0.94))
+    caminho_png = Path(caminho_png)
+    caminho_png.parent.mkdir(parents=True, exist_ok=True)
+    figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
+    plt.close(figura)
+
+
+# [IA] ChatGPT (Codex) – barras por faixas e proporção agregada escolhidas pelo grupo.
+def faltantes_por_faixa(caminho_csv, caminho_png):
+    """Agrupa candidatos por votos no CSV original e desenha a proporção sem SOURCE."""
+    dados = pd.read_csv(caminho_csv, index_col=0)
+    candidatos = dados.groupby("TARGET").size().rename("votos").to_frame()
+    candidatos["sem_source"] = dados["SOURCE"].isna().groupby(dados["TARGET"]).sum()
+    rotulos = ["1–4", "5–19", "20–99", "100–499", "500 ou mais"]
+    candidatos["faixa"] = pd.cut(
+        candidatos["votos"], bins=[0, 4, 19, 99, 499, float("inf")], labels=rotulos
+    )
+    resumo = candidatos.groupby("faixa", observed=False).agg(
+        candidatos=("votos", "size"),
+        votos=("votos", "sum"),
+        sem_source=("sem_source", "sum"),
+    )
+    # Faixas vazias ficam sem percentual, em vez de serem apresentadas como 0%.
+    denominador = resumo["votos"].replace(0, float("nan"))
+    resumo["percentual_sem_source"] = 100 * resumo["sem_source"] / denominador
+
+    figura, eixo = plt.subplots(figsize=(12, 7))
+    percentuais = resumo["percentual_sem_source"]
+    eixo.bar(range(5), percentuais, color="#0072B2", width=0.65,
+             hatch="///", edgecolor="#263238", linewidth=0.7)
+    maior_percentual = percentuais.max()
+    if pd.isna(maior_percentual) or maior_percentual == 0:
+        maior_percentual = 1
+    eixo.set_ylim(0, maior_percentual * 1.35)
+
+    etiquetas = []
+    for posicao, (faixa, grupo) in enumerate(resumo.iterrows()):
+        quantidade_candidatos = f"{int(grupo['candidatos']):,}".replace(",", ".")
+        quantidade_votos = f"{int(grupo['votos']):,}".replace(",", ".")
+        etiquetas.append(f"{faixa}\n{quantidade_candidatos} candidatos\n{quantidade_votos} votos")
+        percentual = grupo["percentual_sem_source"]
+        if pd.isna(percentual):
+            texto = "Sem dados"
+            altura = 0
+        else:
+            quantidade_sem_source = f"{int(grupo['sem_source']):,}".replace(",", ".")
+            percentual_formatado = f"{percentual:.2f}%".replace(".", ",")
+            texto = f"{percentual_formatado}\n{quantidade_sem_source} sem SOURCE"
+            altura = percentual
+        eixo.annotate(texto, (posicao, altura), xytext=(0, 7),
+                      textcoords="offset points", ha="center", fontsize=11, color="#263238")
+
+    eixo.set_xticks(range(5), etiquetas)
+    eixo.set_xlabel("Faixa do total de votos recebidos por candidato (antes do tratamento)", labelpad=14)
+    eixo.set_ylabel("Votos sem SOURCE / total de votos da faixa (%)")
+    eixo.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{valor:.1f}%".replace(".", ",")))
+    eixo.set_title("Votos sem origem identificada por faixa de votos recebidos", fontsize=15,
+                   fontweight="bold", loc="left", pad=22)
+    eixo.grid(axis="y", alpha=0.18)
+    eixo.set_axisbelow(True)
+    eixo.spines[["top", "right"]].set_visible(False)
+    figura.text(0.09, 0.07,
+                "Fonte: wikiRfA.csv original • Todos os candidatos com TARGET identificado; nenhum limite mínimo adicional.",
+                fontsize=9, color="#52606d")
+    figura.text(0.09, 0.03,
+                "Proporção agregada por faixa: soma dos votos sem SOURCE ÷ soma dos votos × 100. Não é a média dos percentuais por candidato.",
+                fontsize=9, color="#52606d")
+    figura.tight_layout(rect=(0, 0.13, 1, 1))
+    caminho_png = Path(caminho_png)
+    caminho_png.parent.mkdir(parents=True, exist_ok=True)
+    figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
+    plt.close(figura)
+    return resumo
+
+
+# [IA] ChatGPT (Codex) – barras de custos do estudo de caso, conforme forma aprovada.
+def efeito_transformacao(caminho_json, caminho_png):
+    """Compara os custos salvos dos dois caminhos em PESO e PESO + 1."""
+    with open(caminho_json, encoding="utf-8") as arquivo:
+        estudo = json.load(arquivo)
+    alternativas = estudo["alternativas"]
+    if estudo["tem_ciclo_negativo"] or len(alternativas) != 2:
+        raise ValueError("A figura espera dois caminhos de um caso sem ciclo negativo.")
+
+    figura, eixo = plt.subplots(figsize=(12, 7))
+    estilos = [("custo_peso", "PESO", "#0072B2", "///", -0.18),
+               ("custo_transformado", "PESO + 1", "#D55E00", "..", 0.18)]
+    for campo, nome, cor, hachura, deslocamento in estilos:
+        custos = [alternativa[campo] for alternativa in alternativas]
+        posicoes = [posicao + deslocamento for posicao in range(2)]
+        barras = eixo.bar(posicoes, custos, width=0.36, label=nome, color=cor,
+                          hatch=hachura, edgecolor="#263238", linewidth=0.7)
+        eixo.bar_label(barras, labels=[str(custo) for custo in custos], padding=6, fontsize=12)
+
+    rotulos = []
+    for alternativa in alternativas:
+        caminho = alternativa["caminho"]
+        quantidade = len(caminho) - 1
+        arcos = "1 arco" if quantidade == 1 else f"{quantidade} arcos"
+        rotulos.append(f"{' → '.join(caminho)}\n({arcos})")
+    maior_custo = max(alternativa[campo] for alternativa in alternativas
+                      for campo in ("custo_peso", "custo_transformado"))
+    eixo.set_xticks(range(2), rotulos)
+    eixo.set_ylim(0, max(1, maior_custo) * 1.4)
+    eixo.set_yticks(range(int(maior_custo) + 1))
+    eixo.set_ylabel("Custo do caminho (soma dos pesos)")
+    eixo.set_xlabel("Caminhos do estudo de caso", labelpad=14)
+    eixo.set_title("Custos dos dois caminhos antes e depois de somar 1 aos pesos",
+                   fontsize=15, fontweight="bold", loc="left", pad=22)
+    eixo.grid(axis="y", alpha=0.18)
+    eixo.set_axisbelow(True)
+    eixo.legend(title="Versão dos pesos", frameon=False)
+    figura.text(0.09, 0.10,
+                "Fonte: estudo_transformacao.json • Subgrafo de três usuários, sem ciclo negativo; exemplo selecionado.",
+                fontsize=9, color="#52606d")
+    figura.text(0.09, 0.06,
+                "Retornos salvos: Bellman-Ford em PESO passa por 9cds; Dijkstra em PESO + 1 retorna o caminho direto.",
+                fontsize=9, color="#52606d")
+    figura.text(0.09, 0.02,
+                "Em PESO + 1, os dois caminhos empatam em custo 2. Este caso não estima a frequência de mudanças na rede.",
+                fontsize=9, color="#52606d")
+    figura.tight_layout(rect=(0, 0.17, 1, 1))
+    caminho_png = Path(caminho_png)
+    caminho_png.parent.mkdir(parents=True, exist_ok=True)
+    figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
+    plt.close(figura)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Gera as figuras do projeto.")
-    parser.add_argument("--parte2", action="store_true", help="gera as três visualizações de André da Parte 2")
+    parser.add_argument("--parte2", action="store_true", help="gera as seis visualizações implementadas da Parte 2")
     parser.add_argument("--out", help="pasta das imagens")
     argumentos = parser.parse_args()
     if argumentos.parte2:

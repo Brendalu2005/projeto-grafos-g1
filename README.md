@@ -280,17 +280,20 @@ podem demorar. Os dois casos mínimos de correção não substituem estas mediç
 
 <!-- [IA] ChatGPT (Codex) – organização da documentação da Parte 2 com as decisões e os resultados já registrados pela equipe. -->
 
-### Visualizações da Parte 2 — André
+### Visualizações da Parte 2
 
-Com o CSV tratado, as métricas e o benchmark já disponíveis, gere as figuras sem
-executar novamente os algoritmos:
+Com os CSVs bruto e tratado, as métricas, os dois benchmarks e o
+`estudo_transformacao.json` (seção 20 do notebook) já disponíveis,
+gere as seis figuras implementadas, na raiz do projeto, sem executar novamente os algoritmos:
 
 ```powershell
 python -m src.viz --parte2
 ```
 
 As saídas são `andre_01_distribuicao_graus.png`, `andre_02_distribuicao_pesos.png`,
-`andre_03_tempos_dfs_bellman.png` e `dados_visualizacoes_andre.json`, em `out/parte2/`.
+`andre_03_tempos_dfs_bellman.png`, `brenda_01_faltantes_por_faixa.png`,
+`brenda_02_tempos_bfs_dijkstra.png`, `brenda_03_efeito_transformacao.png`
+e `dados_visualizacoes_andre.json`, em `out/parte2/`.
 As duas primeiras são exploratórias; a terceira comunica os tempos de DFS e
 Bellman-Ford para a fonte comum Siva1979 no mesmo ambiente. A comparação não mistura
 as máquinas das duas contribuições de benchmark.
@@ -299,7 +302,27 @@ Finalidade, justificativas, fontes e notas estão em
 [visualizacoes_andre_parte2.md](docs/visualizacoes_andre_parte2.md). Os textos são
 rascunhos gerados com IA para revisão de André, conforme a autorização da professora
 informada por ele. O registro de IA inclui escolha, código e interpretação.
-As demais figuras e a consolidação do relatório continuam pendentes.
+As figuras de faltantes e de tempos de BFS/Dijkstra também são implementadas em
+`src/viz.py`. A primeira lê o CSV bruto e mostra a proporção agregada sem SOURCE
+nas faixas aprovadas. A segunda mantém três painéis, um por fonte, no ambiente
+próprio de BFS/Dijkstra. As duas séries de benchmark não são misturadas em uma
+comparação de ambiente controlado. A terceira figura adicional compara os custos
+dos dois caminhos do estudo de caso em PESO e PESO + 1, incluindo o custo zero
+e o empate após a transformação. A geração sobrescreve as seis imagens e os
+dados de conferência de André; `--out` permite escolher outra pasta de saída.
+
+As células de desenho das antigas seções 18 e 19 foram retiradas do notebook:
+o comando acima centraliza a geração das figuras. O estudo de caso da seção 20
+permanece no notebook e fornece o JSON para a figura de transformação. O exemplo
+selecionado não mede a frequência de mudanças de caminhos na rede inteira.
+As notas analíticas e as justificativas das três figuras adicionais, incluindo
+os cortes das faixas da figura de faltantes, foram aprovadas e registradas no
+[avd_log.md](docs/avd_log.md), com indicação do apoio de IA.
+As fontes, justificativas, notas e limites dessas três figuras estão reunidos em
+[visualizacoes_brenda_parte2.md](docs/visualizacoes_brenda_parte2.md).
+A conferência automática de alcance entre BFS e Dijkstra está na seção 13 do
+notebook; a conferência manual de BFS continua pendente. O relatório consolidado
+já está disponível em `out/parte2/parte2_report.json`.
 
 ## Uso de IA
 
