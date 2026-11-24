@@ -9,35 +9,13 @@ import argparse
 import hashlib
 import json
 import math
-import platform
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.benchmark import criar_recortes, medir_algoritmo, selecionar_fontes
+# [IA] ChatGPT (Codex) – reutiliza a mesma coleta de ambiente do executor BFS/Dijkstra.
+from src.benchmark import ambiente_atual, criar_recortes, medir_algoritmo, selecionar_fontes
 from src.graphs.algorithms import bellman_ford, bfs, dfs
 from src.graphs.io import carregar_dataset
-
-
-def ambiente_atual():
-    processador = platform.processor() or None
-    if platform.system() == "Windows":
-        import winreg
-        try:
-            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                                r"HARDWARE\DESCRIPTION\System\CentralProcessor\0") as chave:
-                processador = winreg.QueryValueEx(chave, "ProcessorNameString")[0].strip()
-        except OSError:
-            pass
-    try:
-        import psutil
-        memoria = psutil.virtual_memory().total
-    except ImportError:
-        memoria = None
-    return {
-        "python": platform.python_version(), "sistema": platform.system(),
-        "versao_sistema": platform.version(), "processador": processador,
-        "memoria_total_bytes": memoria,
-    }
 
 
 def executar_benchmark(caminho_csv, caminho_saida, fontes_bellman_completo=1):

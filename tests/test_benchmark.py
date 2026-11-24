@@ -1,6 +1,11 @@
 # [IA] ChatGPT (Codex) – testes das regras de recorte aprovadas pela equipe.
 from collections import Counter
 from copy import deepcopy
+import csv
+import hashlib
+import json
+import math
+import sys
 
 import pytest
 
@@ -193,3 +198,71 @@ def test_medicao_rejeita_fonte_ausente():
 
     with pytest.raises(ValueError, match="fonte"):
         medir_algoritmo(nao_executar, {"A": []}, "B")
+
+
+# [IA] ChatGPT (Codex) – integração do comando, preservação dos dados e falhas de alcance.
+@pytest.fixture
+def csv_benchmark(tmp_path):
+    caminho = tmp_path / "tratado.csv"
+    with caminho.open("w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
+        escritor.writerow(["SOURCE", "TARGET", "VOTE", "RESULT", "PESO"])
+        for fonte in ["A", "B", "C", "D"]:
+            for peso in [-1, 0, 1, 2] * 25:
+                escritor.writerow([fonte, "T", -1, 1, peso])
+    return caminho
+
+
+def test_comando_benchmark_exporta_18_configuracoes(csv_benchmark, tmp_path, monkeypatch):
+    import src.benchmark as executor
+
+    saida = tmp_path / "resultado.json"
+    original = csv_benchmark.read_bytes()
+    dijkstra_original = executor.dijkstra
+    pesos_recebidos = []
+
+    def conferir_pesos(grafo, fonte):
+        pesos_recebidos.extend(peso for vizinhos in grafo.values() for _, peso in vizinhos)
+        return dijkstra_original(grafo, fonte)
+
+    monkeypatch.setattr(executor, "dijkstra", conferir_pesos)
+    monkeypatch.setattr(sys, "argv", ["benchmark", "--dataset", str(csv_benchmark), "--out", str(saida)])
+    executor.main()
+
+    relatorio = json.loads(saida.read_text(encoding="utf-8"))
+    assert relatorio["completo"] is True
+    assert relatorio["configuracoes_esperadas"] == len(relatorio["medicoes"]) == 18
+    assert len({(m["algoritmo"], m["percentual"], m["fonte"]) for m in relatorio["medicoes"]}) == 18
+    assert {m["algoritmo"] for m in relatorio["medicoes"]} == {"BFS", "DIJKSTRA"}
+    assert {m["percentual"] for m in relatorio["medicoes"]} == {10, 50, 100}
+    assert len(relatorio["fontes"]) == 3
+    assert relatorio["sha256_entrada"] == hashlib.sha256(original).hexdigest()
+    assert relatorio["arquivo_entrada"] == csv_benchmark.name
+    assert csv_benchmark.read_bytes() == original
+    assert set(pesos_recebidos) == {0, 1, 2, 3}
+    for medicao in relatorio["medicoes"]:
+        assert len(medicao["tempos"]) == medicao["repeticoes"] == 5
+        assert medicao["aquecimentos"] == 1
+        assert medicao["outros_usuarios_alcancados"] == 1
+        assert medicao["arcos"] == {10: 40, 50: 200, 100: 400}[medicao["percentual"]]
+        assert math.isclose(medicao["media"], sum(medicao["tempos"]) / 5)
+
+
+def test_executor_preserva_saida_existente(csv_benchmark, tmp_path):
+    from src.benchmark import executar_benchmark
+
+    saida = tmp_path / "anterior.json"
+    saida.write_text("resultado anterior", encoding="utf-8")
+    with pytest.raises(ValueError, match="saída já existe"):
+        executar_benchmark(csv_benchmark, saida)
+    assert saida.read_text(encoding="utf-8") == "resultado anterior"
+
+
+def test_executor_rejeita_conjuntos_diferentes_com_mesma_contagem(csv_benchmark, tmp_path, monkeypatch):
+    import src.benchmark as executor
+
+    monkeypatch.setattr(executor, "dijkstra", lambda grafo, fonte: ({fonte: 0, "outro": 1}, {}))
+    saida = tmp_path / "divergente.json"
+    with pytest.raises(ValueError, match="Alcances diferentes"):
+        executor.executar_benchmark(csv_benchmark, saida)
+    assert not saida.exists()

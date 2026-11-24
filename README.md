@@ -216,6 +216,31 @@ O benchmark usa recortes aninhados de 10%, 50% e 100% dos arcos embaralhados com
 
 A exportação do ambiente usa `psutil` opcionalmente para obter a memória. Se a biblioteca não estiver instalada, o campo fica `null` e deve ser completado antes da consolidação. Os CSVs são ignorados pelo Git; para uma nova instalação, gere o tratado pelo notebook. Executar as células de exportação novamente sobrescreve os respectivos arquivos de saída.
 
+Para medir BFS e Dijkstra na máquina usada por André, execute na raiz do projeto,
+com o ambiente virtual ativado e a mesma versão de Python e das dependências
+usada nas medições de DFS/Bellman-Ford:
+
+```powershell
+Get-FileHash -LiteralPath data/dataset_parte2/processed/wikiRfA_tratado.csv -Algorithm SHA256
+python -m src.benchmark --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --out out/parte2/benchmark_bfs_dijkstra_mesmo_ambiente.json
+```
+
+Confira o hash antes de medir. O CSV de referência tem SHA-256
+`de16066d90875782f2daffae3adbe5c513f0fa9743ad242d3e1fcbf5c635e7c2`,
+também registrado no benchmark anterior de DFS/Bellman-Ford. Se houver diferença,
+alinhem o CSV antes de iniciar. As duas máquinas devem usar a mesma versão dos
+algoritmos e das regras de recorte.
+
+O comando reutiliza os algoritmos existentes, confere os conjuntos alcançados
+fora do cronômetro e mede 18 configurações: dois algoritmos, três fontes e três
+tamanhos. São um aquecimento e cinco repetições medidas por configuração.
+O JSON registra o hash do CSV, ambiente, alcance, estatísticas e `completo`.
+Somente `completo: true` indica o término das 18 configurações. A saída é
+atualizada após cada configuração; o executor recusa uma saída já existente.
+Ao terminar, André deve devolver `benchmark_bfs_dijkstra_mesmo_ambiente.json`
+para conferência e consolidação. Essa execução não altera os JSONs anteriores,
+as figuras ou `parte2_report.json`.
+
 Para testar somente a estrutura do benchmark, na raiz do projeto:
 
 ```bash

@@ -1,3 +1,58 @@
+## Revisão do BFS e comando do benchmark — 23/11/2026
+
+Seguindo a nova divisão de tarefas informada por Brenda, foi revisado o BFS
+existente: usa `deque`, `popleft()` e dicionários para distâncias e predecessores.
+A preparação percorre todos os arcos antes da busca e faz parte da chamada
+medida. Não foi identificado erro que justificasse alterar o algoritmo; os tempos
+observados não demonstram, por si só, erro nem uma vantagem geral de Dijkstra.
+A causa exata da diferença de desempenho não foi isolada nesta revisão.
+
+Após aprovação de Brenda, `src/benchmark.py` recebeu um comando executável para
+BFS e Dijkstra. Reutiliza recortes e seleção de fontes com semente 42, mede uma
+busca completa por fonte, com um aquecimento e cinco repetições. Compara os
+conjuntos alcançados fora do cronômetro e registra hash do CSV, ambiente e status
+de conclusão. São 18 configurações e 90 tempos medidos. Não sobrescreve uma saída
+existente. A função de coleta do ambiente foi movida do executor de
+DFS/Bellman-Ford para o módulo comum, mantendo o comportamento e evitando cópia.
+Os algoritmos não foram alterados.
+
+**Comando para André, na raiz do projeto:**
+
+```powershell
+python -m src.benchmark --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --out out/parte2/benchmark_bfs_dijkstra_mesmo_ambiente.json
+```
+
+**SHA-256 do CSV tratado:**
+`de16066d90875782f2daffae3adbe5c513f0fa9743ad242d3e1fcbf5c635e7c2`.
+O hash coincide com o registrado nas medições anteriores de DFS/Bellman-Ford.
+André deve conferir o hash antes da execução e usar a versão alinhada do código,
+Python e dependências na mesma máquina das medições anteriores.
+
+**Verificação:** 32 testes de BFS, Dijkstra, preparação/medição e executores
+passaram. Foram testadas a transformação dos pesos, a exportação, a recusa de
+sobrescrita e a detecção de conjuntos diferentes mesmo com quantidades iguais.
+O comando também foi executado no CSV real com saída temporária: 18 configurações,
+90 tempos e alcances de 2.661, 3.360 e 3.443 nos recortes de 10%, 50% e 100%.
+CSV, benchmarks anteriores e relatório consolidado foram preservados em bytes.
+Os resultados temporários foram removidos e não são a medição oficial de André.
+
+**Checklist das atividades de Brenda na nova divisão:**
+- [x] Conferir o BFS e preparar/testar o comando do benchmark.
+- [ ] Commit do benchmark — não realizado, conforme pedido de Brenda.
+- [ ] Enviar comando e hash ao André — instruções prontas no README e neste log; envio por Brenda.
+- [ ] Consultar as professoras sobre Bellman-Ford com uma fonte em 100%.
+- [ ] Juntar os resultados no `parte2_report.json`, após receber as novas medições.
+- [ ] Reclassificar B02 como análise visual de desempenho.
+- [ ] Registrar a ligação entre achados exploratórios e explanatórias.
+- [ ] Integrar ao PDF as seções de BFS, Dijkstra, transformação e resposta à pesquisa.
+- [ ] Conferir BFS à mão e executar testes em clone limpo.
+- [ ] Concluir registro de IA e reflexão.
+
+**Apoio de IA:** ChatGPT (Codex) revisou os arquivos existentes, implementou o
+executor e seus testes após aprovação e registrou comandos e resultados técnicos.
+Não foi feito commit nem enviada mensagem ao André. A medição no ambiente de
+André e a consulta às professoras continuam pendentes.
+
 ## Organização das visualizações de Brenda em documento próprio — 23/11/2026
 
 A pedido de Brenda, as classificações, fontes, justificativas e notas já aprovadas
