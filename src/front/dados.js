@@ -187,7 +187,10 @@
   }
   async function result(name, algorithm, grade, fonteConsumivel = false) {
     const row = await rawResult(name, algorithm, fonteConsumivel);
-    return row ? normalize(row, name, algorithm, grade, fonteConsumivel) : null;
+    if (!row) return null;
+    // [IA] ChatGPT (Codex) – identifica o arquivo realmente usado na exibição.
+    return {...await normalize(row, name, algorithm, grade, fonteConsumivel),
+      arquivo_importado: row.arquivo_importado || null};
   }
   async function compare(name, grade, fonteConsumivel = false) {
     const key = `${name}/${fonteConsumivel}`;
@@ -221,8 +224,9 @@
   }
   async function importFile(file) {
     const rows = records(decode(await file.arrayBuffer()), file.name.toLowerCase());
+    if (!rows.length) throw new Error('O arquivo não contém resultados.');
     for (const row of rows) if (!/^[\w-]+$/.test(row.mapa || '') || !ALGORITHMS.includes(row.algoritmo) || !['OK','RECUSA','SEM_SOLUCAO','CICLO_NEGATIVO','CLASSIFICACAO','EXPLORACAO'].includes(row.status)) throw new Error('Use um CSV oficial ou a saída da CLI correspondente ao mapa e algoritmo.');
-    for (const row of rows) imported.set(`${row.mapa}/${row.algoritmo}`, row);
+    for (const row of rows) imported.set(`${row.mapa}/${row.algoritmo}`, {...row, arquivo_importado: file.name});
     return rows;
   }
   window.FrontData = {list, map, result, compare, analyses, importFile, output, online};

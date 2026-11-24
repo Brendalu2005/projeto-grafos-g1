@@ -124,7 +124,7 @@
     document.querySelectorAll('.map-card').forEach(card => card.setAttribute('aria-selected', String(card.dataset.mapa === name)));
     $('#palco-mapa').textContent = titulo(name) + (current()?.grupo ? ' · mapa da equipe' : '');
     loadAnalyses();
-    load();
+    return load();
   }
 
   // ---------- controles ----------
@@ -228,7 +228,10 @@
     }
     S.kind = result.status === 'exploracao' ? 'explore' : result.status === 'ciclo_negativo' ? 'cycle' : 'path';
     S.steps = S.kind === 'cycle' ? result.ciclo_negativo : result.passos;
-    $('#algorithm-note').textContent = result.aviso || result.mensagem;
+    // [IA] ChatGPT (Codex) – mantém a origem importada visível após carregar o resultado.
+    const nota = result.aviso || result.mensagem;
+    $('#algorithm-note').textContent = result.arquivo_importado
+      ? `Arquivo importado: ${result.arquivo_importado}. ${nota}` : nota;
     if (result.status === 'sucesso') status(`${algInfo(S.alg).nome} encontrou o caminho`, `${result.movimentos} movimentos, custo total ${result.custo_total ?? 'indisponível'}.`, result.aviso ? 'warning' : '');
     else if (S.kind === 'explore') status('Exploração da DFS pronta', `${S.steps.length} estados na ordem em que foram descobertos.`);
     else if (result.status === 'classificacao') status('Classificação da DFS carregada', result.mensagem);
@@ -418,12 +421,14 @@
     const file = event.target.files?.[0]; if (!file) return;
     try {
       const rows = await FrontData.importFile(file);
-      if (rows.length && S.maps.some(map => map.mapa === rows[0].mapa)) {
-        S.alg = rows[0].algoritmo; syncPills();
-        if (S.mode !== 'single') setMode('single');
-        selectMap(rows[0].mapa);
-      }
-      status('Arquivo carregado', `${rows.length} ${rows.length === 1 ? 'resultado importado' : 'resultados importados'}.`);
+      // [IA] ChatGPT (Codex) – prioriza a seleção atual e aguarda sua atualização.
+      const disponiveis = rows.filter(row => S.maps.some(map => map.mapa === row.mapa));
+      const selecionado = disponiveis.find(row => row.mapa === S.map && row.algoritmo === S.alg)
+        || disponiveis.find(row => row.mapa === S.map) || disponiveis[0];
+      if (!selecionado) throw new Error('Nenhum resultado corresponde aos mapas disponíveis na interface.');
+      S.alg = selecionado.algoritmo; syncPills();
+      if (S.mode !== 'single') setMode('single');
+      await selectMap(selecionado.mapa);
     } catch (error) { status('Arquivo inválido', error.message, 'error'); }
     finally { event.target.value = ''; }
   });
