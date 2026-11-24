@@ -281,6 +281,10 @@ h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
 .figure-viewer .card-sub { margin-block: 14px; }
 .figure-controls { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
 .figure-controls button:disabled { opacity: .35; cursor: default; }
+.graph-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 28px; margin-block: 22px 8px; font-size: 14px; }
+.graph-controls label { display: inline-flex; align-items: center; gap: 10px; }
+.graph-controls select { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.graph-controls input { accent-color: var(--accent); }
 @media (max-width: 900px) {
   .dataset-layout { grid-template-columns: minmax(0, 1fr); }
   .figure-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }

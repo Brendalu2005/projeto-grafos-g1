@@ -62,7 +62,30 @@
   const imported = new Map();
   const edgeCache = new Map();
   const compareCache = new Map();
+  const visualCache = new Map();
   const dirOf = fonteConsumivel => fonteConsumivel ? 'fonte_consumivel/' : '';
+
+  // [IA] ChatGPT (Codex) – prepara a visualização a partir dos CSVs já exportados, sem recalcular grafos.
+  async function visualizacao(name, fonteConsumivel = false) {
+    const chave = `${name}/${fonteConsumivel}`;
+    if (!visualCache.has(chave)) {
+      const dir = dirOf(fonteConsumivel);
+      const [textoArestas, textoArmadilhas] = await Promise.all([
+        optional(output(`${dir}arestas_${name}.csv`)), optional(output(`${dir}armadilhas_${name}.csv`)),
+      ]);
+      const rotulos = new Set();
+      for (const arco of textoArestas ? csv(textoArestas) : []) {
+        if (arco.origem !== 'ALVO') rotulos.add(arco.origem);
+        if (arco.destino !== 'ALVO') rotulos.add(arco.destino);
+      }
+      const estados = [...rotulos].map(state);
+      visualCache.set(chave, {mapa:name, fonte:fonteConsumivel, estados,
+        camadas:[...new Set(estados.map(estado => estado.chaves.join('') || '-'))].sort(),
+        armadilhas:new Set((textoArmadilhas ? csv(textoArmadilhas) : []).map(linha => linha.estado)),
+        disponivel:textoArestas !== null && textoArmadilhas !== null});
+    }
+    return visualCache.get(chave);
+  }
 
   async function analyses(name, fonteConsumivel = false) {
     const dir = dirOf(fonteConsumivel);
@@ -180,8 +203,10 @@
       steps.forEach((step, i) => { step.custo_acumulado = i ? null : 0; });
     }
     if (cycle.length) { cost = 0; complete = true; addCosts(cycle); }
+    // [IA] ChatGPT (Codex) – exibe o custo calculado dos arcos do ciclo já exportado.
+    const custoCiclo = cycle.length && complete ? cost : row.custo_ciclo ?? null;
     return {status: statuses[row.status], mensagem: messages[row.status], passos:steps,
-      ciclo_negativo:cycle, classificacao_arcos:row.classificacao_arcos || null,
+      ciclo_negativo:cycle, custo_ciclo:custoCiclo, classificacao_arcos:row.classificacao_arcos || null,
       movimentos:steps.length ? steps.length-1 : null, custo_total:total,
       aviso: !complete ? 'Os CSVs de arestas estão ausentes ou não batem com o custo desta execução. O custo por passo fica indisponível; o custo total vem da saída oficial.' : ''};
   }
@@ -229,5 +254,5 @@
     for (const row of rows) imported.set(`${row.mapa}/${row.algoritmo}`, {...row, arquivo_importado: file.name});
     return rows;
   }
-  window.FrontData = {list, map, result, compare, analyses, importFile, output, online};
+  window.FrontData = {list, map, result, compare, analyses, visualizacao, importFile, output, online};
 })();

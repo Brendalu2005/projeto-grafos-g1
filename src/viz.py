@@ -218,7 +218,10 @@ def gerar_figuras_parte1(pasta_saida="out/parte1"):
         resultado = resolver(caminho, "BELLMAN_FORD")
         if resultado["status"] != "OK":
             raise ValueError(f"Não foi possível gerar percurso para {nome}: {resultado['status']}")
-        percurso_colorido(caminho, resultado, pasta_saida / f"percurso_{nome}.png")
+        arquivo_percurso = pasta_saida / f"percurso_{nome}.png"
+        percurso_colorido(caminho, resultado, arquivo_percurso)
+        # [IA] ChatGPT (Codex) – nome exigido no enunciado, preservando o arquivo usado pelo front.
+        (pasta_saida / f"percurso_{nome.split('_')[0]}.png").write_bytes(arquivo_percurso.read_bytes())
     grafo_estados_camadas("data/mapas/m02_uma_chave.txt", pasta_saida / "grafo_estados_camadas_m02.png")
 
 

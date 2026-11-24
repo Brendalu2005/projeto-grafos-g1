@@ -94,6 +94,13 @@
 
       <div id="status-message" class="status" role="status" aria-live="polite"><strong>Carregando</strong><span>Lendo os mapas do projeto.</span></div>
 
+      <!-- [IA] ChatGPT (Codex) – controles visuais sobre estados e armadilhas já exportados. -->
+      <div class="graph-controls">
+        <label for="layer-filter">Camada de chaves <select id="layer-filter"><option value="all">Todas as camadas</option></select></label>
+        <label><input id="trap-toggle" type="checkbox" checked> Destacar estados-armadilha</label>
+      </div>
+      <p class="card-sub" id="structure-note">Carregando os estados exportados.</p>
+
       <div class="mode" id="modo-single">
         <div class="alg-pills" role="radiogroup" aria-label="Algoritmo" id="alg-pills"></div>
         <div class="stage">

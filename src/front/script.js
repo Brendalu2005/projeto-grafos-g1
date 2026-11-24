@@ -14,7 +14,8 @@
     grupo_rotas: 'Rotas', grupo_armadilhas: 'Armadilhas',
   };
   const SETAS = {'^': '↑', '>': '→', 'v': '↓', '<': '←'};
-  const S = {maps: [], map: null, alg: 'BFS', fonte: false, mode: 'single', page: 'inicio', steps: [], kind: 'path', index: 0, race: null, timer: null, request: 0};
+  const S = {maps: [], map: null, alg: 'BFS', fonte: false, mode: 'single', page: 'inicio', steps: [], kind: 'path', index: 0, race: null, timer: null, request: 0,
+    visual:null, camada:'all', destacarArmadilhas:true};
 
   // [IA] ChatGPT (Codex) – figuras existentes agrupadas conforme a classificação da equipe.
   const FIGURAS = {
@@ -124,7 +125,7 @@
 
   // ---------- desenho do mapa ----------
   function drawMaze(canvas, grade, options = {}) {
-    const {width = 600, maxHeight = Infinity, maxCell = 36, minCell = 2, steps = [], upto = -1, kind = 'path', color = null} = options;
+    const {width = 600, maxHeight = Infinity, maxCell = 36, minCell = 2, steps = [], upto = -1, kind = 'path', color = null, visual = null} = options;
     const rows = grade.length, cols = grade[0].length;
     const cell = Math.max(minCell, Math.min(maxCell, Math.floor(width / cols), Math.floor(maxHeight / rows)));
     const w = cols * cell, h = rows * cell, dpr = window.devicePixelRatio || 1;
@@ -144,15 +145,38 @@
       ctx.fillRect(c * cell, r * cell, cell - gap, cell - gap);
     }
     const centro = (r, c) => [c * cell + (cell - gap) / 2, r * cell + (cell - gap) / 2];
+    // [IA] ChatGPT (Codex) – filtro e realce visuais dos estados já presentes nos CSVs.
+    const naCamada = estado => !visual || S.camada === 'all' || (estado.chaves.join('') || '-') === S.camada;
+    if (visual) {
+      const estadosCamada = visual.estados.filter(naCamada);
+      const casasCamada = new Set(estadosCamada.map(estado => `${estado.linha},${estado.coluna}`));
+      if (S.camada !== 'all') {
+        ctx.fillStyle = css('--bg'); ctx.globalAlpha = 0.8;
+        for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+          if (grade[r][c] !== '#' && !casasCamada.has(`${r},${c}`)) ctx.fillRect(c * cell, r * cell, cell - gap, cell - gap);
+        }
+        ctx.globalAlpha = 1;
+      }
+      if (S.destacarArmadilhas) {
+        const casasArmadilha = new Set(estadosCamada.filter(estado => visual.armadilhas.has(estado.estado)).map(estado => `${estado.linha},${estado.coluna}`));
+        ctx.strokeStyle = css('--bad'); ctx.lineWidth = Math.max(2, cell * 0.08); ctx.setLineDash([4, 2]);
+        for (const casa of casasArmadilha) {
+          const [r, c] = casa.split(',').map(Number);
+          ctx.strokeRect(c * cell + 2, r * cell + 2, Math.max(1, cell - 5), Math.max(1, cell - 5));
+        }
+        ctx.setLineDash([]);
+      }
+    }
     const camada = step => css(`--layer-${Math.min(step.chaves.length, 4)}`);
     const ultimo = Math.min(upto, steps.length - 1);
     if (ultimo >= 0 && kind === 'explore') {
       ctx.fillStyle = color; ctx.globalAlpha = 0.38;
-      for (let i = 0; i <= ultimo; i++) ctx.fillRect(steps[i].coluna * cell, steps[i].linha * cell, cell - gap, cell - gap);
+      for (let i = 0; i <= ultimo; i++) if (naCamada(steps[i])) ctx.fillRect(steps[i].coluna * cell, steps[i].linha * cell, cell - gap, cell - gap);
       ctx.globalAlpha = 1;
     } else if (ultimo >= 1) {
       ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, cell * 0.28);
       for (let i = 1; i <= ultimo; i++) {
+        if (!naCamada(steps[i - 1]) || !naCamada(steps[i])) continue;
         const [x1, y1] = centro(steps[i - 1].linha, steps[i - 1].coluna), [x2, y2] = centro(steps[i].linha, steps[i].coluna);
         ctx.strokeStyle = color || camada(steps[i]);
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
@@ -168,7 +192,7 @@
         ctx.fillText(SETAS[s] || s, x, y + 1);
       }
     }
-    if (ultimo >= 0) {
+    if (ultimo >= 0 && naCamada(steps[ultimo])) {
       const step = steps[ultimo];
       const [x, y] = centro(step.linha, step.coluna);
       ctx.beginPath(); ctx.arc(x, y, Math.max(3, cell * 0.34), 0, Math.PI * 2);
@@ -287,7 +311,7 @@
     const map = current(); if (!map) return;
     const wrap = $('#single-wrap');
     drawMaze($('#single-canvas'), map.grade, {width: wrap.clientWidth, maxHeight: Math.max(320, window.innerHeight * 0.62), maxCell: 44, minCell: 6,
-      steps: S.steps, upto: S.index, kind: S.kind, color: S.kind === 'explore' ? css('--alg-dfs') : null});
+      steps: S.steps, upto: S.index, kind: S.kind, color: S.kind === 'explore' ? css('--alg-dfs') : null, visual:S.visual});
     const step = S.steps[S.index];
     $('#position-value').textContent = step ? `linha ${step.linha}, coluna ${step.coluna}` : '—';
     $('#keys-value').textContent = step ? step.chaves.join(', ') || 'nenhuma' : '—';
@@ -319,7 +343,8 @@
     if (result.status === 'sucesso') status(`${algInfo(S.alg).nome} encontrou o caminho`, `${result.movimentos} movimentos, custo total ${result.custo_total ?? 'indisponível'}.`, result.aviso ? 'warning' : '');
     else if (S.kind === 'explore') status('Exploração da DFS pronta', `${S.steps.length} estados na ordem em que foram descobertos.`);
     else if (result.status === 'classificacao') status('Classificação da DFS carregada', result.mensagem);
-    else status(S.kind === 'cycle' ? 'Ciclo negativo encontrado' : result.status === 'sem_caminho' ? 'Sem solução' : 'Execução recusada', result.mensagem, 'warning');
+    else status(S.kind === 'cycle' ? 'Ciclo negativo encontrado' : result.status === 'sem_caminho' ? 'Sem solução' : 'Execução recusada',
+      S.kind === 'cycle' && result.custo_ciclo !== null ? `${result.mensagem} Custo do ciclo: ${result.custo_ciclo}.` : result.mensagem, 'warning');
     draw();
   }
 
@@ -368,7 +393,7 @@
     for (const lane of S.race.lanes) {
       const wrap = lane.el.querySelector('.canvas-wrap');
       drawMaze(lane.el.querySelector('canvas'), map.grade, {width: wrap.clientWidth, maxHeight: 360, maxCell: 30, minCell: 3,
-        steps: lane.steps, upto: Math.min(S.index, lane.steps.length - 1), kind: lane.kind, color: css(algInfo(lane.algoritmo).cor)});
+        steps: lane.steps, upto: Math.min(S.index, lane.steps.length - 1), kind: lane.kind, color: css(algInfo(lane.algoritmo).cor), visual:S.visual});
       const estado = laneState(lane, S.index);
       const pill = lane.el.querySelector('[data-pill]');
       pill.textContent = estado.texto; pill.className = `pill ${estado.classe}`;
@@ -430,11 +455,36 @@
     stop(); S.index = 0;
     if (!current()) return;
     try {
+      const visual = await FrontData.visualizacao(S.map, S.fonte);
+      if (ticket !== S.request) return;
+      if (S.visual?.mapa !== visual.mapa || S.visual?.fonte !== visual.fonte) S.camada = 'all';
+      S.visual = visual;
+      $('#layer-filter').replaceChildren(...['all', ...visual.camadas].map(camada => {
+        const option = document.createElement('option');
+        option.value = camada;
+        option.textContent = camada === 'all' ? 'Todas as camadas' : camada === '-' ? 'Sem chaves' : `Chaves ${camada}`;
+        return option;
+      }));
+      $('#layer-filter').value = S.camada;
+      $('#layer-filter').disabled = !visual.disponivel;
+      $('#trap-toggle').disabled = !visual.disponivel;
+      atualizarNotaEstrutura();
       if (S.mode === 'single') await loadSingle(ticket); else await loadRace(ticket);
     } catch (error) {
       if (ticket !== S.request) return;
       status('Não foi possível carregar', `${error.message} Rode python -m src.front.server na raiz do projeto.`, 'error');
     }
+  }
+
+  function atualizarNotaEstrutura() {
+    const visual = S.visual;
+    if (!visual?.disponivel) {
+      $('#structure-note').textContent = 'CSVs de estados ou armadilhas indisponíveis para este mapa e regra.';
+      return;
+    }
+    const estados = visual.estados.filter(estado => S.camada === 'all' || (estado.chaves.join('') || '-') === S.camada);
+    const armadilhas = estados.filter(estado => visual.armadilhas.has(estado.estado)).length;
+    $('#structure-note').textContent = `${estados.length} estados na seleção, ${armadilhas} estados-armadilha. A borda vermelha tracejada indica casas com pelo menos um estado-armadilha na seleção. O filtro muda o desenho, não o resultado do algoritmo.`;
   }
 
   // ---------- análises ----------
@@ -481,6 +531,8 @@
 
   // ---------- eventos ----------
   window.addEventListener('hashchange', mostrarPagina);
+  $('#layer-filter').addEventListener('change', event => { S.camada = event.target.value; atualizarNotaEstrutura(); draw(); });
+  $('#trap-toggle').addEventListener('change', event => { S.destacarArmadilhas = event.target.checked; draw(); });
   $('#figure-prev').addEventListener('click', () => mostrarFigura(indiceFigura - 1));
   $('#figure-next').addEventListener('click', () => mostrarFigura(indiceFigura + 1));
   $('#dataset-image').addEventListener('error', () => { $('#dataset-image').hidden = true; $('#dataset-image-error').hidden = false; });

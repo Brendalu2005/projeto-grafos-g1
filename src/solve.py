@@ -40,6 +40,11 @@ def resolver(caminho_mapa, algoritmo, fonte_consumivel = False):
         if ciclo is not None:
             linha['status'] = 'CICLO_NEGATIVO'
             linha['ciclo'] = [rotulo(estado) if estado != ALVO else ALVO for estado in ciclo]
+            # [IA] ChatGPT (Codex) – soma os pesos dos arcos do ciclo já retornado pelo algoritmo.
+            linha['custo_ciclo'] = sum(
+                next(peso for destino, peso in grafo[u] if destino == v)
+                for u, v in zip(ciclo, ciclo[1:])
+            )
             return linha
 
     if dist[ALVO] == math.inf:
@@ -177,12 +182,16 @@ def exportar_comparacao(pastas, pasta_saida, fonte_consumivel=False):
                       (construir_g_est(mapa, fonte_consumivel), estado_inicial(mapa)))
         for nome, (grafo, origem) in zip(modelos, candidatos):
             distancias, _ = bfs(grafo, origem)
-            passos = distancias.get(ALVO, math.inf)
-            linhas.append({"mapa": mapa.nome, "modelagem": nome,
+            # [IA] ChatGPT (Codex) – depuração: o arco virtual até ALVO não é movimento na grade.
+            passos = distancias.get(ALVO, math.inf) - 1
+            linhas.append({"mapa": mapa.nome, "abordagem": nome, "modelagem": nome,
                            "passos": "" if passos == math.inf else int(passos),
+                           # Validação e observação devem ser preenchidas pelo grupo.
+                           "caminho_valido": "", "observacao": "",
                            "status": "SEM_SOLUCAO" if passos == math.inf else "OK",
                            "fonte_consumivel": fonte_consumivel})
-    escrever_csv(linhas, ["mapa", "modelagem", "passos", "status", "fonte_consumivel"], Path(pasta_saida) / "comparacao_modelagem.csv")
+    escrever_csv(linhas, ["mapa", "abordagem", "passos", "caminho_valido", "observacao",
+                         "modelagem", "status", "fonte_consumivel"], Path(pasta_saida) / "comparacao_modelagem.csv")
     return linhas
 
 
@@ -245,7 +254,8 @@ def resolver_todos(pastas, pasta_saida, fonte_consumivel=False):
             escrever_json(resultado, pasta_saida / nome)
         elif resultado["status"] == "CICLO_NEGATIVO":
             escrever_json({"mapa": resultado["mapa"], "algoritmo": algoritmo,
-                           "status": resultado["status"], "ciclo": resultado["ciclo"]}, pasta_saida / nome)
+                           "status": resultado["status"], "ciclo": resultado["ciclo"],
+                           "custo_ciclo": resultado["custo_ciclo"]}, pasta_saida / nome)
 
 
 # [IA] ChatGPT (Codex) – integração da Parte 2, escolhas copiadas do notebook.

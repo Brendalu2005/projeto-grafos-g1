@@ -6,6 +6,7 @@ def test_resolver_preserva_ciclo_negativo_do_m06():
     assert resultado["status"] == "CICLO_NEGATIVO"
     assert len(resultado["ciclo"]) >= 3
     assert resultado["ciclo"][0] == resultado["ciclo"][-1]
+    assert resultado["custo_ciclo"] == -1
 
 
 def test_fonte_consumivel_remove_ciclo_negativo_do_m06():
@@ -85,6 +86,8 @@ def test_homepage_preserva_acesso_ao_labirinto_e_figuras_parte2():
             assert 'data-page="inicio"' in pagina
             assert 'id="nav-parte1"' in pagina
             assert 'id="nav-parte2"' in pagina
+            assert 'id="layer-filter"' in pagina
+            assert 'id="trap-toggle"' in pagina
             class Recursos(HTMLParser):
                 def __init__(self):
                     super().__init__()
@@ -118,3 +121,33 @@ def test_homepage_preserva_acesso_ao_labirinto_e_figuras_parte2():
         servidor.shutdown()
         servidor.server_close()
         thread.join(timeout=5)
+
+
+# [IA] ChatGPT (Codex) – regressão do movimento virtual e do formato de exportação, em exemplo mínimo.
+def test_comparacao_nao_conta_arco_virtual_como_movimento(tmp_path, monkeypatch):
+    import csv
+    from types import SimpleNamespace
+    import src.solve as solve
+
+    grafo = {"S": [("G", 1)], "G": [("ALVO", 0)], "ALVO": []}
+    monkeypatch.setattr(solve, "ler_mapa", lambda caminho: SimpleNamespace(nome="minimo", inicio="S"))
+    monkeypatch.setattr(solve, "construir_g_pos", lambda *args: grafo)
+    monkeypatch.setattr(solve, "construir_g_est", lambda *args: grafo)
+    monkeypatch.setattr(solve, "estado_inicial", lambda mapa: "S")
+    linhas = solve.exportar_comparacao([], tmp_path)
+    assert linhas and all(linha["passos"] == 1 for linha in linhas)
+    with (tmp_path / "comparacao_modelagem.csv").open(encoding="utf-8") as arquivo:
+        leitor = csv.DictReader(arquivo)
+        assert {"mapa", "abordagem", "passos", "caminho_valido", "observacao"} <= set(leitor.fieldnames)
+
+
+# [IA] ChatGPT (Codex) – confere os nomes exigidos sem resolver os mapas do grupo.
+def test_gerador_preserva_nomes_das_figuras_e_cria_nomes_exigidos(tmp_path, monkeypatch):
+    import src.viz as viz
+
+    monkeypatch.setattr(viz, "resolver", lambda *args: {"status": "OK"})
+    monkeypatch.setattr(viz, "percurso_colorido", lambda mapa, resultado, destino: destino.write_bytes(b"figura de teste"))
+    monkeypatch.setattr(viz, "grafo_estados_camadas", lambda *args: None)
+    viz.gerar_figuras_parte1(tmp_path)
+    for mapa, nome in (("m03", "m03_tres_chaves"), ("m08", "m08_grande")):
+        assert (tmp_path / f"percurso_{mapa}.png").read_bytes() == (tmp_path / f"percurso_{nome}.png").read_bytes()

@@ -1,3 +1,27 @@
+## Ajustes após conferência do enunciado completo — 24/11/2026
+
+Esta entrada complementa o histórico abaixo; o fechamento anterior da Parte 2
+não significava atendimento integral de todos os itens da Parte 1.
+
+- [x] Front com seleção de camada e realce de casas que possuem estados-armadilha na seleção, lendo os CSVs existentes.
+- [x] Custo do ciclo negativo já retornado de m06 calculado a partir de seus arcos e apresentado no front; o JSON existente registra custo −1.
+- [x] Contagem de movimentos da comparação corrigida para excluir o arco virtual até ALVO, nas duas regras da fonte.
+- [x] Colunas exigidas adicionadas à comparação, mantendo as anteriores para compatibilidade.
+- [x] Nomes percurso_m03.png e percurso_m08.png disponíveis; o gerador mantém também os nomes anteriores.
+- [x] Pasta out/parte1/fonte_consumivel conferida: 40 arquivos existentes, com resultados próprios da regra consumível. O nome utilizado pelo código não tem acento.
+- [x] Testes: 89 aprovados; controles de camada/armadilhas e leitura da variante consumível verificados com os CSVs existentes.
+- [ ] Grupo adequar um mapa obrigatório para que o caminho de menor custo passe por uma esteira e colete bônus; mapas originais preservados.
+- [ ] Grupo conferir e preencher caminho_valido e observacao na comparação de modelagens; os campos foram deixados vazios, sem gerar análise autoral.
+- [ ] Grupo decidir e implementar o registro explícito da ordem de visita no retorno do BFS; algorithms.py preservado.
+- [ ] Os benchmarks históricos continuam sem os campos de ciclo negativo adicionados ao executor para futuras medições; não houve repetição automática das medições.
+
+**Apoio de IA:** ChatGPT (Codex) realizou ajustes de interface, IO e depuração
+da contagem, adicionou testes de regressão e ajustou o formato das exportações
+existentes. Não criou ou modificou mapas, algoritmos ou construção de estados,
+nem gerou novas soluções oficiais dos mapas nesta etapa. A validação dos
+caminhos e suas observações permanecem com os integrantes, conforme a restrição
+solicitada pela usuária sobre usos de IA não permitidos pelo enunciado.
+
 ## Fechamento técnico da Parte 2 — 24/11/2026
 
 Este é o checklist atual. As entradas abaixo são histórico e não acrescentam
