@@ -1,0 +1,178 @@
+{
+  "metodo": "comparação automática com valores esperados explicitados independentemente da execução",
+  "conferencia_manual_do_integrante": false,
+  "casos": [
+    {
+      "caso": "quatro_tipos_e_paralelos",
+      "grafo": {
+        "A": [
+          [
+            "B",
+            1
+          ],
+          [
+            "B",
+            2
+          ],
+          [
+            "D",
+            1
+          ],
+          [
+            "F",
+            1
+          ]
+        ],
+        "B": [
+          [
+            "C",
+            1
+          ]
+        ],
+        "C": [
+          [
+            "A",
+            1
+          ],
+          [
+            "D",
+            1
+          ]
+        ],
+        "D": [],
+        "F": [
+          [
+            "D",
+            1
+          ]
+        ],
+        "E": [
+          [
+            "D",
+            1
+          ]
+        ]
+      },
+      "fonte": "A",
+      "descoberta": {
+        "A": 1,
+        "B": 2,
+        "C": 3,
+        "D": 4,
+        "F": 8
+      },
+      "termino": {
+        "D": 5,
+        "C": 6,
+        "B": 7,
+        "F": 9,
+        "A": 10
+      },
+      "predecessores": {
+        "A": null,
+        "B": "A",
+        "C": "B",
+        "D": "C",
+        "F": "A"
+      },
+      "tem_ciclo": true,
+      "arcos": [
+        {
+          "origem": "A",
+          "destino": "B",
+          "indice_adjacencia": 0,
+          "tipo": "arvore"
+        },
+        {
+          "origem": "B",
+          "destino": "C",
+          "indice_adjacencia": 0,
+          "tipo": "arvore"
+        },
+        {
+          "origem": "C",
+          "destino": "A",
+          "indice_adjacencia": 0,
+          "tipo": "retorno"
+        },
+        {
+          "origem": "C",
+          "destino": "D",
+          "indice_adjacencia": 1,
+          "tipo": "arvore"
+        },
+        {
+          "origem": "A",
+          "destino": "B",
+          "indice_adjacencia": 1,
+          "tipo": "avanco"
+        },
+        {
+          "origem": "A",
+          "destino": "D",
+          "indice_adjacencia": 2,
+          "tipo": "avanco"
+        },
+        {
+          "origem": "A",
+          "destino": "F",
+          "indice_adjacencia": 3,
+          "tipo": "arvore"
+        },
+        {
+          "origem": "F",
+          "destino": "D",
+          "indice_adjacencia": 0,
+          "tipo": "cruzamento"
+        }
+      ],
+      "confere": true
+    },
+    {
+      "caso": "ciclo_dataset",
+      "grafo": {
+        "Rcsprinter123": [
+          [
+            "Jasper Deng",
+            -1
+          ]
+        ],
+        "Jasper Deng": [
+          [
+            "Rcsprinter123",
+            -1
+          ]
+        ]
+      },
+      "fonte": "Rcsprinter123",
+      "descoberta": {
+        "Rcsprinter123": 1,
+        "Jasper Deng": 2
+      },
+      "termino": {
+        "Jasper Deng": 3,
+        "Rcsprinter123": 4
+      },
+      "predecessores": {
+        "Rcsprinter123": null,
+        "Jasper Deng": "Rcsprinter123"
+      },
+      "tem_ciclo": true,
+      "arcos": [
+        {
+          "origem": "Rcsprinter123",
+          "destino": "Jasper Deng",
+          "indice_adjacencia": 0,
+          "tipo": "arvore"
+        },
+        {
+          "origem": "Jasper Deng",
+          "destino": "Rcsprinter123",
+          "indice_adjacencia": 0,
+          "tipo": "retorno"
+        }
+      ],
+      "confere": true
+    }
+  ]
+}

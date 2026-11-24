@@ -245,5 +245,130 @@
       "processador": "13th Gen Intel(R) Core(TM) i5-1335U",
       "memoria_total_bytes": 16847937536
     }
+  },
+  "result": {
+    "unidade": "registro de voto",
+    "total_registros": 196614,
+    "registros_por_result": {
+      "-1": 74090,
+      "1": 122524
+    },
+    "targets_com_result_distinto": 236,
+    "distribuicoes": {
+      "VOTE": {
+        "-1": {
+          "-1": {
+            "registros": 33285,
+            "percentual": 44.925091105412335
+          },
+          "0": {
+            "registros": 8621,
+            "percentual": 11.635848292617087
+          },
+          "1": {
+            "registros": 32184,
+            "percentual": 43.439060601970574
+          }
+        },
+        "1": {
+          "-1": {
+            "registros": 7382,
+            "percentual": 6.024942052169371
+          },
+          "0": {
+            "registros": 3447,
+            "percentual": 2.813326368711436
+          },
+          "1": {
+            "registros": 111695,
+            "percentual": 91.16173157911919
+          }
+        }
+      },
+      "PESO agrupado": {
+        "-1": {
+          "-1": {
+            "registros": 32287,
+            "percentual": 43.57808071264678
+          },
+          "0": {
+            "registros": 9448,
+            "percentual": 12.752058307463896
+          },
+          "1": {
+            "registros": 30921,
+            "percentual": 41.734377108921585
+          },
+          "2 ou mais": {
+            "registros": 1434,
+            "percentual": 1.935483870967742
+          }
+        },
+        "1": {
+          "-1": {
+            "registros": 7368,
+            "percentual": 6.013515719369266
+          },
+          "0": {
+            "registros": 3452,
+            "percentual": 2.817407201854331
+          },
+          "1": {
+            "registros": 111415,
+            "percentual": 90.9332049231171
+          },
+          "2 ou mais": {
+            "registros": 289,
+            "percentual": 0.2358721556592994
+          }
+        }
+      },
+      "Votos recebidos por TARGET": {
+        "-1": {
+          "1–4": {
+            "registros": 523,
+            "percentual": 0.7058982318801458
+          },
+          "5–19": {
+            "registros": 7317,
+            "percentual": 9.87582669726009
+          },
+          "20–99": {
+            "registros": 29395,
+            "percentual": 39.67471993521393
+          },
+          "100–499": {
+            "registros": 33031,
+            "percentual": 44.582264813065194
+          },
+          "500+": {
+            "registros": 3824,
+            "percentual": 5.161290322580645
+          }
+        },
+        "1": {
+          "1–4": {
+            "registros": 87,
+            "percentual": 0.07100649668636348
+          },
+          "5–19": {
+            "registros": 2418,
+            "percentual": 1.9734909079037577
+          },
+          "20–99": {
+            "registros": 70436,
+            "percentual": 57.487512650582744
+          },
+          "100–499": {
+            "registros": 48052,
+            "percentual": 39.218438836472856
+          },
+          "500+": {
+            "registros": 1531,
+            "percentual": 1.2495511083542816
+          }
+        }
+      }
+    }
   }
 }

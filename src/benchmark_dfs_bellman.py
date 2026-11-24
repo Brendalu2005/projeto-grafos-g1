@@ -18,11 +18,16 @@ from src.graphs.algorithms import bellman_ford, bfs, dfs
 from src.graphs.io import carregar_dataset
 
 
-def executar_benchmark(caminho_csv, caminho_saida, fontes_bellman_completo=1):
+# [IA] ChatGPT (Codex) – complemento sem repetir configurações nem sobrescrever a base. !andre!
+def executar_benchmark(caminho_csv, caminho_saida, fontes_bellman_completo=1, complementar_de=None):
+    if complementar_de is not None:
+        fontes_bellman_completo = 3
     if fontes_bellman_completo not in (1, 3):
         raise ValueError("Use uma ou três fontes de Bellman-Ford no grafo completo.")
     caminho_csv = Path(caminho_csv)
     caminho_saida = Path(caminho_saida)
+    if caminho_saida.exists():
+        raise ValueError(f"A saída já existe: {caminho_saida}. Use outro caminho em --out.")
     grafo = carregar_dataset(caminho_csv)
     recortes = criar_recortes(grafo, semente=42)
     fontes = selecionar_fontes(recortes)
@@ -44,10 +49,30 @@ def executar_benchmark(caminho_csv, caminho_saida, fontes_bellman_completo=1):
         "completo": False,
         "medicoes": [],
     }
+    if complementar_de is not None:
+        base = Path(complementar_de)
+        anterior = json.loads(base.read_text(encoding="utf-8"))
+        for campo in ("sha256_entrada", "ambiente", "semente", "fontes", "regra_recorte", "regra_fontes"):
+            if anterior[campo] != relatorio[campo]:
+                raise ValueError(f"A base difere da execução atual: {campo}.")
+        esperadas = {(a, p, f) for a in ("DFS", "BELLMAN_FORD")
+                     for p in (10, 50, 100) for f in fontes}
+        chaves = [(m["algoritmo"], m["percentual"], m["fonte"]) for m in anterior["medicoes"]]
+        faltantes = esperadas - set(chaves)
+        if len(chaves) != len(set(chaves)) or set(chaves) - esperadas:
+            raise ValueError("Configurações duplicadas ou inesperadas na base.")
+        if not faltantes or any(a != "BELLMAN_FORD" or p != 100 for a, p, _ in faltantes):
+            raise ValueError("A base deve ter somente Bellman-Ford em 100% pendente.")
+        relatorio["medicoes"] = anterior["medicoes"]
+        relatorio["complementacao"] = {
+            "arquivo_base": base.as_posix(),
+            "sha256_base": hashlib.sha256(base.read_bytes()).hexdigest(),
+            "inicio_base_utc": anterior["inicio_utc"],
+            "fim_base_utc": anterior.get("fim_utc"),
+            "regra": "preservar medições anteriores e completar somente Bellman-Ford em 100%",
+        }
+    concluidas = {(m["algoritmo"], m["percentual"], m["fonte"]) for m in relatorio["medicoes"]}
     caminho_saida.parent.mkdir(parents=True, exist_ok=True)
-    # Evita sobrescrever um benchmark anterior ao iniciar uma nova execução.
-    if caminho_saida.exists():
-        raise ValueError(f"A saída já existe: {caminho_saida}. Use outro caminho em --out.")
     for nome, algoritmo in (("DFS", dfs), ("BELLMAN_FORD", bellman_ford)):
         for recorte in recortes:
             grafo_recorte = recorte["grafo"]
@@ -55,6 +80,8 @@ def executar_benchmark(caminho_csv, caminho_saida, fontes_bellman_completo=1):
             if nome == "BELLMAN_FORD" and recorte["percentual"] == 100:
                 fontes_medicao = fontes[:fontes_bellman_completo]
             for fonte in fontes_medicao:
+                if (nome, recorte["percentual"], fonte) in concluidas:
+                    continue
                 # Preparação e alcance ficam fora do intervalo medido.
                 distancias, _ = bfs(grafo_recorte, fonte)
                 alcance = sum(v != fonte and d != math.inf for v, d in distancias.items())
@@ -85,8 +112,11 @@ def main():
     parser.add_argument("--out", default="out/parte2/benchmark_dfs_bellman.json")
     parser.add_argument("--fontes-bellman-completo", type=int, choices=[1, 3], default=1,
                         help="quantidade de fontes de Bellman-Ford em 100%%; padrão 1")
+    # [IA] ChatGPT (Codex) – opção para concluir as duas fontes restantes. !andre!
+    parser.add_argument("--complementar", metavar="JSON_BASE",
+                        help="preservar a base e completar somente Bellman-Ford em 100%%")
     args = parser.parse_args()
-    executar_benchmark(args.dataset, args.out, args.fontes_bellman_completo)
+    executar_benchmark(args.dataset, args.out, args.fontes_bellman_completo, args.complementar)
 
 
 if __name__ == "__main__":

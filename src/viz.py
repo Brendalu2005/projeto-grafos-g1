@@ -363,7 +363,7 @@ def tempos_dfs_bellman_dataset(relatorio, caminho_png):
             "ambiente": relatorio["ambiente"]}
 
 
-# [IA] ChatGPT (Codex) – geração conjunta das seis figuras; preserva os dados de conferência de André.
+# [IA] ChatGPT (Codex) – inclui a análise de RESULT na geração das figuras da Parte 2. !andre!
 def gerar_figuras_parte2(pasta_saida="out/parte2"):
     pasta_saida = Path(pasta_saida)
     pasta_saida.mkdir(parents=True, exist_ok=True)
@@ -378,6 +378,8 @@ def gerar_figuras_parte2(pasta_saida="out/parte2"):
             "pesos": distribuicao_pesos_dataset("data/dataset_parte2/processed/wikiRfA_tratado.csv",
                                                pasta_saida / "andre_02_distribuicao_pesos.png"),
             "tempos": tempos_dfs_bellman_dataset(benchmark, pasta_saida / "andre_03_tempos_dfs_bellman.png"),
+            "result": atributos_por_result_dataset("data/dataset_parte2/processed/wikiRfA_tratado.csv",
+                                                   pasta_saida / "andre_04_atributos_result.png"),
         }
         faltantes_por_faixa("data/dataset_parte2/raw/wikiRfA.csv",
                            pasta_saida / "brenda_01_faltantes_por_faixa.png")
@@ -386,7 +388,7 @@ def gerar_figuras_parte2(pasta_saida="out/parte2"):
         efeito_transformacao(pasta_dados / "estudo_transformacao.json",
                              pasta_saida / "brenda_03_efeito_transformacao.png")
     (pasta_saida / "dados_visualizacoes_andre.json").write_text(
-        json.dumps(dados, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8"
+        json.dumps(dados, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8", newline="\n"
     )
     return dados
 
@@ -588,9 +590,72 @@ def efeito_transformacao(caminho_json, caminho_png):
     plt.close(figura)
 
 
+# [IA] ChatGPT (Codex) – compara distribuições por RESULT usando registros, sem agregar eleições por usuário. !andre!
+def atributos_por_result_dataset(caminho_csv, caminho_png):
+    dados = pd.read_csv(caminho_csv)
+    if dados.empty or not dados["RESULT"].isin([-1, 1]).all():
+        raise ValueError("RESULT deve conter somente -1 e 1, com registros nos dois grupos.")
+    totais = dados["RESULT"].value_counts().reindex([-1, 1], fill_value=0)
+    if (totais == 0).any():
+        raise ValueError("São necessários registros dos dois resultados.")
+    grau_entrada = dados["TARGET"].value_counts()
+    dados["Votos recebidos por TARGET"] = pd.cut(
+        dados["TARGET"].map(grau_entrada), bins=[0, 4, 19, 99, 499, float("inf")],
+        labels=["1–4", "5–19", "20–99", "100–499", "500+"],
+    )
+    dados["PESO agrupado"] = dados["PESO"].map(lambda p: str(p) if p < 2 else "2 ou mais")
+    paineis = [("VOTE", [-1, 0, 1], ["Contrário\n−1", "Neutro\n0", "Favorável\n1"]),
+              ("PESO agrupado", ["-1", "0", "1", "2 ou mais"], ["−1", "0", "1", "2 ou mais"]),
+              ("Votos recebidos por TARGET", ["1–4", "5–19", "20–99", "100–499", "500+"],
+               ["1–4", "5–19", "20–99", "100–499", "500+"])]
+    resumo = {"unidade": "registro de voto", "total_registros": len(dados),
+              "registros_por_result": {str(r): int(totais[r]) for r in (-1, 1)},
+              "targets_com_result_distinto": int((dados.groupby("TARGET")["RESULT"].nunique() > 1).sum()),
+              "distribuicoes": {}}
+    figura, eixos = plt.subplots(1, 3, figsize=(15, 6.5), sharey=True)
+    for eixo, (campo, categorias, rotulos) in zip(eixos, paineis):
+        resumo["distribuicoes"][campo] = {}
+        for resultado, cor, padrao, deslocamento, nome in (
+            (-1, "#0072B2", "///", -0.19, "RESULT −1 · rejeição"),
+            (1, "#D55E00", "..", 0.19, "RESULT 1 · aprovação"),
+        ):
+            contagem = dados.loc[dados["RESULT"] == resultado, campo].value_counts().reindex(categorias, fill_value=0)
+            percentuais = [100 * int(n) / int(totais[resultado]) for n in contagem]
+            resumo["distribuicoes"][campo][str(resultado)] = {
+                str(c): {"registros": int(n), "percentual": p}
+                for c, n, p in zip(categorias, contagem, percentuais)}
+            barras = eixo.bar([i + deslocamento for i in range(len(categorias))], percentuais,
+                              width=0.36, color=cor, hatch=padrao, edgecolor="#263238",
+                              linewidth=0.7, label=nome)
+            eixo.bar_label(barras, labels=[f"{p:.1f}%".replace(".", ",") for p in percentuais],
+                           padding=4, fontsize=8)
+        eixo.set_xticks(range(len(categorias)), rotulos)
+        eixo.set_title(campo.replace(" agrupado", ""), fontsize=12, fontweight="bold")
+        eixo.set_ylim(0, 105)
+        eixo.grid(axis="y", alpha=0.18)
+        eixo.set_axisbelow(True)
+        eixo.spines[["top", "right"]].set_visible(False)
+    eixos[0].set_ylabel("Registros dentro de cada grupo de RESULT (%)")
+    handles, labels = eixos[0].get_legend_handles_labels()
+    figura.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.89), ncol=2, frameon=False)
+    figura.suptitle("Votos, pesos e volume recebido por resultado da candidatura", fontsize=15, fontweight="bold", y=0.98)
+    figura.text(0.07, 0.11,
+                f"Fonte: CSV tratado • {int(totais[-1]):,} registros de rejeição e {int(totais[1]):,} de aprovação. Percentuais normalizados por grupo.".replace(",", "."),
+                fontsize=9, color="#263238")
+    figura.text(0.07, 0.065, "Volume recebido: todas as ocorrências por TARGET, incluindo paralelos. A distribuição é ponderada pelos registros de votos.", fontsize=9, color="#263238")
+    figura.text(0.07, 0.02, "Um TARGET pode aparecer com resultados diferentes; os dados tratados não identificam eleições individuais. Associação não implica causalidade.", fontsize=9, color="#263238")
+    figura.subplots_adjust(left=0.07, right=0.98, top=0.78, bottom=0.24, wspace=0.14)
+    caminho_png = Path(caminho_png)
+    caminho_png.parent.mkdir(parents=True, exist_ok=True)
+    figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
+    plt.close(figura)
+    return resumo
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Gera as figuras do projeto.")
-    parser.add_argument("--parte2", action="store_true", help="gera as seis visualizações implementadas da Parte 2")
+    # [IA] ChatGPT (Codex) – mantém a ajuda consistente com a inclusão da figura de RESULT. !andre!
+    parser.add_argument("--parte2", action="store_true", help="gera as visualizações implementadas da Parte 2")
     parser.add_argument("--out", help="pasta das imagens")
     argumentos = parser.parse_args()
     if argumentos.parte2:
