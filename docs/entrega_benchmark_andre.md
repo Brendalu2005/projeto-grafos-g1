@@ -55,24 +55,24 @@ consta no próprio JSON, sem alterar os valores medidos.
   correspondentes de BFS/Dijkstra.
 - Conferir o SHA-256 do CSV de entrada e preservar a identificação dos pesos.
 
-## Ambiente e consolidação
+## Ambiente e consolidação — atualizado em 24/11/2026
 
 O ambiente das medições deve ser lido do próprio JSON. A execução de André usa
 Python 3.12.6, Windows, Intel Core i5-1335U e aproximadamente 16 GB de memória.
-O arquivo entregue anteriormente por Brenda registra Python 3.12.10, Windows,
-Intel Core i5-1235U e aproximadamente 8 GB de memória.
+O arquivo histórico de Brenda registra Python 3.12.10, Windows, Intel Core
+i5-1235U e aproximadamente 8 GB, preservado em `benchmark_bfs_dijkstra.json`.
+O novo `benchmark_bfs_dijkstra_mesmo_ambiente.json` foi medido por André com os
+mesmos metadados de Python, sistema, processador e memória de DFS/Bellman-Ford.
 
-Os ambientes são diferentes. Ao consolidar `out/parte2/parte2_report.json`,
-preservar o ambiente de cada contribuição. Não atribuir as medições de André
-à máquina de Brenda, nem apresentar diferenças de tempo entre essas contribuições
-como se o ambiente fosse controlado. Se a comparação exigir o mesmo ambiente,
-repetir as medições necessárias em uma única máquina pelo procedimento comum.
-Essa escolha e sua discussão devem ser feitas pelo grupo.
+O relatório atual já usa o novo arquivo e registra `mesmo_ambiente_registrado: true`.
+Os hashes das contribuições coincidem com o CSV atual. Não se misturam os tempos
+antigos de Brenda com os atuais de André. Metadados iguais não comprovam carga
+idêntica da máquina durante sessões distintas.
 
-Brenda deve incorporar os registros de `medicoes` após a conferência de conclusão,
-mantendo os campos de repetição, tempos, estatísticas, tarefa, fonte, tamanho,
-versão dos pesos e semente. André revisa a consolidação. Este documento não cria
-o relatório final, não substitui a discussão crítica e não envia mensagens a Brenda.
+Os registros já foram incorporados, preservando tempos, estatísticas, tarefa,
+fonte, tamanho, versão dos pesos, semente, ambiente e casos obrigatórios.
+André deve revisar o material para entrega. Esta documentação não substitui a
+revisão dos integrantes nem envia mensagens.
 
 ## Reprodução
 

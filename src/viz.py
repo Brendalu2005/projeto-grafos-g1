@@ -383,7 +383,7 @@ def gerar_figuras_parte2(pasta_saida="out/parte2"):
         }
         faltantes_por_faixa("data/dataset_parte2/raw/wikiRfA.csv",
                            pasta_saida / "brenda_01_faltantes_por_faixa.png")
-        tempo_bfs_dijkstra(pasta_dados / "benchmark_bfs_dijkstra.json",
+        tempo_bfs_dijkstra(pasta_dados / "benchmark_bfs_dijkstra_mesmo_ambiente.json",
                            pasta_saida / "brenda_02_tempos_bfs_dijkstra.png")
         efeito_transformacao(pasta_dados / "estudo_transformacao.json",
                              pasta_saida / "brenda_03_efeito_transformacao.png")
@@ -457,7 +457,7 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
                    fontsize=15, fontweight="bold")
     ambiente = relatorio["ambiente"]
     figura.text(0.07, 0.07,
-                "Fonte: benchmark_bfs_dijkstra.json • 5 repetições + 1 aquecimento • Barras: mínimo e máximo • Alcance exclui a fonte.",
+                f"Fonte: {Path(caminho_json).name} • 5 repetições + 1 aquecimento • Barras: mínimo e máximo • Alcance exclui a fonte.",
                 fontsize=9, color="#52606d")
     figura.text(0.07, 0.03,
                 f"Mesmo ambiente: Python {ambiente['python']} · {ambiente['processador']} · BFS: PESO; Dijkstra: PESO + 1. Escala vertical comum e linear.",

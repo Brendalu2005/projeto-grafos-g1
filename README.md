@@ -256,14 +256,27 @@ python -m pytest tests/test_benchmark.py -v
 | `dijkstra_pares.json` | Caminhos e custos transformados de cinco pares. |
 | `dfs_fontes.json` | Resultados de DFS em três fontes. |
 | `bellman_ford_casos.json` | Casos pequenos com e sem ciclo negativo; não substituem o benchmark de escalabilidade. |
-| `benchmark_bfs_dijkstra.json` | 18 configurações, 90 tempos medidos, estatísticas e ambiente de BFS e Dijkstra. |
+| `benchmark_bfs_dijkstra.json` | Histórico: primeira medição de BFS e Dijkstra, preservada na máquina de Brenda. |
+| `benchmark_bfs_dijkstra_mesmo_ambiente.json` | Medição atual de BFS/Dijkstra na máquina de André: 18 configurações e 90 tempos. |
 | `benchmark_dfs_bellman.json` | 16 configurações, 80 tempos medidos, estatísticas e ambiente de DFS e Bellman-Ford; apenas uma fonte de Bellman-Ford em 100%, conforme decisão de André. |
+| `parte2_report.json` | Casos obrigatórios e 34 configurações dos quatro algoritmos, com 170 tempos e ambientes conferidos. |
+| `estudo_transformacao.json` | Exemplo selecionado de dois caminhos, com empate após PESO + 1; não representa a rede inteira. |
+| `verificacao_outliers.json` | Conferência do tratamento, pesos elevados e graus extremos contra o CSV bruto. |
+| `conferencia_tecnica_dfs.json` | Conferência automática com valores esperados; não é uma conferência manual de André. |
 
-O relatório final `out/parte2/parte2_report.json` ainda depende da consolidação das
-duas contribuições de benchmark. As medições de DFS e Bellman-Ford foram concluídas;
-o procedimento, a redução de escopo e os cuidados com os ambientes estão em
-[entrega_benchmark_andre.md](docs/entrega_benchmark_andre.md). As visualizações e a
-discussão crítica também permanecem pendentes.
+O relatório `out/parte2/parte2_report.json` está consolidado. Para reproduzir sua
+conferência e exportação, execute a seção 1 e depois as seções 16 e 17 do notebook
+de experimentos: elas leem os JSONs existentes sem executar benchmarks. O
+dicionário `arquivos_benchmark` seleciona os arquivos. Hashes, estatísticas,
+fontes, tamanhos e alcance são conferidos antes da gravação.
+
+Os quatro algoritmos têm medições em 10%, 50% e 100%, com cinco repetições por
+configuração. Bellman-Ford tem uma fonte em 100%; três fontes são explicitamente
+exigidas pelos critérios para BFS/DFS, não para cada tamanho de Bellman-Ford.
+As duas fontes adicionais completariam o plano ampliado e podem ser acrescentadas
+sem repetir as medições anteriores. Essa cobertura e suas limitações estão
+registradas no relatório; não se considera a mera existência de `completo: true`
+como comprovação de três fontes em 100%.
 
 ### Benchmark de DFS e Bellman-Ford
 
@@ -298,6 +311,19 @@ Em uma nova execução, use outro nome:
 python -m src.benchmark_dfs_bellman --out out/parte2/benchmark_dfs_bellman_nova_execucao.json
 ```
 
+Para completar apenas as duas fontes de Bellman-Ford ainda não medidas em 100%,
+se o grupo mantiver esse plano ampliado, execute na mesma máquina e ambiente
+registrados na base, sem sobrescrevê-la:
+
+```powershell
+python -m src.benchmark_dfs_bellman --complementar out/parte2/benchmark_dfs_bellman.json --out out/parte2/benchmark_dfs_bellman_completo.json
+```
+
+O complemento confere hash e ambiente, preserva os tempos existentes e exige novo
+destino. Depois de concluído, selecione esse arquivo no dicionário da seção 16
+do notebook e execute as seções 16 e 17. Isso não deve ser executado como etapa
+automática de geração das figuras ou de revisão da entrega.
+
 O Bellman-Ford atual faz todas as passagens pelo grafo; as configurações maiores
 podem demorar. Os dois casos mínimos de correção não substituem estas medições.
 
@@ -309,14 +335,14 @@ podem demorar. Os dois casos mínimos de correção não substituem estas mediç
 
 Com os CSVs bruto e tratado, as métricas, os dois benchmarks e o
 `estudo_transformacao.json` (seção 20 do notebook) já disponíveis,
-gere as seis figuras implementadas, na raiz do projeto, sem executar novamente os algoritmos:
+gere as sete figuras implementadas, na raiz do projeto, sem executar novamente os algoritmos:
 
 ```powershell
 python -m src.viz --parte2
 ```
 
 As saídas são `andre_01_distribuicao_graus.png`, `andre_02_distribuicao_pesos.png`,
-`andre_03_tempos_dfs_bellman.png`, `brenda_01_faltantes_por_faixa.png`,
+`andre_03_tempos_dfs_bellman.png`, `andre_04_atributos_result.png`, `brenda_01_faltantes_por_faixa.png`,
 `brenda_02_tempos_bfs_dijkstra.png`, `brenda_03_efeito_transformacao.png`
 e `dados_visualizacoes_andre.json`, em `out/parte2/`.
 As duas primeiras são exploratórias; a terceira comunica os tempos de DFS e
@@ -329,25 +355,42 @@ rascunhos gerados com IA para revisão de André, conforme a autorização da pr
 informada por ele. O registro de IA inclui escolha, código e interpretação.
 As figuras de faltantes e de tempos de BFS/Dijkstra também são implementadas em
 `src/viz.py`. A primeira lê o CSV bruto e mostra a proporção agregada sem SOURCE
-nas faixas aprovadas. A segunda mantém três painéis, um por fonte, no ambiente
-próprio de BFS/Dijkstra. As duas séries de benchmark não são misturadas em uma
-comparação de ambiente controlado. A terceira figura adicional compara os custos
+nas faixas aprovadas. A segunda mantém três painéis, um por fonte, e usa
+`benchmark_bfs_dijkstra_mesmo_ambiente.json`, com os mesmos metadados de ambiente
+do benchmark de DFS/Bellman-Ford. A terceira figura adicional compara os custos
 dos dois caminhos do estudo de caso em PESO e PESO + 1, incluindo o custo zero
-e o empate após a transformação. A geração sobrescreve as seis imagens e os
+e o empate após a transformação. A geração sobrescreve as sete imagens e os
 dados de conferência de André; `--out` permite escolher outra pasta de saída.
 
 As células de desenho das antigas seções 18 e 19 foram retiradas do notebook:
 o comando acima centraliza a geração das figuras. O estudo de caso da seção 20
 permanece no notebook e fornece o JSON para a figura de transformação. O exemplo
 selecionado não mede a frequência de mudanças de caminhos na rede inteira.
-As notas analíticas e as justificativas das três figuras adicionais, incluindo
-os cortes das faixas da figura de faltantes, foram aprovadas e registradas no
-[avd_log.md](docs/avd_log.md), com indicação do apoio de IA.
+As notas e justificativas aprovadas estão no [avd_log.md](docs/avd_log.md), com
+indicação do apoio de IA. A nota de B02 foi atualizada para as novas medições e
+aguarda revisão autoral. B02 é análise visual de desempenho; A01, A02, A04 e B01
+são exploratórias de dados, e A03/B03 são explanatórias.
 As fontes, justificativas, notas e limites dessas três figuras estão reunidos em
 [visualizacoes_brenda_parte2.md](docs/visualizacoes_brenda_parte2.md).
 A conferência automática de alcance entre BFS e Dijkstra está na seção 13 do
-notebook; a conferência manual de BFS continua pendente. O relatório consolidado
-já está disponível em `out/parte2/parte2_report.json`.
+notebook. A conferência manual de BFS no pequeno recorte foi confirmada por
+Brenda e registrada no log. A suíte passou com 81 testes em clone limpo e 81 com
+as alterações locais copiadas, sem instalar dependências.
+
+### Relatório técnico e declaração
+
+O material da Parte 2 foi reunido em [RELATORIO_PARTE2.md](docs/RELATORIO_PARTE2.md)
+e [RELATORIO_PARTE2.pdf](docs/RELATORIO_PARTE2.pdf), com dataset, tratamentos,
+métricas, algoritmos, benchmark, comparação técnica, sete figuras, notas e limites.
+É uma compilação técnica com apoio de IA para revisão e incorporação ao relatório
+conjunto do grupo; não substitui a Parte 1 nem a revisão autoral dos integrantes.
+
+[DECLARACAO_IA.md](docs/DECLARACAO_IA.md) reúne os usos conhecidos da Parte 2.
+`docs/DECLARACAO_IA.pdf` é um rascunho sem assinaturas, com o formulário oficial
+e esse registro. O grupo precisa completar identificação e links das conversas
+ou blocos de uso, escrever a reflexão de 10–15 linhas, conferir o alcance das
+autorizações com as professoras e assinar antes da entrega. Não é correto
+considerar essas etapas cumpridas apenas porque o arquivo PDF existe.
 
 ## Uso de IA
 

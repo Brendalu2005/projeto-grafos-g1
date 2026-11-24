@@ -17,7 +17,7 @@ sujeitos à revisão do grupo e à declaração de uso de IA.
 | ID | Tipo | Finalidade | Responsável | Imagem |
 |---|---|---|---|---|
 | B01 | Exploratória | Examinar a qualidade dos dados pela proporção de votos sem SOURCE em faixas de votos recebidos | Brenda | [Faltantes por faixa](../out/parte2/brenda_01_faltantes_por_faixa.png) |
-| B02 | Exploratória | Comparar o comportamento das implementações de BFS e Dijkstra nos recortes | Brenda | [Tempos de BFS e Dijkstra](../out/parte2/brenda_02_tempos_bfs_dijkstra.png) |
+| B02 | Análise visual de desempenho | Comparar o comportamento das implementações de BFS e Dijkstra nos recortes | Brenda | [Tempos de BFS e Dijkstra](../out/parte2/brenda_02_tempos_bfs_dijkstra.png) |
 | B03 | Explanatória | Explicar, no exemplo selecionado, como somar 1 por arco elimina a vantagem do caminho antes mais barato | Brenda | [Efeito da transformação](../out/parte2/brenda_03_efeito_transformacao.png) |
 
 O código das três figuras está em [src/viz.py](../src/viz.py). As imagens têm
@@ -81,14 +81,19 @@ própria faixa e deve ser acompanhada pelas contagens.
 **Finalidade.** Comparar o comportamento das implementações nos recortes de 10%,
 50% e 100% dos arcos, para Siva1979, Gwynand e John Carter.
 
-**Fonte e recorte da comparação.** `out/parte2/benchmark_bfs_dijkstra.json`.
+**Fonte e recorte da comparação.** `out/parte2/benchmark_bfs_dijkstra_mesmo_ambiente.json`.
 Cada configuração possui cinco repetições medidas e um aquecimento fora do
 cronômetro. A figura mostra médias em segundos e barras de mínimo–máximo.
 Essas barras não são intervalos de confiança.
 
-As medições foram realizadas no mesmo ambiente: Python 3.12.10, Windows,
-Intel Core i5-1235U, com aproximadamente 8 GB de memória. Os resultados de
-DFS/Bellman-Ford de André, medidos em outra máquina, não entram nesta figura.
+As medições atuais foram realizadas por André: Python 3.12.6, Windows
+(versão registrada 10.0.26300), Intel Core i5-1335U e aproximadamente 16 GB de
+memória. Esses metadados coincidem com os de DFS/Bellman-Ford. B02 apresenta
+somente BFS e Dijkstra. O benchmark anterior continua preservado em
+`benchmark_bfs_dijkstra.json`, mas não fornece os valores da imagem atual.
+
+B02 é uma análise visual dos resultados dos algoritmos; não entra na contagem
+de figuras exploratórias voltadas ao entendimento do dataset.
 
 **Escolha do gráfico.**
 
@@ -109,9 +114,29 @@ foram comparados separadamente entre BFS e Dijkstra nas nove configurações de
 fonte e tamanho. A conferência está na seção 13 do notebook de experimentos,
 fora da medição de tempo.
 
-**Nota analítica aprovada.**
+**Valores atuais para conferência.** Médias em segundos, extraídas do novo JSON:
 
-> Para Siva1979, BFS e Dijkstra apresentam tempos médios próximos no recorte de 10%. Nos recortes de 50% e 100%, a média do BFS fica acima da do Dijkstra. Para Gwynand e John Carter, o BFS apresenta média maior nos três tamanhos. Entretanto, há sobreposição entre alguns intervalos mínimo–máximo e grande variação do BFS em Gwynand a 10%. Esses resultados descrevem as implementações e o ambiente medidos, sem demonstrar uma vantagem geral de Dijkstra. Os conjuntos de usuários alcançados foram iguais entre os algoritmos em cada configuração.
+| Fonte | Recorte | BFS | Dijkstra |
+|---|---|---:|---:|
+| Siva1979 | 10% | 0,025365 | 0,028914 |
+| Siva1979 | 50% | 0,138694 | 0,111150 |
+| Siva1979 | 100% | 0,309036 | 0,169753 |
+| Gwynand | 10% | 0,026767 | 0,025690 |
+| Gwynand | 50% | 0,137485 | 0,101892 |
+| Gwynand | 100% | 0,282175 | 0,132150 |
+| John Carter | 10% | 0,034100 | 0,026290 |
+| John Carter | 50% | 0,141781 | 0,135927 |
+| John Carter | 100% | 0,220787 | 0,111098 |
+
+**Nota atualizada para revisão autoral.**
+
+> Para Siva1979, BFS e Dijkstra apresentam tempos médios próximos no recorte de 10%. Nos recortes de 50% e 100%, a média do BFS fica acima da do Dijkstra. Para Gwynand e John Carter, o BFS apresenta média maior nos três tamanhos. Há sobreposição entre alguns intervalos mínimo–máximo; em 100%, o BFS apresenta maior amplitude entre as repetições nas três fontes. Esses resultados descrevem as implementações e o ambiente medidos, sem demonstrar uma vantagem geral de Dijkstra. Os conjuntos de usuários alcançados foram iguais entre os algoritmos em cada configuração.
+
+**Apoio de IA na atualização.** A redação preserva as observações anteriormente
+aprovadas por Brenda e substitui a referência à variabilidade do benchmark antigo
+pelos intervalos do arquivo atual. Essa atualização factual foi feita com IA e
+deve ser revisada por Brenda antes da entrega como nota autoral. A versão anterior
+aprovada permanece no histórico do log e se refere às medições antigas.
 
 **Limites.** BFS utiliza PESO, mas ignora seus valores na busca; Dijkstra utiliza
 PESO + 1. O tempo inclui a chamada completa de cada implementação, incluindo
@@ -182,7 +207,9 @@ O comando gera as seis figuras de Brenda e André em `out/parte2/`, sem executar
 algoritmos ou refazer o benchmark. Para escolher outra pasta de saída, use `--out`.
 O comando padrão `python -m src.viz` continua gerando as figuras da Parte 1.
 
-As notas e justificativas aqui reunidas já foram aprovadas na conversa e
-registradas no log. Ainda é necessário integrar figuras e textos ao PDF técnico,
-concluir a revisão dos critérios de AVD e a declaração de IA. A conferência manual
-de BFS continua pendente; não é substituída pela conferência automática de alcance.
+As notas e justificativas aprovadas estão registradas no log. A nota de B02 foi
+atualizada para os novos dados e aguarda revisão autoral. A conferência manual de
+BFS foi concluída em 24/11/2026 no recorte Siva1979 → Ceranthor → Salvio giuliano
+→ 07bargem. Os testes em clone limpo e com alterações locais passaram: 81 em cada
+execução, sem instalação de dependências. O relatório da Parte 2 reúne os textos
+e figuras; a declaração de IA ainda depende da revisão, reflexão e assinaturas do grupo.

@@ -1,4 +1,4 @@
-# Parte 2 — Três visualizações de André
+# Parte 2 — Quatro visualizações de André
 
 ## Uso de IA:
 ChatGPT (Codex) ajudou na escolha das figuras,
@@ -12,6 +12,7 @@ Tambem auxiliou em deixar as visualizações mais acessíveis as pessoas daltôn
 | A01 | Exploratória | Examinar a distribuição dos graus dirigidos | André | [Distribuição dos graus](../out/parte2/andre_01_distribuicao_graus.png) |
 | A02 | Exploratória | Comparar votos e duas versões dos pesos | André | [Distribuição dos pesos](../out/parte2/andre_02_distribuicao_pesos.png) |
 | A03 | Explanatória | Comunicar a diferença de tempo observada em um ambiente controlado entre os dois algoritmos | André | [Tempos de DFS e Bellman-Ford](../out/parte2/andre_03_tempos_dfs_bellman.png) |
+| A04 | Exploratória | Examinar VOTE, PESO e volume recebido em relação a RESULT | André | [Atributos por RESULT](../out/parte2/andre_04_atributos_result.png) |
 
 As figuras têm título, identificação dos eixos, legenda e indicação de fonte.
 O código está em `src/viz.py`; os números usados nas figuras estão em
@@ -117,9 +118,10 @@ medidas no mesmo ambiente e mostrar os tempos nos três tamanhos disponíveis.
 
 **Fonte e recorte da comparação.** `out/parte2/benchmark_dfs_bellman.json`, usando
 somente Siva1979 para ambos os algoritmos em 10%, 50% e 100% dos arcos. Essa fonte
-é a única de Bellman-Ford medida no grafo completo. Não se misturam as medições de
-Brenda, realizadas em outro ambiente, nem médias com quantidades diferentes de
-fontes. Há cinco repetições por configuração e um aquecimento fora do cronômetro.
+é a única de Bellman-Ford medida no grafo completo. A03 usa apenas este arquivo,
+sem médias com quantidades diferentes de fontes. Há cinco repetições por
+configuração e um aquecimento fora do cronômetro. O benchmark atual de BFS/Dijkstra
+também foi realizado por André, no mesmo ambiente registrado, e é mostrado em B02.
 
 **Da exploração à comunicação.** A conferência da tabela de tempos revelou uma
 diferença de várias ordens de grandeza para a fonte comum. A figura destaca esse
@@ -152,6 +154,42 @@ mas três tamanhos e cinco tempos por configuração não bastam para demonstrar
 lei assintótica ou explicar toda a variação observada. A figura não responde,
 isoladamente, à pergunta sobre a transformação dos pesos para Dijkstra.
 
+## A04 — Atributos por resultado da candidatura
+
+**Finalidade e fonte.** Exploração de `VOTE`, `PESO` e volume recebido por TARGET
+em relação a `RESULT`, no CSV tratado. A função `atributos_por_result_dataset`,
+em `src/viz.py`, gera três painéis com percentuais normalizados separadamente
+nos grupos de rejeição e aprovação. Os números estão em
+`out/parte2/dados_visualizacoes_andre.json`, na chave `result`.
+
+**Escolha implementada.** Barras agrupadas, em azul com listras para RESULT -1 e
+laranja-avermelhado com pontos para RESULT 1. Os painéis mostram o voto original,
+o peso ajustado agrupado e a faixa do total de votos recebidos pelo candidato.
+Os tamanhos dos grupos aparecem no rodapé: 74.090 e 122.524 registros.
+
+**Leitura técnica dos dados exportados.** No grupo RESULT -1, os votos favoráveis
+são 32.184 de 74.090 registros (43,44%). No grupo RESULT 1, são 111.695 de 122.524
+(91,16%). A unidade é o registro de voto, não a eleição ou um candidato único.
+Há 236 TARGETs com mais de um valor de RESULT. Sem datas ou identificador de
+eleição, não se deve atribuir um único resultado a cada candidato nem inferir
+causalidade dessa comparação. Esta leitura numérica foi compilada com IA para
+revisão de André; não é apresentada como nota analítica autoral já aprovada.
+
+## Conferência de valores extremos
+
+`out/parte2/verificacao_outliers.json` registra a conferência reproduzível, sem
+alterar o dataset. Para graus, foram usados os limites de 1,5 IQR, incluindo
+vértices de grau zero: 2.150 usuários sinalizados na entrada e 1.718 na saída.
+Os cinco maiores de cada direção foram conferidos com o CSV bruto mantido.
+Para pesos, foram examinadas as 14 ocorrências com PESO >= 4, com valores até 6;
+a regra de incremento foi conferida em todas as linhas. Nenhum registro adicional
+foi removido: graus altos e pesos elevados não foram presumidos erros. Os pesos
+elevados conferem com o incremento nos grupos idênticos. A decisão de manutenção
+e a evidência técnica devem ser revisadas por André na versão autoral do relatório.
+
+**Apoio de IA nesta atualização.** Compilação dos dados e verificações já produzidos
+pelo código de André, atualização de fontes e redação técnica para revisão.
+
 ## Reprodução e próximos passos
 
 Na raiz do projeto, após gerar o CSV tratado e ter as métricas e o benchmark:
@@ -163,8 +201,7 @@ python -m src.viz --parte2
 Para outra pasta de imagens, use `--out`. O comando padrão `python -m src.viz`
 continua gerando as figuras da Parte 1. Não é necessário refazer o benchmark.
 
-Estas são três figuras do conjunto planejado, não a conclusão de todas as
-exigências de AVD. Brenda e André devem combinar as demais figuras, a resposta
-visual à pergunta de pesquisa e a cobertura da exploração relacional/multivariada
-e de outliers no conjunto final. Após revisão, incorporar as figuras e os textos
-adequados ao PDF, mantendo a declaração fiel do uso de IA.
+O conjunto atual possui sete figuras: quatro exploratórias de dados (A01, A02,
+A04 e B01), duas explanatórias (A03 e B03) e uma análise visual de desempenho
+(B02). Essa organização não dispensa a revisão autoral dos textos atualizados,
+em especial A04 e a nova nota de B02, nem a declaração fiel do uso de IA.

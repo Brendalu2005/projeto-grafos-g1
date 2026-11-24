@@ -1,3 +1,74 @@
+## Fechamento técnico da Parte 2 — 24/11/2026
+
+Este é o checklist atual. As entradas abaixo são histórico e não acrescentam
+novas obrigações ao enunciado. A conferência foi feita contra os critérios,
+os resultados salvos e o código existente.
+
+- [x] Dataset aprovado pelas professoras, conforme confirmação de Brenda.
+- [x] Tratamento documentado, dados sem SOURCE preservados no bruto, VOTE e PESO separados, laços e paralelos mantidos.
+- [x] Métricas e justificativas registradas; outliers conferidos sem exclusões adicionais.
+- [x] BFS e DFS em três fontes, Dijkstra em cinco pares e os dois casos obrigatórios de Bellman-Ford registrados e consolidados.
+- [x] BFS revisado; conferência manual de Brenda concluída no recorte registrado abaixo.
+- [x] Quatro algoritmos medidos em 10%, 50% e 100%, com pelo menos cinco repetições por configuração: 34 configurações e 170 tempos.
+- [x] Novas medições de BFS/Dijkstra incorporadas; CSV, alcance e metadados do ambiente conferidos contra DFS/Bellman-Ford.
+- [x] Sete figuras reproduzíveis: quatro exploratórias de dados, duas explanatórias e B02 como análise visual de desempenho.
+- [x] B02 e seus documentos atualizados para os resultados da máquina comum.
+- [x] Pergunta de pesquisa, transformação, limitações e ligação entre exploração e explicação reunidas no relatório em Markdown e PDF.
+- [x] Documentação de reprodução, registro técnico de IA e formulário oficial em PDF preparado como rascunho sem assinaturas.
+- [x] Testes em clone limpo já registrados; suíte final com as alterações atuais: 81 testes aprovados, sem instalar dependências.
+
+**Bellman-Ford:** já existem medições nos três tamanhos, com uma fonte em 100%.
+O requisito explícito de três fontes é para BFS e DFS. Gwynand e John Carter
+em 100% completariam o plano ampliado de benchmark; não são tratados como
+nova implementação obrigatória. A redução das fontes limita comparações
+entre fontes e está declarada no relatório.
+
+**Atos autorais e de entrega que continuam com os integrantes:**
+
+- [ ] Revisar e assumir os textos compilados com IA, especialmente as notas atualizadas de B02 e A04; conciliar a matriz de contribuição com o relatório conjunto.
+- [ ] Completar identificação, links reais das conversas e reflexão autoral de 10–15 linhas na declaração; confirmar com as professoras o alcance das autorizações de IA relatadas.
+- [ ] Todos os integrantes assinarem a declaração e realizarem a entrega final. A conferência técnica automática de DFS não equivale à conferência manual de André.
+
+Esses atos não foram simulados ou assinados pela IA. Não há instalação de
+dependências, alteração dos algoritmos para favorecer tempos ou commit nesta
+etapa. O apoio de ChatGPT (Codex) incluiu auditoria, consolidação, atualização
+das figuras/documentos e preparação dos PDFs, com revisão autoral indicada.
+
+## Conferência manual de BFS concluída no recorte — 24/11/2026
+
+Brenda localizou e conferiu no CSV tratado os três arcos do recorte abaixo.
+Após contar os passos a partir de Siva1979, confirmou que a distância até
+07bargem é de três arcos. O BFS conta cada arco como um passo, incluindo o arco
+de peso negativo, sem somar os pesos.
+
+| Origem | Destino | PESO |
+|---|---|---:|
+| Siva1979 | Ceranthor | 1 |
+| Ceranthor | Salvio giuliano | 1 |
+| Salvio giuliano | 07bargem | -1 |
+
+As distâncias 0, 1, 2 e 3 para Siva1979, Ceranthor, Salvio giuliano e 07bargem,
+respectivamente, coincidem com as registradas em `bfs_fontes.json` para a fonte
+Siva1979. A conferência manual cobre este pequeno recorte; não constitui uma
+verificação manual de todos os resultados da rede.
+
+**Checklist atualizado:**
+- [x] BFS revisado e comando de benchmark preparado e testado.
+- [x] Novas medições de BFS/Dijkstra de André incorporadas ao relatório, com hashes e ambientes conferidos.
+- [x] Casos obrigatórios incluídos e cobertura de Bellman-Ford validada conforme o arquivo selecionado.
+- [x] B02 atualizada para o benchmark no mesmo ambiente.
+- [x] Testes em clone limpo: 81 testes passaram; com as alterações locais copiadas, os mesmos 81 passaram, sem instalar dependências.
+- [x] Conferência manual de BFS no recorte acima, confirmada por Brenda.
+- [ ] Receber as duas fontes restantes de Bellman-Ford em 100% de André e atualizar a consolidação, ou confirmar a aceitação do escopo reduzido com as professoras.
+- [ ] Reclassificar B02 e revisar sua nota e suas fontes nos documentos, que ainda descrevem as medições anteriores.
+- [ ] Integrar as seções de Brenda ao PDF e concluir o registro de IA e a reflexão.
+
+**Apoio de IA:** ChatGPT (Codex) selecionou o recorte por leitura do CSV e do JSON,
+explicou a contagem de passos e orientou a localização das linhas. Brenda
+conferiu os registros e confirmou a contagem manual na conversa. A cópia
+temporária dos testes foi removida; não houve instalação de dependências.
+As pendências das entradas anteriores representam o histórico.
+
 ## Ligação entre exploração e figura explanatória B03 — 23/11/2026
 
 Brenda confirmou que a observação da distribuição de PESO e PESO + 1 motivou
