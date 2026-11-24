@@ -16,6 +16,7 @@ from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra
 from src.graphs.estados import ALVO, construir_g_est, estado_inicial, rotulo
 from src.graphs.io import ler_mapa
 from src.solve import resolver
+from src.front import dataset
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -99,6 +100,22 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
+        # [IA] ChatGPT (Codex) – consultas da rede real, sem exportar arquivos.
+        if url.path in ("/api/dataset/grafo", "/api/dataset/executar", "/api/dataset/conexoes"):
+            try:
+                if url.path.endswith("grafo"):
+                    resposta = dataset.recortar(dataset.grafo_completo())
+                elif url.path.endswith("conexoes"):
+                    usuario = parse_qs(url.query).get("usuario", [""])[0]
+                    resposta = dataset.conexoes(usuario)
+                else:
+                    algoritmo = parse_qs(url.query).get("alg", [""])[0]
+                    resposta = dataset.executar(algoritmo)
+                return self.send_json(200, resposta)
+            except FileNotFoundError:
+                return self.send_json(404, {"erro": "CSV tratado não encontrado. Execute o notebook de preparação do dataset."})
+            except (OSError, ValueError, KeyError) as error:
+                return self.send_json(422, {"erro": str(error)})
         # [IA] ChatGPT (Codex) – a raiz abre a homepage das duas partes.
         if url.path in ("/", "/index.html"):
             self.path = "/src/front/index.html"

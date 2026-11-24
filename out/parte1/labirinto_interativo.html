@@ -9,6 +9,7 @@
   <title>Grafos · Projeto</title>
   <link rel="stylesheet" href="/src/front/style.css">
   <script src="/src/front/dados.js" defer></script>
+  <script src="/src/front/dataset.js" defer></script>
   <script src="/src/front/script.js" defer></script>
 </head>
 <body>
@@ -35,6 +36,7 @@
     <a href="#figuras">Figuras</a>
   </nav>
   <nav class="section-nav" id="nav-parte2" aria-label="Parte 2" hidden>
+    <a href="#grafo">Grafo interativo</a>
     <a href="#exploratorias">Exploratórias</a>
     <a href="#explanatorias">Explanatórias</a>
     <a href="#desempenho">Desempenho</a>
@@ -197,6 +199,36 @@
           <p id="dataset-image-error" class="card-sub" role="status" hidden>Figura indisponível. Gere as imagens com <code>python -m src.viz --parte2</code>.</p>
           <div class="figure-controls"><button class="ghost-button" id="figure-prev" type="button">‹ Anterior</button><a class="link-cta" id="figure-open" target="_blank" rel="noopener">Ampliar figura ↗</a><button class="ghost-button" id="figure-next" type="button">Próxima ›</button></div>
         </article>
+      </div>
+    </section>
+    <!-- [IA] ChatGPT (Codex) – navegação do dataset em Canvas e execução dos casos existentes. -->
+    <section class="page-section" data-page="grafo" aria-labelledby="rede-titulo" hidden>
+      <div class="section-head"><div><p class="eyebrow">Parte 2 · Wiki-RfA</p><h2 id="rede-titulo">Explore a rede de votos.</h2></div><span class="badge" id="rede-contagem">Carregando recorte…</span></div>
+      <p class="dataset-intro" id="rede-regra">O recorte visual preserva arcos reais do dataset tratado. As execuções usam os algoritmos já implementados no projeto.</p>
+      <div class="card">
+        <div class="graph-controls">
+          <label>Algoritmo <select id="rede-alg"><option>BFS</option><option>DFS</option><option value="DIJKSTRA">Dijkstra</option><option value="BELLMAN_FORD">Bellman-Ford</option></select></label>
+          <button class="ghost-button" id="rede-executar" type="button" disabled>Executar 3 fontes</button>
+          <button class="ghost-button" id="rede-reset" type="button">Centralizar</button>
+          <label><input type="checkbox" id="rede-negativos">Somente arcos com PESO negativo</label>
+          <label><input type="checkbox" id="rede-somente">Somente resultado selecionado</label>
+        </div>
+        <p class="card-sub" id="rede-escopo"></p>
+        <p class="card-sub" id="rede-status" role="status" aria-live="polite">Abra esta seção com o servidor local em execução.</p>
+        <div class="rede-canvas"><canvas id="rede-canvas" tabindex="0" aria-label="Rede dirigida de votos. Arraste para mover, role para ampliar e clique em um usuário. Os resultados também estão descritos abaixo."></canvas></div>
+        <p class="card-sub"><strong>Como navegar:</strong> arraste o grafo para mover e use a roda do mouse para aproximar ou afastar. Clique em um usuário para ver suas conexões e os nomes dos vizinhos.</p>
+        <p class="card-sub" id="rede-legenda">Cores do grafo: cinza = conexões da rede; vinho = arcos com PESO negativo; azul = resultado do algoritmo. As setas apontam de quem votou para quem recebeu o voto.</p>
+        <div class="graph-controls"><label>Localizar usuário <input id="rede-busca" type="search" placeholder="Nome exato no dataset"></label><button id="rede-localizar" class="ghost-button" type="button">Localizar</button><button id="rede-voltar" class="ghost-button" type="button" hidden>Voltar ao grafo</button></div>
+        <p id="rede-usuario" class="card-sub" aria-live="polite">Clique em um usuário para mostrar somente suas conexões de entrada e saída, com os nomes dos vizinhos.</p>
+        <div id="rede-vizinhos" class="rede-vizinhos" aria-label="Vizinhos do usuário selecionado" hidden></div>
+      </div>
+      <div class="card rede-resultados">
+        <h3 id="rede-resultados-titulo">Execuções</h3>
+        <p class="card-sub">BFS e DFS: três fontes cada · Dijkstra: cinco pares · Bellman-Ford: dois cenários. São execuções interativas, sem medição de benchmark e sem alterar os arquivos do projeto.</p>
+        <div class="graph-controls" id="rede-casos" aria-label="Selecionar execução"></div>
+        <p id="rede-nota" class="card-sub"></p>
+        <pre id="rede-resumo" class="rede-resumo">Execute um algoritmo para consultar seus resultados.</pre>
+        <div class="rede-tabela"><table><caption id="rede-tabela-nota">Arcos do resultado selecionado</caption><thead><tr><th>Origem</th><th>Destino</th><th>PESO</th><th>PESO + 1 (Dijkstra)</th></tr></thead><tbody id="rede-arcos"></tbody></table></div>
       </div>
     </section>
   </main>

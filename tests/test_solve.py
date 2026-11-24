@@ -102,7 +102,7 @@ def test_homepage_preserva_acesso_ao_labirinto_e_figuras_parte2():
 
             recursos = Recursos()
             recursos.feed(pagina)
-            assert len(recursos.urls) == 3
+            assert len(recursos.urls) == 4
             for recurso in recursos.urls:
                 conexao.request("GET", urljoin(rota, recurso))
                 resposta = conexao.getresponse()

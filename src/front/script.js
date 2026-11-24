@@ -71,10 +71,10 @@
     const hash = location.hash.slice(1) || 'inicio';
     const pagina = aliases[hash] || hash;
     const paginasParte1 = ['parte1', 'comparar', 'analises', 'figuras'];
-    const parte2 = Object.hasOwn(FIGURAS, pagina);
+    const parte2 = Object.hasOwn(FIGURAS, pagina) || pagina === 'grafo';
     S.page = parte2 || paginasParte1.includes(pagina) ? pagina : 'inicio';
     stop(); ++S.request;
-    const tela = parte2 ? 'parte2' : S.page === 'comparar' ? 'palco' : S.page;
+    const tela = S.page === 'grafo' ? 'grafo' : parte2 ? 'parte2' : S.page === 'comparar' ? 'palco' : S.page;
     // [IA] ChatGPT (Codex) – seleção de mapas e exploração compartilham a tela da Parte 1.
     document.querySelectorAll('[data-page]').forEach(section => {
       section.hidden = section.dataset.page !== tela && !(S.page === 'parte1' && section.dataset.page === 'palco');
@@ -89,7 +89,8 @@
       if (ativo) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     });
     window.scrollTo({top: 0, behavior: 'instant'});
-    if (parte2) mostrarCategoria(S.page);
+    if (S.page === 'grafo') DatasetGraph.open();
+    else if (parte2) mostrarCategoria(S.page);
     else if (S.page === 'analises' || S.page === 'figuras') { if (current()) loadAnalyses(); }
     else if (S.page === 'parte1' || S.page === 'comparar') {
       if (S.page === 'parte1') requestAnimationFrame(drawThumbs);

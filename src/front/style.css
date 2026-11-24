@@ -285,6 +285,20 @@ h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
 .graph-controls label { display: inline-flex; align-items: center; gap: 10px; }
 .graph-controls select { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
 .graph-controls input { accent-color: var(--accent); }
+/* [IA] ChatGPT (Codex) – rede real da Parte 2, com os cartões e cores do projeto. */
+.rede-canvas { height: min(65vh, 650px); min-height: 340px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface-2); }
+#rede-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+#rede-canvas:active { cursor: grabbing; }
+.rede-resultados { margin-top: 24px; }
+.rede-vizinhos { display: flex; flex-wrap: wrap; gap: 8px; max-height: 220px; overflow-y: auto; padding: 8px 0; }
+.rede-vizinhos button { text-align: left; font-size: 12px; }
+.rede-resumo { white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.7 var(--mono); color: var(--ink); }
+.rede-tabela { overflow-x: auto; }
+.rede-tabela table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+.rede-tabela th, .rede-tabela td { padding: 10px; border-bottom: 1px solid var(--line); }
+.rede-tabela caption { text-align: left; color: var(--muted); padding-block: 12px; }
+#rede-casos button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+#rede-busca { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
 @media (max-width: 900px) {
   .dataset-layout { grid-template-columns: minmax(0, 1fr); }
   .figure-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
