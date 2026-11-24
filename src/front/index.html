@@ -6,40 +6,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Explore os labirintos do projeto de Teoria dos Grafos e compare BFS, DFS, Dijkstra e Bellman-Ford.">
-  <title>Labirintos</title>
-  <link rel="stylesheet" href="./style.css">
-  <script src="./dados.js" defer></script>
-  <script src="./script.js" defer></script>
+  <title>Grafos · Projeto</title>
+  <link rel="stylesheet" href="/src/front/style.css">
+  <script src="/src/front/dados.js" defer></script>
+  <script src="/src/front/script.js" defer></script>
 </head>
 <body>
   <header class="nav">
     <div class="nav-inner">
-      <a class="brand" href="#inicio" aria-label="Labirintos, início">
+      <a class="brand" href="#inicio" aria-label="Projeto de grafos, início">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 2h16v16H2zM6 2v8h4M14 6v12M6 14h4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-        <span>Labirintos</span>
+        <span>Grafos</span>
       </a>
       <nav class="nav-links" aria-label="Seções">
-        <a href="#mapas">Mapas</a>
-        <a href="#palco" data-mode-link="single">Explorar</a>
-        <a href="#palco" data-mode-link="compare">Comparar</a>
-        <a href="#analises">Análises</a>
+        <a href="#inicio">Início</a>
+        <a href="#parte1">Parte 1</a>
+        <a href="#parte2">Parte 2</a>
       </nav>
       <span class="server-pill" id="server-pill" title="Situação do servidor de resultados"><i></i><span>Conectando</span></span>
     </div>
   </header>
 
+  <!-- [IA] ChatGPT (Codex) – telas separadas por navegação, mantendo a estética existente. -->
+  <nav class="section-nav" id="nav-parte1" aria-label="Parte 1" hidden>
+    <a href="#parte1">Mapas e exploração</a>
+    <a href="#comparar">Comparar algoritmos</a>
+    <a href="#analises">Análises do grafo</a>
+    <a href="#figuras">Figuras</a>
+  </nav>
+  <nav class="section-nav" id="nav-parte2" aria-label="Parte 2" hidden>
+    <a href="#exploratorias">Exploratórias</a>
+    <a href="#explanatorias">Explanatórias</a>
+    <a href="#desempenho">Desempenho</a>
+  </nav>
+
   <main id="inicio">
-    <section class="hero">
-      <p class="eyebrow">Teoria dos Grafos · Parte 1</p>
-      <h1>Desvende o labirinto.</h1>
-      <p class="hero-sub">Cada casa pode virar vários estados. Escolha um mapa, siga um algoritmo passo a passo ou coloque os quatro para correr lado a lado.</p>
-      <div class="hero-links">
-        <a class="link-cta" href="#palco" data-mode-link="single">Explorar um algoritmo <span aria-hidden="true">›</span></a>
-        <a class="link-cta" href="#palco" data-mode-link="compare">Comparar os quatro <span aria-hidden="true">›</span></a>
+    <section class="hero home" data-page="inicio">
+      <p class="eyebrow">Teoria dos Grafos · Análise e Visualização de Dados</p>
+      <h1>Um projeto.<br>Dois cenários.</h1>
+      <p class="hero-sub">Explore os algoritmos nos labirintos e descubra a rede de votos da Wikipédia.</p>
+      <div class="project-grid">
+        <a class="project-card" href="#parte1">
+          <span class="badge">Parte 1</span>
+          <h2>Labirintos com chaves.</h2>
+          <p>Mapas, grafos de estados e algoritmos em ação. Acompanhe cada passo e compare os resultados.</p>
+          <span class="link-cta">Explorar os labirintos <span aria-hidden="true">›</span></span>
+        </a>
+        <a class="project-card" href="#parte2">
+          <span class="badge">Parte 2</span>
+          <h2>Votos que formam uma rede.</h2>
+          <p>O dataset Wiki-RfA em visualizações exploratórias, explanatórias e de desempenho.</p>
+          <span class="link-cta">Conhecer o Wiki-RfA <span aria-hidden="true">›</span></span>
+        </a>
       </div>
     </section>
 
-    <section class="maps" id="mapas" aria-labelledby="mapas-titulo">
+    <section class="maps page-section" id="mapas" data-page="parte1" aria-labelledby="mapas-titulo" hidden>
       <div class="section-head">
         <h2 id="mapas-titulo">Escolha um mapa.</h2>
         <div class="toolbar">
@@ -57,11 +79,12 @@
       <div class="map-row" id="mapas-equipe" role="listbox" aria-label="Mapas da equipe"></div>
     </section>
 
-    <section class="stage-section" id="palco" aria-labelledby="palco-titulo">
+    <section class="stage-section" id="palco" data-page="palco" aria-labelledby="palco-titulo" hidden>
       <div class="section-head">
         <div>
           <p class="eyebrow" id="palco-mapa">—</p>
           <h2 id="palco-titulo">Siga cada passo.</h2>
+          <a class="link-cta" id="trocar-mapa" href="#parte1" hidden>Trocar mapa <span aria-hidden="true">›</span></a>
         </div>
         <div class="segmented segmented-large" role="radiogroup" aria-label="Modo de visualização">
           <button type="button" role="radio" aria-checked="true" data-mode="single">Um algoritmo</button>
@@ -120,7 +143,7 @@
       </div>
     </section>
 
-    <section class="analyses" id="analises" aria-labelledby="analises-titulo">
+    <section class="analyses" id="analises" data-page="analises" aria-labelledby="analises-titulo" hidden>
       <div class="section-head">
         <div>
           <p class="eyebrow">Além do caminho</p>
@@ -138,10 +161,34 @@
           <p class="card-sub">Como a DFS enxerga cada arco.</p>
           <div id="arc-view" class="card-body">Carregando…</div>
         </article>
-        <article class="card card-wide" id="figuras-card">
+      </div>
+    </section>
+
+    <section class="page-section" data-page="figuras" aria-labelledby="figuras-titulo" hidden>
+      <div class="section-head"><div><p class="eyebrow">Parte 1 · Labirintos</p><h2 id="figuras-titulo">Figuras do mapa selecionado.</h2></div><a class="link-cta" href="#parte1">Trocar mapa ›</a></div>
+        <article class="card" id="figuras-card">
           <h3>Figuras do projeto</h3>
           <p class="card-sub" id="figuras-sub">Geradas pelo src/viz.py a partir das saídas em out/parte1.</p>
           <div id="figures-view" class="figures"></div>
+        </article>
+    </section>
+
+    <section class="page-section" data-page="parte2" aria-labelledby="dataset-titulo" hidden>
+      <div class="section-head">
+        <div><p class="eyebrow">Parte 2 · Wiki-RfA</p><h2 id="dataset-titulo">A rede de votos da Wikipédia.</h2></div>
+        <span class="badge">11.376 usuários · 196.614 arcos</span>
+      </div>
+      <p class="dataset-intro">Cada voto liga um eleitor a um candidato. Navegue pelas figuras para conhecer os dados, acompanhar as explicações e comparar os algoritmos.</p>
+      <div class="dataset-layout">
+        <aside class="card figure-sidebar" aria-label="Seleção da figura">
+          <p class="eyebrow" id="figure-category">Exploratórias</p>
+          <div class="figure-list" id="dataset-figures"></div>
+        </aside>
+        <article class="card figure-viewer" aria-labelledby="dataset-figure-title">
+          <div class="section-head"><div><p class="eyebrow" id="dataset-figure-id"></p><h3 id="dataset-figure-title"></h3></div><span class="badge" id="dataset-figure-count"></span></div>
+          <figure><img id="dataset-image" class="dataset-image" alt=""><figcaption id="dataset-caption" class="card-sub"></figcaption></figure>
+          <p id="dataset-image-error" class="card-sub" role="status" hidden>Figura indisponível. Gere as imagens com <code>python -m src.viz --parte2</code>.</p>
+          <div class="figure-controls"><button class="ghost-button" id="figure-prev" type="button">‹ Anterior</button><a class="link-cta" id="figure-open" target="_blank" rel="noopener">Ampliar figura ↗</a><button class="ghost-button" id="figure-next" type="button">Próxima ›</button></div>
         </article>
       </div>
     </section>

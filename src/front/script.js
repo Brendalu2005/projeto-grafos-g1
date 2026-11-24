@@ -14,7 +14,90 @@
     grupo_rotas: 'Rotas', grupo_armadilhas: 'Armadilhas',
   };
   const SETAS = {'^': '↑', '>': '→', 'v': '↓', '<': '←'};
-  const S = {maps: [], map: null, alg: 'BFS', fonte: false, mode: 'single', steps: [], kind: 'path', index: 0, race: null, timer: null, request: 0};
+  const S = {maps: [], map: null, alg: 'BFS', fonte: false, mode: 'single', page: 'inicio', steps: [], kind: 'path', index: 0, race: null, timer: null, request: 0};
+
+  // [IA] ChatGPT (Codex) – figuras existentes agrupadas conforme a classificação da equipe.
+  const FIGURAS = {
+    exploratorias: [
+      ['A01', 'Distribuição dos graus', 'andre_01_distribuicao_graus.png'],
+      ['A02', 'Distribuição dos votos e pesos', 'andre_02_distribuicao_pesos.png'],
+      ['A04', 'Atributos por resultado', 'andre_04_atributos_result.png'],
+      ['B01', 'Votos sem origem por faixa', 'brenda_01_faltantes_por_faixa.png'],
+    ],
+    explanatorias: [
+      ['A03', 'Tempos de DFS e Bellman-Ford', 'andre_03_tempos_dfs_bellman.png'],
+      ['B03', 'Efeito da transformação dos pesos', 'brenda_03_efeito_transformacao.png'],
+    ],
+    desempenho: [['B02', 'Tempos de BFS e Dijkstra', 'brenda_02_tempos_bfs_dijkstra.png']],
+  };
+  let categoriaFigura = 'exploratorias', indiceFigura = 0;
+
+  function mostrarFigura(indice) {
+    const figuras = FIGURAS[categoriaFigura];
+    indiceFigura = Math.max(0, Math.min(indice, figuras.length - 1));
+    const [id, nome, arquivo] = figuras[indiceFigura];
+    const url = new URL(`../parte2/${arquivo}`, FrontData.output('')).href;
+    $('#dataset-figure-id').textContent = id;
+    $('#dataset-figure-title').textContent = nome;
+    $('#dataset-figure-count').textContent = `${indiceFigura + 1} de ${figuras.length}`;
+    $('#dataset-image-error').hidden = true;
+    $('#dataset-image').hidden = false;
+    $('#dataset-image').alt = `${id} · ${nome}`;
+    $('#dataset-image').src = url;
+    $('#figure-open').href = url;
+    $('#dataset-caption').textContent = 'Figura gerada pelo projeto a partir dos dados e resultados da Parte 2.';
+    $('#figure-prev').disabled = indiceFigura === 0;
+    $('#figure-next').disabled = indiceFigura === figuras.length - 1;
+    document.querySelectorAll('[data-figure]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.figure) === indiceFigura)));
+  }
+
+  function mostrarCategoria(categoria) {
+    categoriaFigura = categoria;
+    $('#figure-category').textContent = {exploratorias:'Exploratórias', explanatorias:'Explanatórias', desempenho:'Desempenho'}[categoria];
+    $('#dataset-figures').replaceChildren(...FIGURAS[categoria].map(([id, nome], indice) => {
+      const button = document.createElement('button');
+      button.type = 'button'; button.dataset.figure = indice;
+      button.innerHTML = `<span>${id}</span>${escape(nome)}`;
+      button.addEventListener('click', () => mostrarFigura(indice));
+      return button;
+    }));
+    mostrarFigura(0);
+  }
+
+  // [IA] ChatGPT (Codex) – alterna telas sem empilhar seções na mesma página.
+  function mostrarPagina() {
+    const aliases = {mapas:'parte1', palco:'parte1', explorar:'parte1', parte2:'exploratorias'};
+    const hash = location.hash.slice(1) || 'inicio';
+    const pagina = aliases[hash] || hash;
+    const paginasParte1 = ['parte1', 'comparar', 'analises', 'figuras'];
+    const parte2 = Object.hasOwn(FIGURAS, pagina);
+    S.page = parte2 || paginasParte1.includes(pagina) ? pagina : 'inicio';
+    stop(); ++S.request;
+    const tela = parte2 ? 'parte2' : S.page === 'comparar' ? 'palco' : S.page;
+    // [IA] ChatGPT (Codex) – seleção de mapas e exploração compartilham a tela da Parte 1.
+    document.querySelectorAll('[data-page]').forEach(section => {
+      section.hidden = section.dataset.page !== tela && !(S.page === 'parte1' && section.dataset.page === 'palco');
+    });
+    $('#trocar-mapa').hidden = S.page !== 'comparar';
+    $('#nav-parte1').hidden = !paginasParte1.includes(S.page);
+    $('#nav-parte2').hidden = !parte2;
+    document.querySelectorAll('.nav-links a, .section-nav a').forEach(link => {
+      const destino = link.getAttribute('href').slice(1);
+      const ativo = destino === S.page || (destino === 'parte1' && link.closest('.nav-links') && paginasParte1.includes(S.page))
+        || (destino === 'parte2' && parte2);
+      if (ativo) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+    });
+    window.scrollTo({top: 0, behavior: 'instant'});
+    if (parte2) mostrarCategoria(S.page);
+    else if (S.page === 'analises' || S.page === 'figuras') { if (current()) loadAnalyses(); }
+    else if (S.page === 'parte1' || S.page === 'comparar') {
+      if (S.page === 'parte1') requestAnimationFrame(drawThumbs);
+      if (current()) {
+        const modo = S.page === 'comparar' ? 'compare' : 'single';
+        if (S.mode !== modo) setMode(modo); else load();
+      }
+    }
+  }
 
   const escape = value => String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[char]);
   const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -105,7 +188,7 @@
         card.setAttribute('role', 'option'); card.dataset.mapa = map.mapa;
         const chaves = new Set(map.grade.join('').match(/[a-d]/g) || []).size;
         card.innerHTML = `<span class="map-thumb"><canvas aria-hidden="true"></canvas></span><span class="map-name">${escape(titulo(map.mapa))}</span><span class="map-meta">${map.linhas}×${map.colunas} · ${chaves ? `${chaves} ${chaves === 1 ? 'chave' : 'chaves'}` : 'sem chaves'}</span>`;
-        card.addEventListener('click', () => selectMap(map.mapa));
+        card.addEventListener('click', () => selectMap(map.mapa, true));
         row.append(card);
       }
       if (!row.children.length) row.innerHTML = '<p class="map-meta">Nenhum mapa nesta pasta.</p>';
@@ -119,12 +202,13 @@
       drawMaze(canvas, map.grade, {width: card.querySelector('.map-thumb').clientWidth - 12, maxHeight: 76, maxCell: 12, minCell: 1});
     });
   }
-  function selectMap(name) {
+  function selectMap(name, abrir = false) {
     S.map = name;
     document.querySelectorAll('.map-card').forEach(card => card.setAttribute('aria-selected', String(card.dataset.mapa === name)));
     $('#palco-mapa').textContent = titulo(name) + (current()?.grupo ? ' · mapa da equipe' : '');
-    loadAnalyses();
-    return load();
+    if (abrir && S.page !== 'parte1') { location.hash = 'parte1'; return; }
+    if (S.page === 'analises' || S.page === 'figuras') return loadAnalyses();
+    if (S.page === 'parte1' || S.page === 'comparar') return load();
   }
 
   // ---------- controles ----------
@@ -341,6 +425,7 @@
   }
 
   async function load() {
+    if (!['parte1', 'comparar'].includes(S.page)) return;
     const ticket = ++S.request;
     stop(); S.index = 0;
     if (!current()) return;
@@ -395,12 +480,16 @@
   }
 
   // ---------- eventos ----------
-  document.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
-  document.querySelectorAll('[data-mode-link]').forEach(link => link.addEventListener('click', () => setMode(link.dataset.modeLink)));
+  window.addEventListener('hashchange', mostrarPagina);
+  $('#figure-prev').addEventListener('click', () => mostrarFigura(indiceFigura - 1));
+  $('#figure-next').addEventListener('click', () => mostrarFigura(indiceFigura + 1));
+  $('#dataset-image').addEventListener('error', () => { $('#dataset-image').hidden = true; $('#dataset-image-error').hidden = false; });
+  document.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.mode === 'single' ? 'parte1' : 'comparar'; }));
   document.querySelectorAll('[data-fonte]').forEach(button => button.addEventListener('click', () => {
     S.fonte = button.dataset.fonte === 'true';
     document.querySelectorAll('[data-fonte]').forEach(b => b.setAttribute('aria-checked', String(b === button)));
-    loadAnalyses(); load();
+    if (S.page === 'analises' || S.page === 'figuras') loadAnalyses();
+    if (S.page === 'parte1' || S.page === 'comparar') load();
   }));
   $('#play-button').addEventListener('click', play);
   $('#restart-button').addEventListener('click', () => move(0));
@@ -427,8 +516,7 @@
         || disponiveis.find(row => row.mapa === S.map) || disponiveis[0];
       if (!selecionado) throw new Error('Nenhum resultado corresponde aos mapas disponíveis na interface.');
       S.alg = selecionado.algoritmo; syncPills();
-      if (S.mode !== 'single') setMode('single');
-      await selectMap(selecionado.mapa);
+      await selectMap(selecionado.mapa, true);
     } catch (error) { status('Arquivo inválido', error.message, 'error'); }
     finally { event.target.value = ''; }
   });
@@ -440,6 +528,7 @@
   // ---------- início ----------
   async function start() {
     buildPills(); buildLegend(); updatePlayer();
+    mostrarPagina();
     FrontData.online().then(on => {
       const pill = $('#server-pill');
       pill.className = `server-pill ${on ? 'on' : 'off'}`;
@@ -452,6 +541,7 @@
       if (!S.maps.length) throw new Error('Nenhum mapa encontrado em data/mapas/.');
       buildGallery();
       selectMap(S.maps.some(map => map.mapa === 'm02_uma_chave') ? 'm02_uma_chave' : S.maps[0].mapa);
+      mostrarPagina();
     } catch (error) {
       status('Falha ao carregar os mapas', `${error.message} Rode python -m src.front.server na raiz do projeto.`, 'error');
     }

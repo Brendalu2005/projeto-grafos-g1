@@ -61,3 +61,60 @@ def test_interface_exclui_aquecimento_e_mede_cinco_execucoes_lentas(monkeypatch,
     assert eventos == ["algoritmo"] + ["relogio", "algoritmo", "relogio"] * 5
     assert tempos == [2000, 3000, 4000, 5000, 6000]
     assert saida == (None if recusa else retorno)
+
+
+# [IA] ChatGPT (Codex) – valida homepage, acesso anterior e imagens das duas partes pelo servidor.
+def test_homepage_preserva_acesso_ao_labirinto_e_figuras_parte2():
+    from http.client import HTTPConnection
+    from http.server import ThreadingHTTPServer
+    from threading import Thread
+    from html.parser import HTMLParser
+    from urllib.parse import urljoin
+    from src.front.server import Handler
+
+    servidor = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = Thread(target=servidor.serve_forever, daemon=True)
+    thread.start()
+    conexao = HTTPConnection(*servidor.server_address, timeout=10)
+    try:
+        for rota in ("/", "/index.html", "/out/parte1/labirinto_interativo.html"):
+            conexao.request("GET", rota)
+            resposta = conexao.getresponse()
+            pagina = resposta.read().decode("utf-8")
+            assert resposta.status == 200
+            assert 'data-page="inicio"' in pagina
+            assert 'id="nav-parte1"' in pagina
+            assert 'id="nav-parte2"' in pagina
+            class Recursos(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.urls = []
+
+                def handle_starttag(self, tag, attrs):
+                    atributos = dict(attrs)
+                    if tag == "script" and "src" in atributos:
+                        self.urls.append(atributos["src"])
+                    if tag == "link" and atributos.get("rel") == "stylesheet":
+                        self.urls.append(atributos["href"])
+
+            recursos = Recursos()
+            recursos.feed(pagina)
+            assert len(recursos.urls) == 3
+            for recurso in recursos.urls:
+                conexao.request("GET", urljoin(rota, recurso))
+                resposta = conexao.getresponse()
+                resposta.read()
+                assert resposta.status == 200
+        for nome in ("andre_01_distribuicao_graus", "andre_02_distribuicao_pesos",
+                     "andre_03_tempos_dfs_bellman", "andre_04_atributos_result",
+                     "brenda_01_faltantes_por_faixa", "brenda_02_tempos_bfs_dijkstra",
+                     "brenda_03_efeito_transformacao"):
+            conexao.request("GET", f"/out/parte2/{nome}.png")
+            resposta = conexao.getresponse()
+            assert resposta.status == 200
+            assert resposta.read().startswith(b"\x89PNG\r\n\x1a\n")
+    finally:
+        conexao.close()
+        servidor.shutdown()
+        servidor.server_close()
+        thread.join(timeout=5)

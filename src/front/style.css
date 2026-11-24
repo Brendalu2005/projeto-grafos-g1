@@ -80,7 +80,8 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+html { scroll-behavior: auto; scroll-padding-top: 64px; }
+[hidden] { display: none !important; }
 body {
   margin: 0;
   background: var(--bg);
@@ -252,6 +253,39 @@ h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
 
 .footer { max-width: 1120px; margin: 0 auto; padding: 32px max(22px, env(safe-area-inset-left)) 48px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); }
 
+/* [IA] ChatGPT (Codex) – homepage e navegação por telas, com os tokens visuais existentes. */
+.nav-links a[aria-current="page"], .section-nav a[aria-current="page"] { color: var(--accent); opacity: 1; font-weight: 600; }
+.section-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 24px; padding: 14px 22px; border-bottom: 1px solid var(--line); }
+.section-nav a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 5px 0; }
+.page-section { padding-block: 44px; }
+.stage-section, .analyses { padding-top: 44px; }
+.home { padding-block: 64px 52px; }
+.home h1 { font-size: clamp(44px, 6.5vw, 72px); }
+.project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 44px; text-align: left; }
+.project-card { display: flex; flex-direction: column; align-items: start; gap: 14px; padding: 32px; background: var(--surface); color: var(--ink); text-decoration: none; border: 1px solid transparent; border-radius: var(--radius); box-shadow: var(--shadow); transition: border-color .2s, transform .2s; }
+.project-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.project-card h2 { font-size: 28px; }
+.project-card p { margin: 0 0 8px; color: var(--muted); font-size: 17px; }
+.project-card .link-cta { margin-top: auto; }
+.dataset-intro { margin: -4px 0 26px; max-width: 760px; color: var(--muted); }
+.dataset-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
+.figure-sidebar { padding: 22px 14px; }
+.figure-sidebar .eyebrow { padding-inline: 10px; margin-bottom: 16px; }
+.figure-list { display: grid; gap: 8px; }
+.figure-list button { padding: 14px 12px; text-align: left; border: 1px solid transparent; background: transparent; border-radius: 12px; font-size: 14px; }
+.figure-list button span { display: block; margin-bottom: 5px; color: var(--muted); font-size: 12px; }
+.figure-list button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.figure-viewer { padding: 24px; }
+.figure-viewer figure { margin: 0; }
+.dataset-image { display: block; width: 100%; height: min(58vh, 580px); object-fit: contain; border-radius: 12px; background: #fff; border: 1px solid var(--line); }
+.figure-viewer .card-sub { margin-block: 14px; }
+.figure-controls { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.figure-controls button:disabled { opacity: .35; cursor: default; }
+@media (max-width: 900px) {
+  .dataset-layout { grid-template-columns: minmax(0, 1fr); }
+  .figure-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 900px) {
   .stage { grid-template-columns: minmax(0, 1fr); }
   .race { grid-template-columns: minmax(0, 1fr); }
@@ -261,8 +295,14 @@ h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
   .speed { grid-template-columns: auto minmax(0, 1fr) auto; }
 }
 @media (max-width: 640px) {
-  .nav-links { display: none; }
+  .nav-links { display: flex; gap: 16px; }
+  .nav-inner { gap: 14px; }
   .server-pill { margin-left: auto; }
+  .server-pill > span { display: none; }
+  .project-grid { grid-template-columns: minmax(0, 1fr); }
+  .project-card { padding: 24px; }
+  .figure-viewer { padding: 16px; }
+  .figure-controls { flex-wrap: wrap; }
   .hero { padding-block: 64px 32px; }
   .bar { grid-template-columns: 96px minmax(0, 1fr) 84px; }
   .row { grid-template-columns: 84px minmax(0, 1fr) 76px; }

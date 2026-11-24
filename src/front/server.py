@@ -99,6 +99,10 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
+        # [IA] ChatGPT (Codex) – a raiz abre a homepage das duas partes.
+        if url.path in ("/", "/index.html"):
+            self.path = "/src/front/index.html"
+            return super().do_GET()
         if url.path == "/api/comparar":
             params = parse_qs(url.query)
             name = params.get("mapa", [""])[0]
@@ -167,7 +171,7 @@ def main():
     parser.add_argument("--port", type=int, default=8766)
     args = parser.parse_args()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
-    print(f"Front: http://127.0.0.1:{args.port}/out/parte1/labirinto_interativo.html", flush=True)
+    print(f"Front: http://127.0.0.1:{args.port}/", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
