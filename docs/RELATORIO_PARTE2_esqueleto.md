@@ -148,7 +148,7 @@ Barras agrupadas foram escolhidas por Brenda para comparar poucos caminhos e dua
 
 ## 8. Reprodução e verificações
 
-O CSV tratado deve ter SHA-256 de16066d90875782f2daffae3adbe5c513f0fa9743ad242d3e1fcbf5c635e7c2. O download e o tratamento estão em data/dataset_parte2/baixar_wikiRfA.ipynb. Os CSVs não são versionados; os notebooks e a fonte do download são disponibilizados. O notebook de experimentos usa os JSONs salvos nas seções 16 e 17 para conferir e consolidar, sem medir algoritmos novamente.
+O CSV tratado deve ter SHA-256 de16066d90875782f2daffae3adbe5c513f0fa9743ad242d3e1fcbf5c635e7c2. O download e o tratamento estão em data/dataset_parte2/preparacao_dataset_wikiRfA.ipynb. Os CSVs não são versionados; os notebooks e a fonte do download são disponibilizados. O notebook de experimentos usa os JSONs salvos nas seções 16 e 17 para conferir e consolidar, sem medir algoritmos novamente.
 
 Para reproduzir os casos: python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --experimentos --out out/parte2
 
