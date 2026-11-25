@@ -8,9 +8,8 @@ Brenda apresentou suas observações e aprovou as escolhas, justificativas e not
 registradas no [avd_log.md](avd_log.md). Este documento reúne esses registros no
 mesmo formato do documento de André, preservando os textos aprovados.
 
-As aprovações de Brenda registram suas decisões durante o trabalho. A conformidade
-dos usos de IA e o alcance das autorizações específicas das professoras continuam
-sujeitos à revisão do grupo e à declaração de uso de IA.
+As análises e justificativas foram revisadas pelo grupo, conforme confirmação
+recebida. Os usos de IA permanecem registrados no log e na declaração correspondente.
 
 ## Organização
 
@@ -27,17 +26,28 @@ indicados nas seções abaixo.
 ## Paleta e acessibilidade
 
 As figuras seguem a paleta usada nas [visualizações de André](visualizacoes_andre_parte2.md):
-azul `#0072B2` e laranja-avermelhado `#D55E00`, com texto escuro e rodapés
-`#52606d` sobre fundo branco.
+azul `#0072B2` e laranja-avermelhado `#D55E00`, com contornos e anotações em `#263238`
+e rodapés em `#52606d` sobre fundo branco. B03 também usa cinza escuro
+`#3E4756` no cabeçalho da tabela de arcos, com texto branco. As barras têm
+preenchimento sólido, sem hachuras.
+
+**Critério de escolha.** O azul e o laranja-avermelhado foram escolhidos pensando
+na acessibilidade para pessoas com daltonismo, com o objetivo de facilitar a
+distinção das séries. As barras mantêm preenchimento sólido, sem textura, e a
+identificação é complementada por posição, legendas, rótulos e, nos gráficos de
+linhas, marcadores e traçados diferentes.
 
 | Figura | Azul | Laranja-avermelhado | Identificação adicional |
 |---|---|---|---|
-| B01 | Proporção de votos sem SOURCE | Não utilizado | Hachura de listras, percentuais e contagens escritos |
+| B01 | Votos com SOURCE | Votos sem SOURCE | Segmentos empilhados: com SOURCE na base e sem SOURCE no topo; contagens e percentuais dos faltantes escritos |
 | B02 | BFS | Dijkstra | Círculos e linha contínua para BFS; quadrados e linha tracejada para Dijkstra |
-| B03 | Custo em PESO | Custo em PESO + 1 | Listras para PESO, pontos para PESO + 1 e valores escritos, inclusive zero |
+| B03 | Custo em PESO | Custo em PESO + 1 | Posição fixa das barras, legenda e valores escritos, inclusive zero; tabela com os pesos por arco |
 
-Esses recursos descrevem o padrão visual aprovado e implementado. As legendas,
-formas, padrões e rótulos permitem identificar as séries além das cores.
+Esses recursos descrevem a implementação atual em `src/viz.py`. Em B02, formas
+e traçados diferenciam as séries além da cor. Em B01 e B03, a posição fixa,
+as legendas e os rótulos apoiam a leitura das barras sólidas. Não foi registrada
+validação específica desta paleta para daltonismo ou contraste; a leitura em
+tons de cinza depende também desses recursos de identificação.
 
 ## B01 — Votos sem origem identificada por faixa de votos recebidos
 
@@ -53,7 +63,9 @@ TARGET identificado, sem limite mínimo adicional.
 
 > Adotei as faixas sugeridas durante a discussão com apoio de IA para comparar candidatos com diferentes volumes de votos em cinco grupos legíveis, mantendo também aqueles com poucos votos. Os cortes são uma escolha de apresentação, não limites estatísticos. Como sua definição influencia a aparência do gráfico, apresento os intervalos e as quantidades de candidatos, votos e registros sem SOURCE para contextualizar os percentuais.
 
-As barras representam a proporção agregada de cada faixa:
+As barras são 100% empilhadas: o segmento azul representa votos com SOURCE e
+o segmento laranja-avermelhado, no topo, representa votos sem SOURCE. Cada barra completa
+corresponde a todos os votos da faixa. A proporção de faltantes é calculada por:
 `100 × soma dos votos sem SOURCE / soma de todos os votos da faixa`.
 Não é calculada a média dos percentuais individuais dos candidatos.
 Os intervalos têm larguras diferentes e são apresentados como categorias.
@@ -66,15 +78,19 @@ Os intervalos têm larguras diferentes e são apresentados como categorias.
 | 100–499 | 531 | 82.397 | 642 | 0,78% |
 | 500 ou mais | 8 | 5.375 | 20 | 0,37% |
 
-**Nota analítica aprovada.**
+**Nota analítica.**
 
-> A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: a barra mais alta não representa a maior quantidade de registros sem origem.
+> A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: o maior segmento proporcional de votos sem SOURCE não representa a maior quantidade desses registros.
+
+A nota anteriormente aprovada mencionava a “barra mais alta”. A redação acima
+foi adaptada com apoio de IA à apresentação atual, em que todas as barras
+completas têm altura de 100%.
 
 **Limites.** A figura não determina o mecanismo nem a causa da ausência de SOURCE.
 Um voto sem origem identificada não é necessariamente um voto nulo. As faixas
 agrupam candidatos e não eleições individuais: a versão utilizada do dataset não
-possui datas nem identificadores de eleição. A altura de cada barra descreve sua
-própria faixa e deve ser acompanhada pelas contagens.
+possui datas nem identificadores de eleição. A altura do segmento laranja-avermelhado
+descreve a proporção de faltantes na faixa e deve ser acompanhada pelas contagens.
 
 ## B02 — Tempos de BFS e Dijkstra por tamanho do grafo e fonte
 
@@ -100,8 +116,10 @@ de figuras exploratórias voltadas ao entendimento do dataset.
 > Escolhi três painéis, um por fonte, para facilitar a comparação dos tempos de BFS e Dijkstra em cada fonte e nos diferentes tamanhos de recorte. A mesma escala vertical permite também comparar os tempos entre os painéis.
 
 As linhas e os marcadores apresentam as médias nos três tamanhos ordenados.
-A escala vertical é linear e comum aos painéis. Cada rótulo horizontal informa
-o percentual do recorte, o número de arcos e o número de outros usuários alcançados.
+A escala vertical é linear e comum aos painéis. Os rótulos horizontais mostram
+somente os percentuais de 10%, 50% e 100% dos arcos. As quantidades de arcos e
+de outros usuários alcançados são apresentadas na tabela abaixo, não nos rótulos
+da imagem atual.
 
 | Recorte | Arcos | Outros usuários alcançados por cada fonte |
 |---|---:|---:|
@@ -128,14 +146,14 @@ fora da medição de tempo.
 | John Carter | 50% | 0,141781 | 0,135927 |
 | John Carter | 100% | 0,220787 | 0,111098 |
 
-**Nota atualizada para revisão autoral.**
+**Nota analítica.**
 
 > Para Siva1979, BFS e Dijkstra apresentam tempos médios próximos no recorte de 10%. Nos recortes de 50% e 100%, a média do BFS fica acima da do Dijkstra. Para Gwynand e John Carter, o BFS apresenta média maior nos três tamanhos. Há sobreposição entre alguns intervalos mínimo–máximo; em 100%, o BFS apresenta maior amplitude entre as repetições nas três fontes. Esses resultados descrevem as implementações e o ambiente medidos, sem demonstrar uma vantagem geral de Dijkstra. Os conjuntos de usuários alcançados foram iguais entre os algoritmos em cada configuração.
 
 **Apoio de IA na atualização.** A redação preserva as observações anteriormente
 aprovadas por Brenda e substitui a referência à variabilidade do benchmark antigo
-pelos intervalos do arquivo atual. Essa atualização factual foi feita com IA e
-deve ser revisada por Brenda antes da entrega como nota autoral. A versão anterior
+pelos intervalos do arquivo atual. Essa atualização factual foi feita com IA.
+A versão anterior
 aprovada permanece no histórico do log e se refere às medições antigas.
 
 **Limites.** BFS utiliza PESO, mas ignora seus valores na busca; Dijkstra utiliza
@@ -170,6 +188,10 @@ versão separada do grafo. O CSV tratado e a coluna PESO são preservados.
 
 Cada grupo representa um caminho; as barras comparam as somas em PESO e PESO + 1.
 O valor zero é escrito, embora sua barra tenha altura zero.
+Os rótulos identificam o algoritmo que retornou cada caminho e sua quantidade
+de arcos. Ao lado das barras, uma tabela apresenta origem, destino e peso de
+cada arco nas duas versões. As anotações da figura explicitam o empate após
+a transformação e o custo do caminho direto em PESO.
 
 | Caminho | Quantidade de arcos | Custo em PESO | Custo em PESO + 1 |
 |---|---:|---:|---:|
@@ -184,9 +206,6 @@ O valor zero é escrito, embora sua barra tenha altura zero.
 
 > Ao observar a distribuição de PESO e PESO + 1, surgiu a dúvida sobre se eliminar os pesos negativos também alteraria os caminhos mínimos. Para investigar essa questão, comparei os custos de dois caminhos antes e depois da transformação no subgrafo selecionado. A figura explanatória apresenta esse exemplo e mostra como caminhos com quantidades diferentes de arcos recebem acréscimos diferentes, chegando ao empate observado.
 
-**Apoio de IA nesta nota.** Brenda confirmou que a dúvida surgiu da observação
-da distribuição dos pesos. ChatGPT (Codex) organizou a redação acima, incluída
-após sua aprovação.
 
 **Limites e relação com a pesquisa.** O caminho direto foi retornado em uma situação
 de empate nos pesos transformados; não se tornou exclusivamente melhor.
@@ -203,13 +222,16 @@ e o JSON do estudo de caso disponíveis:
 python -m src.viz --parte2
 ```
 
-O comando gera as seis figuras de Brenda e André em `out/parte2/`, sem executar
-algoritmos ou refazer o benchmark. Para escolher outra pasta de saída, use `--out`.
+O comando gera as sete figuras de Brenda e André e atualiza
+`dados_visualizacoes_andre.json` em `out/parte2/`, sem executar os algoritmos
+de busca ou refazer o benchmark. Para escolher outra pasta de saída, use `--out`;
+os arquivos de origem continuam sendo lidos das pastas padrão do projeto.
 O comando padrão `python -m src.viz` continua gerando as figuras da Parte 1.
 
-As notas e justificativas aprovadas estão registradas no log. A nota de B02 foi
-atualizada para os novos dados e aguarda revisão autoral. A conferência manual de
+As notas e justificativas foram revisadas pelo grupo. A nota de B02 corresponde
+ao benchmark atual do mesmo ambiente. A conferência manual de
 BFS foi concluída em 24/11/2026 no recorte Siva1979 → Ceranthor → Salvio giuliano
-→ 07bargem. Os testes em clone limpo e com alterações locais passaram: 81 em cada
-execução, sem instalação de dependências. O relatório da Parte 2 reúne os textos
-e figuras; a declaração de IA ainda depende da revisão, reflexão e assinaturas do grupo.
+→ 07bargem. O registro anterior informa 81 testes aprovados em clone limpo e 81
+com alterações locais, sem instalação de dependências; essa contagem não representa
+uma nova execução feita nesta revisão documental. O relatório da Parte 2 reúne os textos
+e figuras; o registro de uso de IA está no documento correspondente.

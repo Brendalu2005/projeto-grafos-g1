@@ -236,8 +236,8 @@ def distribuicao_graus_dataset(metricas, caminho_png):
     figura, eixo = plt.subplots(figsize=(11.5, 6.6))
     # [IA] ChatGPT (Codex) – paleta solicitada, com preenchimentos sólidos.
     for deslocamento, nome, campo, cor in (
-        (-0.19, "Entrada", "graus_entrada", "#0081CF"),
-        (0.19, "Saída", "graus_saida", "#8C1F4E"),
+        (-0.19, "Entrada", "graus_entrada", "#0072B2"),
+        (0.19, "Saída", "graus_saida", "#D55E00"),
     ):
         graus = list(metricas[campo].values())
         contagem = [sum(g >= minimo and (maximo is None or g <= maximo) for g in graus)
@@ -279,7 +279,7 @@ def distribuicao_pesos_dataset(caminho_csv, caminho_png):
     figura, eixo = plt.subplots(figsize=(11.5, 6.6))
     # [IA] ChatGPT (Codex) – três cores solicitadas, sem hachuras.
     for deslocamento, (nome, serie), cor in zip(
-        (-0.26, 0, 0.26), series.items(), ("#3E4756", "#0081CF", "#8C1F4E"),
+        (-0.26, 0, 0.26), series.items(), ("#3E4756", "#0072B2", "#D55E00"),
     ):
         contagem = serie.value_counts().reindex(valores, fill_value=0)
         contagens[nome] = {str(v): int(contagem[v]) for v in valores}
@@ -326,8 +326,8 @@ def tempos_dfs_bellman_dataset(relatorio, caminho_png):
     figura, eixo = plt.subplots(figsize=(11.5, 6.6))
     # [IA] ChatGPT (Codex) – linhas, marcadores e rótulos redundantes à cor.
     for nome, cor, rotulo, marcador, estilo in (
-        ("DFS", "#0081CF", "DFS", "o", "-"),
-        ("BELLMAN_FORD", "#8C1F4E", "Bellman-Ford", "s", "--"),
+        ("DFS", "#0072B2", "DFS", "o", "-"),
+        ("BELLMAN_FORD", "#D55E00", "Bellman-Ford", "s", "--"),
     ):
         medicoes = selecionadas[nome]
         medias = [m["media"] for m in medicoes]
@@ -411,7 +411,7 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
 
     figura, eixos = plt.subplots(1, 3, figsize=(15, 6), sharex=True, sharey=True)
     percentuais = [10, 50, 100]
-    estilos = [("BFS", "#0081CF", "o", "-"), ("DIJKSTRA", "#8C1F4E", "s", "--")]
+    estilos = [("BFS", "#0072B2", "o", "-"), ("DIJKSTRA", "#D55E00", "s", "--")]
 
     for eixo, fonte in zip(eixos, fontes):
         for algoritmo, cor, marcador, linha in estilos:
@@ -489,9 +489,9 @@ def faltantes_por_faixa(caminho_csv, caminho_png):
     figura, eixo = plt.subplots(figsize=(12, 7))
     percentuais = resumo["percentual_sem_source"]
     com_source = 100 - percentuais
-    eixo.bar(range(5), com_source, color="#0081CF", width=0.65,
+    eixo.bar(range(5), com_source, color="#0072B2", width=0.65,
              label="Com SOURCE", edgecolor="#263238", linewidth=0.7)
-    eixo.bar(range(5), percentuais, bottom=com_source, color="#8C1F4E", width=0.65,
+    eixo.bar(range(5), percentuais, bottom=com_source, color="#D55E00", width=0.65,
              label="Sem SOURCE", edgecolor="#263238", linewidth=0.7)
     eixo.set_ylim(0, 100)
 
@@ -549,8 +549,8 @@ def efeito_transformacao(caminho_json, caminho_png):
     figura, (eixo, eixo_tabela) = plt.subplots(
         1, 2, figsize=(15, 8), gridspec_kw={"width_ratios": [1.8, 1.2]}
     )
-    estilos = [("custo_peso", "Antes: PESO", "#0081CF", -0.18),
-               ("custo_transformado", "Depois: PESO + 1", "#8C1F4E", 0.18)]
+    estilos = [("custo_peso", "Antes: PESO", "#0072B2", -0.18),
+               ("custo_transformado", "Depois: PESO + 1", "#D55E00", 0.18)]
     for campo, nome, cor, deslocamento in estilos:
         custos = [alternativa[campo] for alternativa in alternativas]
         posicoes = [posicao + deslocamento for posicao in range(2)]
@@ -645,8 +645,8 @@ def atributos_por_result_dataset(caminho_csv, caminho_png):
     for eixo, (campo, categorias, rotulos) in zip(eixos, paineis):
         resumo["distribuicoes"][campo] = {}
         for resultado, cor, deslocamento, nome in (
-            (-1, "#0081CF", -0.19, "RESULT −1 · rejeição"),
-            (1, "#8C1F4E", 0.19, "RESULT 1 · aprovação"),
+            (-1, "#0072B2", -0.19, "RESULT −1 · rejeição"),
+            (1, "#D55E00", 0.19, "RESULT 1 · aprovação"),
         ):
             contagem = dados.loc[dados["RESULT"] == resultado, campo].value_counts().reindex(categorias, fill_value=0)
             percentuais = [100 * int(n) / int(totais[resultado]) for n in contagem]

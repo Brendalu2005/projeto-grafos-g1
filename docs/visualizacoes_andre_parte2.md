@@ -11,7 +11,7 @@ Tambem auxiliou em deixar as visualizações mais acessíveis as pessoas daltôn
 |---|---|---|---|---|
 | A01 | Exploratória | Examinar a distribuição dos graus dirigidos | André | [Distribuição dos graus](../out/parte2/andre_01_distribuicao_graus.png) |
 | A02 | Exploratória | Comparar votos e duas versões dos pesos | André | [Distribuição dos pesos](../out/parte2/andre_02_distribuicao_pesos.png) |
-| A03 | Explanatória | Comunicar a diferença de tempo observada em um ambiente controlado entre os dois algoritmos | André | [Tempos de DFS e Bellman-Ford](../out/parte2/andre_03_tempos_dfs_bellman.png) |
+| A03 | Explanatória | Comunicar a diferença de tempo observada entre os dois algoritmos no mesmo ambiente registrado | André | [Tempos de DFS e Bellman-Ford](../out/parte2/andre_03_tempos_dfs_bellman.png) |
 | A04 | Exploratória | Examinar VOTE, PESO e volume recebido em relação a RESULT | André | [Atributos por RESULT](../out/parte2/andre_04_atributos_result.png) |
 
 As figuras têm título, identificação dos eixos, legenda e indicação de fonte.
@@ -20,30 +20,39 @@ O código está em `src/viz.py`; os números usados nas figuras estão em
 
 ## Paleta e acessibilidade
 
-As figuras usam azul `#0072B2` e laranja-avermelhado `#D55E00` da paleta
-Okabe–Ito, com cinza escuro `#595959` como referência neutra. A escolha segue
-as recomendações de [Color Universal Design, de Okabe e Ito](https://jfly.uni-koeln.de/color/),
-que consideram diferenças na percepção de cores.
+As figuras usam azul `#0072B2`, laranja-avermelhado `#D55E00` e cinza escuro `#3E4756`,
+conforme a implementação atual em `src/viz.py`. As barras têm preenchimento
+sólido, sem hachuras. Os contornos usam `#263238` e os rodapés, em geral,
+`#52606d`, sobre fundo branco.
+
+**Critério de escolha.** O azul e o laranja-avermelhado foram escolhidos pensando
+na acessibilidade para pessoas com daltonismo, com o objetivo de facilitar a
+distinção das séries. As barras mantêm preenchimento sólido, sem textura, e a
+identificação é complementada por posição, legendas, rótulos e, nos gráficos de
+linhas, marcadores e traçados diferentes.
 
 | Figura | Azul | Laranja-avermelhado | Cinza escuro |
 |---|---|---|---|
 | A01 | Grau de entrada | Grau de saída | — |
 | A02 | PESO ajustado | PESO + 1 (Dijkstra) | VOTE original |
 | A03 | DFS | Bellman-Ford | — |
+| A04 | RESULT -1: rejeição | RESULT 1: aprovação | — |
 
-**Justificativa.** O par azul e laranja-avermelhado distingue categorias sem
-depender da oposição entre vermelho e verde. No A02, o cinza identifica o voto
+**Uso das cores.** Azul e laranja-avermelhado identificam as duas séries comparadas. No A02,
+o cinza identifica o voto
 original como referência, enquanto as cores destacam as duas versões dos pesos.
 As cores indicam categorias, sem atribuir sentido de bom ou ruim aos valores
 ou algoritmos. Os rótulos usam texto escuro sobre fundo branco para manter
 a leitura independente da cor das séries.
 
-Nenhuma paleta garante distinção para todas as pessoas com daltonismo. Por isso,
-as barras também têm padrões diferentes; no A03, círculos e linha contínua
-identificam DFS, e quadrados e linha tracejada identificam Bellman-Ford.
-Legendas, valores e nomes junto às séries complementam essas diferenças,
-inclusive em impressão em tons de cinza. Essa redundância segue o princípio
-de [não usar somente a cor para transmitir informação](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html).
+**Recursos de acessibilidade.** No A03, círculos e linha contínua identificam
+DFS, enquanto quadrados e linha tracejada identificam Bellman-Ford; as anotações
+também apresentam valores e nomes das séries. Nas barras agrupadas, a posição
+fixa de cada série e a legenda apoiam a identificação; A01 e A04 também mostram
+percentuais escritos. A02 utiliza legenda e ordem fixa das três séries, sem
+valores escritos em todas as barras. Como as barras não têm padrões distintos,
+a leitura em tons de cinza depende também da posição e da legenda. Não foi
+registrada validação específica desta paleta para daltonismo ou contraste.
 
 ## A01 — Distribuição dos graus de entrada e saída
 
@@ -58,8 +67,8 @@ ao de saída.
 dos mesmos intervalos. Os intervalos categóricos mantêm os zeros explícitos e
 incluem a cauda de valores altos sem remover usuários. A altura representa o
 percentual de usuários, não a densidade de um histograma com intervalos iguais.
-O azul com listras identifica entrada, e o laranja-avermelhado com pontos identifica
-saída. A posição lado a lado e os rótulos numéricos apoiam a comparação sem depender
+O azul identifica entrada, e o laranja-avermelhado identifica saída, ambos com preenchimento
+sólido. A posição lado a lado e os rótulos numéricos apoiam a comparação sem depender
 somente das cores. Os intervalos têm larguras diferentes e não devem ser interpretados
 como uma escala horizontal contínua.
 
@@ -75,8 +84,10 @@ nos mesmos intervalos, mantendo explícitos os usuários de grau zero.
 
 **Limites.** Grau zero se refere ao grafo tratado, não à ausência de atividade na
 Wikipédia em geral. O gráfico não determina a causa dos graus altos nem comprova
-que sejam erros. A agregação em intervalos não substitui uma investigação
-individual dos outliers que o grupo decida realizar.
+que sejam erros. A agregação em intervalos não substitui a investigação individual
+dos outliers. A conferência já realizada dos cinco maiores graus de cada direção
+está descrita na seção “Conferência de valores extremos”; os demais sinalizados
+pelo critério não foram todos conferidos individualmente.
 
 ## A02 — Distribuição de VOTE, PESO e PESO + 1
 
@@ -90,9 +101,10 @@ o CSV ou substituir a coluna original.
 **Escolha do gráfico.** Barras agrupadas por valor inteiro permitem comparar as
 frequências das três versões. A escala logarítmica no eixo vertical torna visíveis
 tanto frequências acima de cem mil quanto valores com uma única ocorrência.
-O cinza com listras identifica VOTE original; o azul com padrão cruzado identifica
-PESO ajustado; o laranja-avermelhado com pontos identifica PESO + 1. A legenda
-mostra cores e padrões para distinguir as versões. Valores com frequência zero não têm
+O cinza escuro identifica VOTE original; o azul identifica PESO ajustado; o laranja-avermelhado
+identifica PESO + 1. As barras são sólidas, sem hachuras, e mantêm essa ordem
+da esquerda para a direita em cada grupo, com identificação na legenda.
+Valores com frequência zero não têm
 barra; diferenças de altura nessa escala não representam diferenças absolutas
 lineares de quantidade.
 
@@ -162,8 +174,9 @@ em `src/viz.py`, gera três painéis com percentuais normalizados separadamente
 nos grupos de rejeição e aprovação. Os números estão em
 `out/parte2/dados_visualizacoes_andre.json`, na chave `result`.
 
-**Escolha implementada.** Barras agrupadas, em azul com listras para RESULT -1 e
-laranja-avermelhado com pontos para RESULT 1. Os painéis mostram o voto original,
+**Escolha implementada.** Barras agrupadas com preenchimento sólido, em azul para
+RESULT -1 e laranja-avermelhado para RESULT 1. A posição fixa, a legenda e os percentuais escritos
+complementam a identificação por cor. Os painéis mostram o voto original,
 o peso ajustado agrupado e a faixa do total de votos recebidos pelo candidato.
 Os tamanhos dos grupos aparecem no rodapé: 74.090 e 122.524 registros.
 
@@ -172,8 +185,8 @@ são 32.184 de 74.090 registros (43,44%). No grupo RESULT 1, são 111.695 de 122
 (91,16%). A unidade é o registro de voto, não a eleição ou um candidato único.
 Há 236 TARGETs com mais de um valor de RESULT. Sem datas ou identificador de
 eleição, não se deve atribuir um único resultado a cada candidato nem inferir
-causalidade dessa comparação. Esta leitura numérica foi compilada com IA para
-revisão de André; não é apresentada como nota analítica autoral já aprovada.
+causalidade dessa comparação. A compilação teve apoio de IA; as análises foram
+revisadas pelo grupo, conforme confirmação recebida.
 
 ## Conferência de valores extremos
 
@@ -185,23 +198,24 @@ Para pesos, foram examinadas as 14 ocorrências com PESO >= 4, com valores até 
 a regra de incremento foi conferida em todas as linhas. Nenhum registro adicional
 foi removido: graus altos e pesos elevados não foram presumidos erros. Os pesos
 elevados conferem com o incremento nos grupos idênticos. A decisão de manutenção
-e a evidência técnica devem ser revisadas por André na versão autoral do relatório.
-
-**Apoio de IA nesta atualização.** Compilação dos dados e verificações já produzidos
-pelo código de André, atualização de fontes e redação técnica para revisão.
+e a evidência técnica integram a análise revisada pelo grupo.
 
 ## Reprodução e próximos passos
 
-Na raiz do projeto, após gerar o CSV tratado e ter as métricas e o benchmark:
+Na raiz do projeto, com os CSVs bruto e tratado, `metricas_dataset.json`,
+`benchmark_dfs_bellman.json`, `benchmark_bfs_dijkstra_mesmo_ambiente.json` e
+`estudo_transformacao.json` nas pastas padrão:
 
 ```powershell
 python -m src.viz --parte2
 ```
 
-Para outra pasta de imagens, use `--out`. O comando padrão `python -m src.viz`
-continua gerando as figuras da Parte 1. Não é necessário refazer o benchmark.
+O comando gera as sete figuras da Parte 2 e atualiza `dados_visualizacoes_andre.json`.
+Para outra pasta de saída, use `--out`; as entradas continuam sendo lidas das
+pastas padrão do projeto. O comando padrão `python -m src.viz` continua gerando
+as figuras da Parte 1. Não é necessário refazer o benchmark.
 
 O conjunto atual possui sete figuras: quatro exploratórias de dados (A01, A02,
 A04 e B01), duas explanatórias (A03 e B03) e uma análise visual de desempenho
-(B02). Essa organização não dispensa a revisão autoral dos textos atualizados,
-em especial A04 e a nova nota de B02, nem a declaração fiel do uso de IA.
+(B02). As análises e justificativas foram revisadas pelo grupo, conforme
+confirmação recebida; o uso de IA permanece registrado na documentação correspondente.
