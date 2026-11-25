@@ -1,0 +1,3 @@
+mapa,caminho_valido,observacao
+grupo_rotas,Sim,"Bellman-Ford encontrou caminho até G: 14 passos e custo 9. A rota coleta a, b e c, atravessa a esteira > em (3,3) e consome o bônus + em (3,4)."
+grupo_armadilhas,Sim,"Bellman-Ford encontrou caminho até G: 8 passos e custo 3, passando pelo bônus +. O mapa tem 245 estados-armadilha entre 267 estados alcançáveis (91,76%)."

@@ -82,7 +82,7 @@ def bellman_ford(grafo, origem):
     return distancia, proc, ciclo
 
 # BFS (Clarissa Lopes)
-def bfs(grafo, origem):
+def bfs(grafo, origem, registrar_ordem=False):
     distancias = {vertice: math.inf for vertice in grafo}
     predecessores = {vertice: None for vertice in grafo}
 
@@ -95,9 +95,11 @@ def bfs(grafo, origem):
     predecessores.setdefault(origem, None)
     distancias[origem] = 0
     fila = deque([origem])
+    ordem_visita = []
 
     while fila:
         atual = fila.popleft()
+        ordem_visita.append(atual)
 
         for vizinho, _ in grafo.get(atual, []):
             if distancias[vizinho] == math.inf:
@@ -105,6 +107,8 @@ def bfs(grafo, origem):
                 predecessores[vizinho] = atual
                 fila.append(vizinho)
 
+    if registrar_ordem:
+        return distancias, predecessores, ordem_visita
     return distancias, predecessores
 
 #DFS (André Avelino)

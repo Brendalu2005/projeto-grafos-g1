@@ -13,6 +13,25 @@ def test_fonte_consumivel_remove_ciclo_negativo_do_m06():
     assert resultado["ciclo"] == []
 
 
+def test_bfs_exporta_ordem_de_visita():
+    resultado = resolver("data/mapas/m02_uma_chave.txt", "BFS")
+
+    visitas = resultado["ordem_visita"].split(" -> ")
+    assert visitas[0] == "(1,1)|-|{}"
+    assert visitas[-1] == "ALVO"
+    assert len(visitas) == len(set(visitas))
+
+
+def test_mapa_do_grupo_tem_rota_otima_pela_esteira_e_bonus():
+    resultado = resolver("data/mapas_grupo/grupo_rotas.txt", "BELLMAN_FORD")
+
+    assert resultado["status"] == "OK"
+    assert resultado["custo"] == 9
+    assert "(3,3)|a|{}" in resultado["caminho"]
+    assert "(3,4)|a|{0}" in resultado["caminho"]
+    assert "(3,13)|abc|{0}" in resultado["caminho"]
+
+
 # [IA] Claude - assegura que a exportação de armadilhas use o grafo da variante.
 def test_exportador_armadilhas_encaminha_regra_consumivel(tmp_path, monkeypatch):
     import src.solve as solve_module

@@ -9,6 +9,7 @@ mini.txt
 *.csv
 !out/parte1/*.csv
 !out/parte1/fonte_consumivel/*.csv
+!data/mapas_grupo/validacao_mapas_grupo.csv
 raw/
 
 #docs

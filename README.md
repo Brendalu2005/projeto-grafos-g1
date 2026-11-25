@@ -57,7 +57,7 @@ python -m src.viz
 python -m src.front.server
 ```
 
-As exportações em lote incluem arestas, graus, métricas globais, camadas, soluções, classificação DFS, comparação das três modelagens, estados-armadilha, percurso do m03 e ciclo negativo do m06. A interface serve os resultados calculados pelo projeto; execute o servidor a partir da raiz para que mapas e CSVs sejam encontrados. O controle “Regra da fonte” permite comparar o cenário original com a fonte consumível.
+As exportações em lote incluem arestas, graus, métricas globais, camadas, soluções, classificação DFS, comparação das três modelagens, estados-armadilha, percurso do m03 e ciclo negativo do m06. As soluções BFS registram também `ordem_visita`, na ordem em que os estados saem da fila. A interface serve os resultados calculados pelo projeto; execute o servidor a partir da raiz para que mapas e CSVs sejam encontrados. O controle “Regra da fonte” permite comparar o cenário original com a fonte consumível.
 
 Os comandos de execução do dataset da Parte 2 ainda não estão implementados na CLI.
 

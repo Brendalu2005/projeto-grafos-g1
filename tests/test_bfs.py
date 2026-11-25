@@ -81,3 +81,17 @@ def test_bfs_no_grafo_de_estados_do_m02():
 	distancias, _ = bfs(grafo, estado_inicial(mapa))
 
 	assert distancias[ALVO] == 35
+
+
+def test_bfs_registra_ordem_de_remocao_da_fila():
+	grafo = {
+		"S": [("A", 1), ("B", 1)],
+		"A": [("C", 1)],
+		"B": [("D", 1)],
+		"C": [],
+		"D": [],
+	}
+
+	_, _, ordem = bfs(grafo, "S", registrar_ordem=True)
+
+	assert ordem == ["S", "A", "B", "C", "D"]

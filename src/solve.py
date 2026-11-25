@@ -10,7 +10,7 @@ from src.graphs.io import (exportar_parte1, exportar_arestas, exportar_graus,
 from src.graphs.estados import (camadas_do_mapa, construir_g_pos,
                                 graus, metricas_do_mapa, sem_alvo)
 
-COLUNAS_SOLUCOES = ['mapa', 'algoritmo', 'passos', 'custo', 'status', 'caminho']
+COLUNAS_SOLUCOES = ['mapa', 'algoritmo', 'passos', 'custo', 'status', 'caminho', 'ordem_visita']
 COLUNAS_DFS = ['mapa', 'arvore', 'retorno', 'avanco', 'cruzamento']
 
 def resolver(caminho_mapa, algoritmo, fonte_consumivel = False):
@@ -21,7 +21,7 @@ def resolver(caminho_mapa, algoritmo, fonte_consumivel = False):
 
     origem = estado_inicial(mapa)
 
-    linha = {"mapa": mapa.nome, "algoritmo": algoritmo, "passos": "", "custo": "", "status": "", "caminho": "", "ciclo": []}
+    linha = {"mapa": mapa.nome, "algoritmo": algoritmo, "passos": "", "custo": "", "status": "", "caminho": "", "ordem_visita": "", "ciclo": []}
 
     if (algoritmo == 'DIJKSTRA'):
         try:
@@ -31,7 +31,10 @@ def resolver(caminho_mapa, algoritmo, fonte_consumivel = False):
             return linha
 
     elif (algoritmo == 'BFS'):
-        dist, pred = bfs(grafo, origem)
+        dist, pred, ordem = bfs(grafo, origem, registrar_ordem=True)
+        linha['ordem_visita'] = ' -> '.join(
+            rotulo(estado) if estado != ALVO else ALVO for estado in ordem
+        )
 
     elif (algoritmo == 'BELLMAN_FORD'):
         dist, pred, ciclo = bellman_ford(grafo, origem)

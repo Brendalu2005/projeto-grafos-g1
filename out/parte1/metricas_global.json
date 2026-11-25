@@ -604,24 +604,24 @@
       "densidade": 0.12380952380952381
     },
     "G_est": {
-      "ordem": 44,
-      "tamanho": 73,
-      "densidade": 0.03858350951374207
+      "ordem": 29,
+      "tamanho": 50,
+      "densidade": 0.06157635467980296
     },
-    "teto_teorico": 480,
-    "taxa_ocupacao": 0.09166666666666666,
+    "teto_teorico": 240,
+    "taxa_ocupacao": 0.12083333333333333,
     "maior_grau_saida": {
-      "estado": "(1,2)|-|{0}",
-      "grau": 3
+      "estado": "(1,2)|-|{}",
+      "grau": 2
     },
     "maior_grau_entrada": {
-      "estado": "(1,2)|-|{0}",
+      "estado": "(1,3)|a|{}",
       "grau": 3
     },
     "becos": [],
-    "multiplicidade_maxima": 8,
+    "multiplicidade_maxima": 4,
     "casas_com_multiplicidade_maxima": [
-      "(3,2)"
+      "(3,3)"
     ]
   }
 ]
