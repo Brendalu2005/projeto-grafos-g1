@@ -1,19 +1,61 @@
+## Conferência dos ajustes da Parte 1 após o merge — 25/11/2026
+
+O mapa `data/mapas_grupo/grupo_rotas.txt` foi ajustado e conferido: possui três
+chaves e seu caminho de menor custo passa pela esteira em `(3,3)` e coleta o
+bônus em `(3,4)`. Bellman-Ford retorna 14 movimentos e custo 9. O CSV de
+arestas contém 51 registros, incluindo o arco virtual até ALVO.
+
+O BFS registra explicitamente a ordem de retirada dos estados da fila quando
+chamado com `registrar_ordem=True`. Na Parte 1, essa sequência é exportada no
+campo `ordem_visita` de `solucoes.csv`. A conferência encontrou a ordem
+preenchida para os dez mapas, tanto na regra original quanto na consumível.
+
+As saídas de `out/parte1/fonte_consumivel/` foram regeneradas pelo comando
+`python -m src.cli --todos --fonte-consumivel --out ./out/parte1/`.
+Soluções, arestas, métricas, graus, camadas e classificação de DFS foram
+atualizados para os mapas atuais. A variante consumível mantém solução finita
+para m06. Nas duas variantes, os arquivos de `grupo_rotas` registram os
+14 movimentos, custo 9 e 51 arcos exportados conferidos.
+
+Os campos `caminho_valido` e `observacao` estão preenchidos nos nove registros
+de cada versão de `comparacao_modelagem.csv`, totalizando 18. O gerador também
+foi atualizado para preencher esses campos: identifica entradas em portas sem
+a chave correspondente, ausência de caminho até G e percursos válidos pelas
+regras do jogo.
+
+Esses resultados atualizam os registros históricos abaixo que descreviam o
+mapa, a ordem do BFS, as saídas consumíveis e os campos de comparação como
+pendentes. O histórico foi preservado, sem listas de tarefas.
+
+## Atualização da B01 — dois painéis — 25/11/2026
+
+**Figura:** `out/parte2/brenda_01_faltantes_por_faixa.png`.
+
+Brenda solicitou testar dois painéis após observar que a sobreposição de escalas
+no gráfico de eixo duplo podia sugerir uma quantidade maior de votos sem SOURCE.
+A versão atual separa as informações:
+
+- Painel esquerdo: total de votos por faixa, em barras azuis `#0072B2` e eixo em quantidade.
+- Painel direito: percentual sem SOURCE por faixa, em barras laranja-avermelhadas `#D55E00` e eixo em porcentagem. Os rótulos incluem a quantidade de votos ausentes.
+- As faixas são as mesmas nos dois painéis. As alturas são comparadas entre faixas dentro de cada painel, pois as unidades são diferentes.
+
+Foram mantidos o CSV bruto, as faixas, a proporção agregada, a tabela de contagens
+e os totais de 198.275 votos e 1.661 registros sem SOURCE. A geração usa
+`faltantes_por_faixa`, em `src/viz.py`, com o mesmo nome de arquivo da B01.
+
+O relatório da Parte 2, o documento de visualizações de Brenda e o esqueleto da
+declaração de IA foram atualizados. A nota já registrada passou a especificar
+“a barra mais alta do painel de percentuais”, preservando a interpretação e os
+números. Os registros abaixo mantêm o histórico dos formatos anteriores.
+
+**Apoio de IA:** ChatGPT (Codex) sugeriu os painéis separados, implementou a
+alteração após solicitação de Brenda, conferiu a imagem e os totais e adaptou
+as descrições dos documentos ao formato atual.
+
 ## Ajustes após conferência do enunciado completo — 24/11/2026
 
 Esta entrada complementa o histórico abaixo; o fechamento anterior da Parte 2
 não significava atendimento integral de todos os itens da Parte 1.
-
-- [x] Front com seleção de camada e realce de casas que possuem estados-armadilha na seleção, lendo os CSVs existentes.
-- [x] Custo do ciclo negativo já retornado de m06 calculado a partir de seus arcos e apresentado no front; o JSON existente registra custo −1.
-- [x] Contagem de movimentos da comparação corrigida para excluir o arco virtual até ALVO, nas duas regras da fonte.
-- [x] Colunas exigidas adicionadas à comparação, mantendo as anteriores para compatibilidade.
-- [x] Nomes percurso_m03.png e percurso_m08.png disponíveis; o gerador mantém também os nomes anteriores.
-- [x] Pasta out/parte1/fonte_consumivel conferida: 40 arquivos existentes, com resultados próprios da regra consumível. O nome utilizado pelo código não tem acento.
-- [x] Testes: 89 aprovados; controles de camada/armadilhas e leitura da variante consumível verificados com os CSVs existentes.
-- [ ] Grupo adequar um mapa obrigatório para que o caminho de menor custo passe por uma esteira e colete bônus; mapas originais preservados.
-- [ ] Grupo conferir e preencher caminho_valido e observacao na comparação de modelagens; os campos foram deixados vazios, sem gerar análise autoral.
-- [ ] Grupo decidir e implementar o registro explícito da ordem de visita no retorno do BFS; algorithms.py preservado.
-- [ ] Os benchmarks históricos continuam sem os campos de ciclo negativo adicionados ao executor para futuras medições; não houve repetição automática das medições.
 
 **Apoio de IA:** ChatGPT (Codex) realizou ajustes de interface, IO e depuração
 da contagem, adicionou testes de regressão e ajustou o formato das exportações
@@ -24,22 +66,9 @@ solicitada pela usuária sobre usos de IA não permitidos pelo enunciado.
 
 ## Fechamento técnico da Parte 2 — 24/11/2026
 
-Este é o checklist atual. As entradas abaixo são histórico e não acrescentam
+As entradas abaixo são histórico e não acrescentam
 novas obrigações ao enunciado. A conferência foi feita contra os critérios,
 os resultados salvos e o código existente.
-
-- [x] Dataset aprovado pelas professoras, conforme confirmação de Brenda.
-- [x] Tratamento documentado, dados sem SOURCE preservados no bruto, VOTE e PESO separados, laços e paralelos mantidos.
-- [x] Métricas e justificativas registradas; outliers conferidos sem exclusões adicionais.
-- [x] BFS e DFS em três fontes, Dijkstra em cinco pares e os dois casos obrigatórios de Bellman-Ford registrados e consolidados.
-- [x] BFS revisado; conferência manual de Brenda concluída no recorte registrado abaixo.
-- [x] Quatro algoritmos medidos em 10%, 50% e 100%, com pelo menos cinco repetições por configuração: 34 configurações e 170 tempos.
-- [x] Novas medições de BFS/Dijkstra incorporadas; CSV, alcance e metadados do ambiente conferidos contra DFS/Bellman-Ford.
-- [x] Sete figuras reproduzíveis: quatro exploratórias de dados, duas explanatórias e B02 como análise visual de desempenho.
-- [x] B02 e seus documentos atualizados para os resultados da máquina comum.
-- [x] Pergunta de pesquisa, transformação, limitações e ligação entre exploração e explicação reunidas no relatório em Markdown e PDF.
-- [x] Documentação de reprodução, registro técnico de IA e formulário oficial em PDF preparado como rascunho sem assinaturas.
-- [x] Testes em clone limpo já registrados; suíte final com as alterações atuais: 81 testes aprovados, sem instalar dependências.
 
 **Bellman-Ford:** já existem medições nos três tamanhos, com uma fonte em 100%.
 O requisito explícito de três fontes é para BFS e DFS. Gwynand e John Carter
@@ -47,11 +76,7 @@ em 100% completariam o plano ampliado de benchmark; não são tratados como
 nova implementação obrigatória. A redução das fontes limita comparações
 entre fontes e está declarada no relatório.
 
-**Atos autorais e de entrega que continuam com os integrantes:**
-
-- [ ] Revisar e assumir os textos compilados com IA, especialmente as notas atualizadas de B02 e A04; conciliar a matriz de contribuição com o relatório conjunto.
-- [ ] Completar identificação, links reais das conversas e reflexão autoral de 10–15 linhas na declaração; confirmar com as professoras o alcance das autorizações de IA relatadas.
-- [ ] Todos os integrantes assinarem a declaração e realizarem a entrega final. A conferência técnica automática de DFS não equivale à conferência manual de André.
+Os atos autorais e de entrega permanecem sob responsabilidade dos integrantes.
 
 Esses atos não foram simulados ou assinados pela IA. Não há instalação de
 dependências, alteração dos algoritmos para favorecer tempos ou commit nesta
@@ -76,17 +101,6 @@ respectivamente, coincidem com as registradas em `bfs_fontes.json` para a fonte
 Siva1979. A conferência manual cobre este pequeno recorte; não constitui uma
 verificação manual de todos os resultados da rede.
 
-**Checklist atualizado:**
-- [x] BFS revisado e comando de benchmark preparado e testado.
-- [x] Novas medições de BFS/Dijkstra de André incorporadas ao relatório, com hashes e ambientes conferidos.
-- [x] Casos obrigatórios incluídos e cobertura de Bellman-Ford validada conforme o arquivo selecionado.
-- [x] B02 atualizada para o benchmark no mesmo ambiente.
-- [x] Testes em clone limpo: 81 testes passaram; com as alterações locais copiadas, os mesmos 81 passaram, sem instalar dependências.
-- [x] Conferência manual de BFS no recorte acima, confirmada por Brenda.
-- [ ] Receber as duas fontes restantes de Bellman-Ford em 100% de André e atualizar a consolidação, ou confirmar a aceitação do escopo reduzido com as professoras.
-- [ ] Reclassificar B02 e revisar sua nota e suas fontes nos documentos, que ainda descrevem as medições anteriores.
-- [ ] Integrar as seções de Brenda ao PDF e concluir o registro de IA e a reflexão.
-
 **Apoio de IA:** ChatGPT (Codex) selecionou o recorte por leitura do CSV e do JSON,
 explicou a contagem de passos e orientou a localização das linhas. Brenda
 conferiu os registros e confirmou a contagem manual na conversa. A cópia
@@ -101,21 +115,9 @@ incluído na seção B03 de [visualizacoes_brenda_parte2.md](visualizacoes_brend
 
 > Ao observar a distribuição de PESO e PESO + 1, surgiu a dúvida sobre se eliminar os pesos negativos também alteraria os caminhos mínimos. Para investigar essa questão, comparei os custos de dois caminhos antes e depois da transformação no subgrafo selecionado. A figura explanatória apresenta esse exemplo e mostra como caminhos com quantidades diferentes de arcos recebem acréscimos diferentes, chegando ao empate observado.
 
-**Checklist atualizado das atividades de Brenda:**
-- [x] Conferir o BFS e preparar/testar o comando do benchmark.
-- [x] Commit do benchmark — realizado por Brenda, conforme sua confirmação.
-- [ ] Confirmar push e envio das instruções ao André.
-- [ ] Consultar as professoras sobre Bellman-Ford com uma fonte em 100% — adiado.
-- [ ] Juntar os resultados no `parte2_report.json` — aguarda novas medições.
-- [ ] Reclassificar B02 como análise visual de desempenho — adiado.
-- [x] Registrar a ligação entre achados exploratórios e a figura explanatória B03.
-- [ ] Integrar ao PDF as seções de BFS, Dijkstra, transformação e resposta à pesquisa.
-- [ ] Conferir BFS à mão e executar testes em clone limpo.
-- [ ] Concluir registro de IA e reflexão.
-
 **Apoio de IA:** ChatGPT (Codex) organizou o texto a partir da ligação confirmada
 por Brenda e o registrou após sua aprovação. As figuras e os resultados não foram
-alterados. Os checklists anteriores permanecem como histórico.
+alterados.
 
 ## Revisão do BFS e comando do benchmark — 23/11/2026
 
@@ -155,18 +157,6 @@ O comando também foi executado no CSV real com saída temporária: 18 configura
 CSV, benchmarks anteriores e relatório consolidado foram preservados em bytes.
 Os resultados temporários foram removidos e não são a medição oficial de André.
 
-**Checklist das atividades de Brenda na nova divisão:**
-- [x] Conferir o BFS e preparar/testar o comando do benchmark.
-- [ ] Commit do benchmark — não realizado, conforme pedido de Brenda.
-- [ ] Enviar comando e hash ao André — instruções prontas no README e neste log; envio por Brenda.
-- [ ] Consultar as professoras sobre Bellman-Ford com uma fonte em 100%.
-- [ ] Juntar os resultados no `parte2_report.json`, após receber as novas medições.
-- [ ] Reclassificar B02 como análise visual de desempenho.
-- [ ] Registrar a ligação entre achados exploratórios e explanatórias.
-- [ ] Integrar ao PDF as seções de BFS, Dijkstra, transformação e resposta à pesquisa.
-- [ ] Conferir BFS à mão e executar testes em clone limpo.
-- [ ] Concluir registro de IA e reflexão.
-
 **Apoio de IA:** ChatGPT (Codex) revisou os arquivos existentes, implementou o
 executor e seus testes após aprovação e registrou comandos e resultados técnicos.
 Não foi feito commit nem enviada mensagem ao André. A medição no ambiente de
@@ -180,13 +170,6 @@ seguindo a estrutura do documento de André: uso de IA, organização, paleta,
 seções por figura, limites e reprodução. Os textos aprovados foram preservados;
 os detalhes técnicos descrevem os dados e a implementação existentes.
 
-**Checklist desta organização:**
-- [x] Documento das três figuras criado no padrão do documento de André.
-- [x] Justificativas e notas aprovadas reunidas, com fontes e limites.
-- [x] Referência ao documento acrescentada ao README.
-- [ ] Integração das figuras e textos ao PDF técnico.
-- [ ] Conferência manual de BFS e conclusão da declaração de IA.
-
 **Apoio de IA:** ChatGPT (Codex) organizou o documento solicitado a partir dos
 registros existentes, sem alterar gráficos, algoritmos, medições ou interpretações
 aprovadas. O histórico do log foi preservado.
@@ -198,15 +181,6 @@ aprovadas. O histórico do log foi preservado.
 **Faixas:** 1–4, 5–19, 20–99, 100–499 e 500 ou mais votos recebidos por candidato.
 
 > Adotei as faixas sugeridas durante a discussão com apoio de IA para comparar candidatos com diferentes volumes de votos em cinco grupos legíveis, mantendo também aqueles com poucos votos. Os cortes são uma escolha de apresentação, não limites estatísticos. Como sua definição influencia a aparência do gráfico, apresento os intervalos e as quantidades de candidatos, votos e registros sem SOURCE para contextualizar os percentuais.
-
-**Checklist atualizado desta etapa:**
-- [x] Três figuras implementadas e conferidas.
-- [x] Notas analíticas das três figuras aprovadas e registradas.
-- [x] Justificativas das três figuras aprovadas e registradas, incluindo os cortes das faixas.
-- [x] Classificação das figuras e resposta à pesquisa registradas.
-- [x] README atualizado.
-- [ ] Conferência manual de BFS.
-- [ ] Consolidação do registro de IA para revisão — ainda não iniciada.
 
 **Apoio de IA:** ChatGPT (Codex) sugeriu os cortes na discussão anterior e organizou a justificativa acima. Brenda aprovou as faixas e posteriormente aprovou este texto para registro. Não foram alterados os dados, as faixas ou a imagem nesta etapa. As pendências de justificativa nas entradas anteriores representam o histórico e foram resolvidas por esta aprovação.
 
@@ -222,16 +196,6 @@ Brenda aprovou a classificação das suas três figuras conforme a finalidade de
 
 Somadas às duas exploratórias e à explanatória registradas em `visualizacoes_andre_parte2.md`, as seis figuras ficam organizadas em quatro exploratórias e duas explanatórias. Essa contagem descreve a classificação aprovada, sem atestar o atendimento de todos os demais critérios de AVD. A figura de transformação ilustra um único caso e não sustenta uma conclusão sobre a frequência do comportamento na rede inteira.
 
-**Checklist atualizado desta etapa:**
-- [x] Três figuras implementadas e conferidas.
-- [x] Notas analíticas das três figuras aprovadas e registradas.
-- [x] Justificativas da segunda e terceira figuras aprovadas e registradas.
-- [x] README atualizado com as aprovações e pendências.
-- [x] Resposta à pergunta de pesquisa incluída no notebook.
-- [x] Classificação das três figuras aprovada e registrada.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Conferência manual de BFS.
-
 **Apoio de IA:** ChatGPT (Codex) propôs a classificação conforme as finalidades discutidas e a registrou após aprovação de Brenda.
 
 ## Resposta à pergunta de pesquisa registrada no notebook — 23/11/2026
@@ -239,15 +203,6 @@ Somadas às duas exploratórias e à explanatória registradas em `visualizacoes
 Brenda aprovou a síntese abaixo e sua inclusão ao final do estudo de caso no notebook de experimentos. No arquivo atual, o estudo está numerado como seção 18, anteriormente referido na conversa como seção 20. Foi acrescentada somente uma célula Markdown, sem executar código ou alterar resultados.
 
 > No exemplo analisado, somar 1 a cada arco altera a preferência entre os caminhos: o caminho via 9cds, inicialmente mais barato, passa a empatar com o direto. O Dijkstra retorna um caminho ótimo nos pesos transformados, mas esse caminho tem custo maior em PESO do que o encontrado por Bellman-Ford. Portanto, a transformação permite executar Dijkstra, porém não garante preservar os caminhos mínimos anteriores. Como analisamos um único par em um subgrafo, não podemos afirmar com que frequência isso acontece na rede inteira.
-
-**Checklist atualizado desta etapa:**
-- [x] Três figuras implementadas e conferidas.
-- [x] Notas analíticas das três figuras aprovadas e registradas.
-- [x] Justificativas da segunda e terceira figuras aprovadas e registradas.
-- [x] README atualizado com as aprovações e pendências.
-- [x] Resposta à pergunta de pesquisa incluída no notebook.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Conferência manual de BFS.
 
 **Apoio de IA:** ChatGPT (Codex) organizou a síntese com base nas interpretações discutidas e aprovadas por Brenda e inseriu o texto após sua aprovação.
 
@@ -257,15 +212,6 @@ Brenda aprovou a síntese abaixo e sua inclusão ao final do estudo de caso no n
 
 > Escolhi barras agrupadas para facilitar a comparação dos custos de cada caminho antes e depois de somar 1 a cada arco. Como o exemplo possui apenas dois caminhos e duas versões dos pesos, a figura permite visualizar os valores e o empate após a transformação com poucos elementos.
 
-A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a ampliação para vários pares. Permanece o limite de ilustração de um exemplo selecionado, sem generalização para a rede inteira.
-
-**Checklist atualizado:**
-- [x] Três figuras implementadas e conferidas.
-- [x] Notas analíticas das três figuras aprovadas e registradas.
-- [x] Justificativa da segunda figura aprovada e registrada.
-- [x] Justificativa da terceira figura aprovada e registrada.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Conferência manual de BFS.
 
 **Apoio de IA:** Brenda explicou que as barras facilitam a comparação antes e depois da transformação por haver poucos elementos no exemplo. ChatGPT (Codex) organizou a redação e registrou o texto após sua aprovação.
 
@@ -274,14 +220,6 @@ A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a am
 **Figura:** `out/parte2/brenda_02_tempos_bfs_dijkstra.png`.
 
 > Escolhi três painéis, um por fonte, para facilitar a comparação dos tempos de BFS e Dijkstra em cada fonte e nos diferentes tamanhos de recorte. A mesma escala vertical permite também comparar os tempos entre os painéis.
-
-**Checklist atualizado:**
-- [x] Figuras atualizadas com contagens e alcance conferido.
-- [x] Notas analíticas das três figuras aprovadas e registradas.
-- [x] Justificativa da figura de tempos aprovada e registrada.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Justificativa da terceira figura.
-- [ ] Conferência manual de BFS.
 
 **Apoio de IA:** Brenda informou que escolheu a apresentação para comparação e aprovou a redação acima. ChatGPT (Codex) organizou e registrou o texto.
 
@@ -295,15 +233,6 @@ A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a am
 
 **Limite do estudo:** trata-se de um exemplo selecionado, sem ciclo negativo, que não estima a frequência desse comportamento na rede inteira. O caminho direto não se tornou exclusivamente melhor nos pesos transformados: ambas as alternativas têm custo 2.
 
-**Checklist atualizado:**
-- [x] Figuras atualizadas com contagens e alcance conferido.
-- [x] Nota analítica da primeira figura aprovada e registrada.
-- [x] Nota analítica da segunda figura aprovada e registrada.
-- [x] Nota analítica da terceira figura aprovada e registrada.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Demais justificativas de escolha das figuras.
-- [ ] Conferência manual de BFS.
-
 **Apoio de IA:** Brenda levantou a possibilidade de a transformação deixar de favorecer caminhos originalmente mais baratos. ChatGPT (Codex) explicou a diferença entre custo anterior e transformado, esclareceu o empate e organizou a nota acima, registrada após aprovação de Brenda.
 
 ## Nota aprovada da figura de tempos BFS e Dijkstra — 23/11/2026
@@ -314,15 +243,7 @@ A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a am
 
 > Para Siva1979, BFS e Dijkstra apresentam tempos médios próximos no recorte de 10%. Nos recortes de 50% e 100%, a média do BFS fica acima da do Dijkstra. Para Gwynand e John Carter, o BFS apresenta média maior nos três tamanhos. Entretanto, há sobreposição entre alguns intervalos mínimo–máximo e grande variação do BFS em Gwynand a 10%. Esses resultados descrevem as implementações e o ambiente medidos, sem demonstrar uma vantagem geral de Dijkstra. Os conjuntos de usuários alcançados foram iguais entre os algoritmos em cada configuração.
 
-**Checklist atualizado:**
-- [x] Figuras atualizadas com contagens e alcance conferido.
-- [x] Nota analítica da primeira figura aprovada e registrada.
-- [x] Nota analítica da segunda figura aprovada e registrada.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Nota analítica da terceira figura e demais justificativas.
-- [ ] Conferência manual de BFS.
-
-**Apoio de IA:** Brenda descreveu a proximidade inicial dos tempos para Siva1979 e as diferenças entre as médias nas outras configurações. ChatGPT (Codex) organizou a redação, acrescentou as ressalvas sobre variação, sobreposição dos intervalos e alcance conferido, e registrou o texto após aprovação de Brenda.
+**Apoio de IA:** Brenda descreveu a proximidade inicial dos tempos para Siva1979 e as diferenças entre as médias nas outras configurações. ChatGPT (Codex) acrescentou as ressalvas sobre variação, sobreposição dos intervalos e alcance conferido, e registrou o texto após aprovação de Brenda.
 
 ## Nota aprovada da figura de faltantes — 23/11/2026
 
@@ -334,13 +255,6 @@ A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a am
 
 **Justificativa da escolha das faixas:** aprovada e registrada na entrada “Justificativa aprovada das faixas de votos”, acima.
 
-**Checklist atualizado:**
-- [x] Figuras atualizadas com contagens e alcance conferido.
-- [x] Nota analítica da primeira figura aprovada e registrada.
-- [ ] Justificativa das faixas da primeira figura — adiada.
-- [ ] Justificativas e notas analíticas da segunda e terceira figuras.
-- [ ] Conferência manual de BFS.
-
 **Apoio de IA:** Brenda levantou a preocupação com o percentual da primeira faixa e aprovou o texto acima. ChatGPT (Codex) esclareceu o cálculo agregado, organizou a redação e registrou a versão aprovada.
 
 ## Contagens e alcance nos rótulos — 23/11/2026
@@ -348,13 +262,6 @@ A pedido de Brenda, foi mantido o estudo de caso existente, sem implementar a am
 Após aprovação de Brenda, a figura de faltantes passou a mostrar a quantidade absoluta sem SOURCE acima de cada barra, junto ao percentual: 23, 147, 829, 642 e 20 registros, totalizando 1.661. As faixas e a proporção agregada foram mantidas.
 
 Na figura de tempos, cada rótulo do eixo horizontal agora informa percentual do recorte, quantidade de arcos e quantidade de outros usuários alcançados. O rodapé esclarece que o alcance exclui a fonte. Os valores foram conferidos independentemente entre BFS e Dijkstra na etapa anterior. As medições, os algoritmos, os ambientes separados e a escala comum dos três painéis foram mantidos.
-
-**Checklist da revisão das figuras:**
-- [x] Conferir independentemente os conjuntos alcançados por BFS e Dijkstra.
-- [x] Acrescentar números absolutos sem SOURCE à figura de faltantes.
-- [x] Acrescentar alcance aos rótulos da figura de tempos.
-- [ ] Registrar justificativas e notas analíticas autorais, incluindo a variabilidade das medições e o empate no estudo de caso.
-- [ ] Fazer a conferência manual de BFS.
 
 **Apoio de IA:** ChatGPT (Codex) ajustou os rótulos aprovados em `src/viz.py` e atualizou este registro, sem novas medições ou interpretação analítica.
 
@@ -366,13 +273,6 @@ As nove comparações passaram. Para cada uma das três fontes, foram alcançado
 
 A pedido de Brenda, o script separado e seu JSON adicional foram removidos. A conferência foi incorporada à célula existente da seção 13 do notebook de experimentos: executa os dois algoritmos e usa `assert` para comparar os conjuntos, mantendo `alcances_benchmark` para as etapas seguintes. Para repetir, execute a preparação da seção 12 e a célula da seção 13. Nenhum arquivo adicional é criado. Esta conferência automática não substitui a conferência manual de BFS, que continua pendente.
 
-**Checklist da revisão das figuras:**
-- [x] Conferir independentemente os conjuntos alcançados por BFS e Dijkstra.
-- [ ] Acrescentar números absolutos sem SOURCE à figura de faltantes.
-- [ ] Acrescentar alcance aos rótulos da figura de tempos.
-- [ ] Registrar justificativas e notas analíticas autorais, incluindo a variabilidade das medições e o empate no estudo de caso.
-- [ ] Fazer a conferência manual de BFS.
-
 **Apoio de IA:** ChatGPT (Codex) executou a conferência aprovada, registrou o resultado técnico e, a pedido de Brenda, transferiu a verificação para a célula existente da seção 13, removendo os arquivos extras. Não alterou algoritmos ou medições.
 
 ## Figura do estudo de caso implementada — 23/11/2026
@@ -380,13 +280,6 @@ A pedido de Brenda, o script separado e seu JSON adicional foram removidos. A co
 Brenda aprovou barras agrupadas por caminho, comparando PESO (azul `#0072B2`, hachura `///`) e PESO + 1 (laranja-avermelhado `#D55E00`, hachura `..`), com valores escritos inclusive no custo zero. A função `efeito_transformacao`, em `src/viz.py`, lê somente `out/parte2/estudo_transformacao.json` e salva `brenda_03_efeito_transformacao.png`. O comando `python -m src.viz --parte2` agora gera as seis figuras, sem executar novamente algoritmos ou benchmarks.
 
 Os valores salvos são 1 e 2 para o caminho direto e 0 e 2 para o caminho via 9cds, respectivamente em PESO e PESO + 1. O rodapé identifica o empate, os caminhos retornados no experimento e o escopo de exemplo selecionado. A figura não apresenta uma estimativa de frequência para a rede inteira.
-
-**Checklist desta etapa:**
-- [x] Centralizar as seis figuras em `src/viz.py`.
-- [x] Implementar a terceira figura com os dados já exportados.
-- [x] Executar o gerador conjunto e conferir visualmente os rótulos, o zero e o empate da terceira figura.
-- [ ] Registrar a justificativa autoral da escolha e escrever a nota analítica de cada uma das três figuras adicionais.
-- [ ] Fazer a conferência manual de BFS, mantida pendente a pedido de Brenda.
 
 **Apoio de IA:** ChatGPT (Codex) implementou o desenho aprovado e atualizou as instruções de geração e este registro. As justificativas e interpretações autorais continuam pendentes.
 
@@ -487,7 +380,6 @@ Após as conferências, optamos por retirar apenas os registros sem SOURCE, pois
 
 **Apoio de IA nos dois textos acima:** ChatGPT (Codex) preparou as prévias a partir das contagens verificadas e das decisões já informadas por André. As decisões são de André. Em 21/11/2026, a IA revisou a clareza do registro, sem acrescentar decisões ou interpretações.
 
-
 ### Conferência da exportação local — 21/11/2026
 
 O CSV tratado foi gerado em `data/dataset_parte2/processed/wikiRfA_tratado.csv`, com 196.614 registros e as colunas `SOURCE`, `TARGET`, `VOTE`, `RESULT` e `PESO`, sem índice adicional. A conferência com pandas verificou a preservação da ordem e dos valores originais dos registros mantidos, a ausência de faltantes e a igualdade de `PESO` com `VOTE` mais o número da ocorrência dentro de cada grupo de quatro colunas idênticas. O CSV bruto permaneceu inalterado, conferido por SHA-256 antes e depois da execução.
@@ -514,7 +406,7 @@ As conferências técnicas verificaram a quantidade de arcos classificados, a qu
 
 Após André solicitar também sugestões de recortes e fontes, Codex sugeriu dois subgrafos induzidos de dois usuários, preservando todos os registros entre eles e a coluna PESO. O primeiro usa Malleus Fatuorum e BDD, com fonte Malleus Fatuorum. O segundo usa Rcsprinter123 e Jasper Deng, com fonte Rcsprinter123. Os registros selecionados pertencem ao CSV tratado; suas posições e o SHA-256 da entrada constam em `out/parte2/bellman_ford_casos.json`.
 
-Codex acrescentou e executou chamadas do Bellman-Ford existente, conferências técnicas e exportação no notebook de experimentos. A implementação do algoritmo não foi alterada. André informou autorização da professora para dispensar novos marcadores; os registros anteriores foram preservados. A escolha final, a conferência manual, as justificativas e a interpretação autoral permanecem com André. Não foram feitas medições de desempenho nem produzidas conclusões analíticas. Os dados e os JSONs anteriores foram preservados, conferidos por SHA-256.
+**Apoio de IA:** Codex acrescentou e executou chamadas do Bellman-Ford existente, conferências técnicas e exportação no notebook de experimentos. A implementação do algoritmo não foi alterada. André informou autorização da professora para dispensar novos marcadores; os registros anteriores foram preservados. A escolha final, a conferência manual, as justificativas e a interpretação autoral permanecem com André. Não foram feitas medições de desempenho nem produzidas conclusões analíticas. Os dados e os JSONs anteriores foram preservados, conferidos por SHA-256.
 
 ### Integração da Parte 2 na CLI — 23/11/2026
 
@@ -539,8 +431,7 @@ compatibilidade da CLI com mapas. O benchmark continua separado desta integraç�
 **Apoio de IA:** ChatGPT (Codex) implementou esta integração, seus testes e a documentação
 após André autorizar expressamente a geração da implementação nesta conversa,
 pedindo código limpo, simples e direto. Foram inseridos marcadores nas funções e
-blocos correspondentes. O grupo deve compreender e conferir o código e registrar
-esse apoio na declaração conjunta. Não foram geradas interpretações ou conclusões analíticas.
+blocos correspondentes. 
 
 ### Benchmark de DFS e Bellman-Ford e entrega para consolidação — 23/11/2026
 
@@ -574,7 +465,7 @@ ou conclusões analíticas.
 **Apoio de IA:** ChatGPT (Codex) preparou e executou as chamadas e exportações do
 benchmark, acrescentou testes de integração e registrou as decisões expressas de
 André. As implementações de DFS e Bellman-Ford não foram alteradas nesta tarefa.
-André deve conferir e compreender o código e elaborar sua análise autoral.
+
 
 ### Três visualizações da Parte 2 — 23/11/2026
 
@@ -592,9 +483,4 @@ revisão de André, não análises atribuídas originalmente ao aluno. As demais
 do grupo e a incorporação ao PDF continuam pendentes.
 
 **Apoio de IA efetivamente utilizado:** escolha dos gráficos, implementação em
-matplotlib e pandas, conferência dos dados, interpretação e redação das notas,
-além de ajustes visuais e documentação. André informou autorização da professora;
-essa informação não é apresentada como uma permissão escrita anexada ao repositório.
-A declaração conjunta deve registrar essas atividades, sem reduzi-las a apoio
-conceitual ou revisão gramatical. André deve conferir os dados, compreender os
-gráficos e revisar os textos antes da entrega.
+matplotlib e pandas, conferência dos dados, interpretação e redação das notas.

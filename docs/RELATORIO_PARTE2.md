@@ -251,7 +251,7 @@ O cinza escuro `#3E4756` é usado como referência para VOTE em A02 e no cabeça
 | A01 | Exploratória | Distribuição dos graus de entrada e saída |
 | A02 | Exploratória | Distribuições de VOTE, PESO e PESO + 1 |
 | A04 | Exploratória | VOTE, PESO e volume recebido por grupo de RESULT |
-| B01 | Exploratória | Composição com e sem SOURCE por faixa de votos recebidos |
+| B01 | Exploratória | Total de votos e percentual sem SOURCE por faixa de votos recebidos, em dois painéis |
 | A03 | Explanatória | Diferença observada entre os tempos de DFS e Bellman-Ford |
 | B03 | Explanatória | Efeito do deslocamento dos pesos sobre dois caminhos reais; responde à pergunta de pesquisa |
 | B02 | Análise visual de desempenho | Tempos de BFS e Dijkstra por fonte e tamanho |
@@ -305,9 +305,9 @@ Essas proporções são descritivas. A04 não estima causalidade, correlação l
 
 ![B01 - Faltantes por faixa](../out/parte2/brenda_01_faltantes_por_faixa.png)
 
-Fonte: CSV bruto. Nota analítica: A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: o maior segmento proporcional de votos sem SOURCE não representa a maior quantidade desses registros.
+Fonte: CSV bruto. Nota analítica: A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: a barra mais alta do painel de percentuais não representa a maior quantidade desses registros.
 
-Na apresentação atual, cada barra representa 100% dos votos da faixa: azul para registros com SOURCE na base e laranja-avermelhado para registros sem SOURCE no topo. O empilhamento compara a composição de cada faixa; as contagens e os percentuais de faltantes escritos acima das barras permitem ler também os segmentos pequenos. A nota foi adaptada à apresentação atual, sem tratar as barras completas como tendo alturas diferentes.
+Na apresentação atual, a figura tem dois painéis com as mesmas faixas: à esquerda, barras azuis mostram o total de votos, em quantidade; à direita, barras laranja-avermelhadas mostram o percentual sem SOURCE, com a quantidade de votos ausentes escrita junto ao percentual. Os painéis separam as escalas para manter legíveis as duas informações. As alturas devem ser comparadas entre faixas dentro de cada painel, pois as unidades são diferentes. A nota foi adaptada para identificar o painel de percentuais, preservando a interpretação e os números registrados.
 
 Brenda aprovou as faixas 1-4, 5-19, 20-99, 100-499 e 500 ou mais como escolha de apresentação para cinco grupos legíveis, mantendo poucos votos. Os cortes não são limites estatísticos. A medida é a proporção agregada por faixa, não a média de percentuais individuais. As quantidades sem SOURCE são 23, 147, 829, 642 e 20, totalizando 1.661.
 

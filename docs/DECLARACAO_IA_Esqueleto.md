@@ -32,7 +32,7 @@ contribuições e assume a responsabilidade pelas decisões e pelo conteúdo ent
 | Usar PESO + 1 em uma cópia para Dijkstra | Transformação definida por Brenda, conforme marcador em `src/solve.py` |
 | Usar recortes aninhados, semente 42 e seleção determinística de fontes | Regras aprovadas pela equipe, conforme marcadores em `src/benchmark.py` |
 | Concluir Bellman-Ford em 100% com uma fonte | Redução do plano autorizada por André, conforme o log |
-| Usar três painéis em B02, empilhamento em B01 e tabela de arcos em B03 | Escolhas e alterações solicitadas pelos integrantes, conforme o log e `src/viz.py` |
+| Usar três painéis em B02, dois painéis em B01 e tabela de arcos em B03 | Escolhas e alterações solicitadas pelos integrantes; a versão atual de B01 foi solicitada por Brenda após testar outros formatos, conforme o log e `src/viz.py` |
 | Restaurar azul e laranja, sem textura, pensando em pessoas com daltonismo | Escolha expressa de Brenda nesta conversa |
 
 ## 1. Identificação a completar pelo grupo
@@ -63,7 +63,7 @@ orientação da equipe, distinguindo a produção assistida das decisões humana
 | P2-03 | src/graphs/metricas_dataset.py | Métricas e testes com exemplo pequeno; conferência das somas dos graus e exportação |
 | P2-04 | Notebook de experimentos, src/solve.py e src/cli.py | Chamadas e organização dos resultados dos algoritmos existentes, exportação dos casos e integração da CLI; testes e comparação com os resultados salvos |
 | P2-05 | src/benchmark.py, src/benchmark_dfs_bellman.py, tests/test_benchmark.py e tests/test_benchmark_dfs_bellman.py | Código de recortes, seleção, medição, ambiente, hash e complemento do benchmark; aquecimento excluído, estatísticas conferidas e testes de preservação. Os marcadores também registram captura do ciclo negativo no aquecimento para novas medições; isso não significa que os arquivos históricos tenham sido reexecutados |
-| P2-06 | src/viz.py e documentos de visualizações | Sugestões de figuras e faixas, implementação, acessibilidade, conferência, discussão e organização das notas; incorporação conforme decisões dos integrantes. Ajustes solicitados incluem rótulos, barras 100% empilhadas de B01, tabela de arcos de B03 e azul/laranja sem textura. Participação de IA além de revisão ortográfica |
+| P2-06 | src/viz.py e documentos de visualizações | Sugestões de figuras e faixas, implementação, acessibilidade, conferência, discussão e organização das notas; incorporação conforme decisões dos integrantes. Em B01, foram testadas barras empilhadas, barras lado a lado e eixo duplo; a versão atual separa total de votos e percentual sem SOURCE em dois painéis, conforme solicitação de Brenda. Inclui adaptação das descrições e da nota já registrada ao novo formato, tabela de arcos de B03 e azul/laranja sem textura. Participação de IA além de revisão ortográfica |
 | P2-07 | Estudo da transformação | Localização do exemplo real, preparação do recorte e comparação; discussão do empate, explicação e redação aprovadas por Brenda |
 | P2-08 | Consolidação e verificações finais | Inclusão dos casos no relatório, leitura do benchmark comum, hashes, ambientes, cobertura, cenários inválidos e testes em clone isolado |
 | P2-09 | src/verificar_parte2.py e tests/test_verificar_parte2.py | Conferências técnicas de RESULT, outliers e DFS geradas com apoio de IA; testes de normalização e rastreabilidade. O JSON de DFS identifica explicitamente que a conferência é automática |

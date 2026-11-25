@@ -45,13 +45,13 @@ Para gerar os resultados de todos os mapas:
 python -m src.cli --todos
 ```
 
-Os resultados ficam em `out/parte1/`. A coluna `ordem_visita` de `solucoes.csv` registra a ordem em que os estados do BFS saem da fila. Para abrir a interface interativa:
+Os resultados ficam em `out/parte1/`. Para abrir a interface interativa das duas partes:
 
 ```bash
 python -m src.front.server
 ```
 
-Acesse [o labirinto interativo](http://127.0.0.1:8766/out/parte1/labirinto_interativo.html). Para resolver apenas um mapa, consulte as opções em `python -m src.cli --help`.
+Acesse [a interface do projeto](http://127.0.0.1:8766/): a Parte 1 reúne os labirintos; a Parte 2, as figuras e o grafo interativo do dataset. Para resolver apenas um mapa, consulte `python -m src.cli --help`.
 
 ## Parte 2 — Dataset Wiki-RfA
 
@@ -121,7 +121,7 @@ projeto-grafos-g1/
 │   ├── benchmark.py                 benchmark de BFS e Dijkstra
 │   ├── benchmark_dfs_bellman.py      benchmark de DFS e Bellman-Ford
 │   ├── viz.py                       geração das figuras
-│   └── front/                       interface interativa da Parte 1
+│   └── front/                       interface interativa das Partes 1 e 2
 ├── out/
 │   ├── parte1/                      resultados e interface dos labirintos
 │   └── parte2/                      casos, métricas, benchmarks, figuras e relatório JSON

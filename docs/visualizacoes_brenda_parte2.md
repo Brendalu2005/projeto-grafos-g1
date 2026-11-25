@@ -39,13 +39,13 @@ linhas, marcadores e traçados diferentes.
 
 | Figura | Azul | Laranja-avermelhado | Identificação adicional |
 |---|---|---|---|
-| B01 | Votos com SOURCE | Votos sem SOURCE | Segmentos empilhados: com SOURCE na base e sem SOURCE no topo; contagens e percentuais dos faltantes escritos |
+| B01 | Total de votos, no painel esquerdo | Percentual de votos sem SOURCE, no painel direito | Painéis com títulos e unidades próprios; totais escritos nas barras azuis e percentuais e quantidades de faltantes nas laranjas |
 | B02 | BFS | Dijkstra | Círculos e linha contínua para BFS; quadrados e linha tracejada para Dijkstra |
 | B03 | Custo em PESO | Custo em PESO + 1 | Posição fixa das barras, legenda e valores escritos, inclusive zero; tabela com os pesos por arco |
 
 Esses recursos descrevem a implementação atual em `src/viz.py`. Em B02, formas
 e traçados diferenciam as séries além da cor. Em B01 e B03, a posição fixa,
-as legendas e os rótulos apoiam a leitura das barras sólidas. Não foi registrada
+os títulos dos painéis, as legendas e os rótulos apoiam a leitura das barras sólidas. Não foi registrada
 validação específica desta paleta para daltonismo ou contraste; a leitura em
 tons de cinza depende também desses recursos de identificação.
 
@@ -63,9 +63,15 @@ TARGET identificado, sem limite mínimo adicional.
 
 > Adotei as faixas sugeridas durante a discussão com apoio de IA para comparar candidatos com diferentes volumes de votos em cinco grupos legíveis, mantendo também aqueles com poucos votos. Os cortes são uma escolha de apresentação, não limites estatísticos. Como sua definição influencia a aparência do gráfico, apresento os intervalos e as quantidades de candidatos, votos e registros sem SOURCE para contextualizar os percentuais.
 
-As barras são 100% empilhadas: o segmento azul representa votos com SOURCE e
-o segmento laranja-avermelhado, no topo, representa votos sem SOURCE. Cada barra completa
-corresponde a todos os votos da faixa. A proporção de faltantes é calculada por:
+A figura tem dois painéis lado a lado, com as mesmas faixas no eixo horizontal.
+O painel esquerdo apresenta o total de votos por faixa em barras azuis, com eixo
+vertical em quantidade de votos. O painel direito apresenta o percentual de votos
+sem SOURCE em barras laranja-avermelhadas, com eixo vertical em porcentagem.
+Os rótulos do painel direito mostram também a quantidade de votos sem SOURCE.
+
+Essa organização mantém as duas informações legíveis e separa suas escalas.
+As alturas devem ser comparadas entre faixas dentro de cada painel; os dois
+painéis usam unidades diferentes. A proporção de faltantes é calculada por:
 `100 × soma dos votos sem SOURCE / soma de todos os votos da faixa`.
 Não é calculada a média dos percentuais individuais dos candidatos.
 Os intervalos têm larguras diferentes e são apresentados como categorias.
@@ -80,16 +86,15 @@ Os intervalos têm larguras diferentes e são apresentados como categorias.
 
 **Nota analítica.**
 
-> A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: o maior segmento proporcional de votos sem SOURCE não representa a maior quantidade desses registros.
+> A primeira faixa apresenta o maior percentual de votos sem origem identificada, mas reúne apenas 577 votos, dos quais 23 estão sem SOURCE. Por isso, o percentual deve ser lido junto às quantidades absolutas: a barra mais alta do painel de percentuais não representa a maior quantidade desses registros.
 
-A nota anteriormente aprovada mencionava a “barra mais alta”. A redação acima
-foi adaptada com apoio de IA à apresentação atual, em que todas as barras
-completas têm altura de 100%.
+A nota anteriormente aprovada foi adaptada com apoio de IA para identificar
+o painel de percentuais, preservando a interpretação e os números registrados.
 
 **Limites.** A figura não determina o mecanismo nem a causa da ausência de SOURCE.
 Um voto sem origem identificada não é necessariamente um voto nulo. As faixas
 agrupam candidatos e não eleições individuais: a versão utilizada do dataset não
-possui datas nem identificadores de eleição. A altura do segmento laranja-avermelhado
+possui datas nem identificadores de eleição. A altura da barra laranja-avermelhada
 descreve a proporção de faltantes na faixa e deve ser acompanhada pelas contagens.
 
 ## B02 — Tempos de BFS e Dijkstra por tamanho do grafo e fonte

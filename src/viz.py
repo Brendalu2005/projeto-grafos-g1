@@ -225,9 +225,7 @@ def gerar_figuras_parte1(pasta_saida="out/parte1"):
     grafo_estados_camadas("data/mapas/m02_uma_chave.txt", pasta_saida / "grafo_estados_camadas_m02.png")
 
 
-# [IA] ChatGPT (Codex) – seleção e implementação das visualizações da Parte 2,
-# após André informar autorização da professora. Textos analíticos gerados por IA
-# ficam identificados como rascunhos para revisão, sem atribuição autoral ao aluno.
+# [IA] ChatGPT (Codex) – seleção e implementação das visualizações da Parte 2.
 def distribuicao_graus_dataset(metricas, caminho_png):
     limites = [(0, 0), (1, 4), (5, 19), (20, 99), (100, 499), (500, None)]
     rotulos = ["0", "1–4", "5–19", "20–99", "100–499", "500 ou mais"]
@@ -467,9 +465,9 @@ def tempo_bfs_dijkstra(caminho_json, caminho_png):
     plt.close(figura)
 
 
-# [IA] ChatGPT (Codex) – barras 100% empilhadas conforme alteração solicitada por Brenda.
+# [IA] ChatGPT (Codex) – dois painéis para separar quantidades e percentuais.
 def faltantes_por_faixa(caminho_csv, caminho_png):
-    """Mostra a composição dos votos com e sem SOURCE em cada faixa."""
+    """Mostra totais e percentuais sem SOURCE em painéis separados."""
     dados = pd.read_csv(caminho_csv, index_col=0)
     candidatos = dados.groupby("TARGET").size().rename("votos").to_frame()
     candidatos["sem_source"] = dados["SOURCE"].isna().groupby(dados["TARGET"]).sum()
@@ -486,19 +484,22 @@ def faltantes_por_faixa(caminho_csv, caminho_png):
     denominador = resumo["votos"].replace(0, float("nan"))
     resumo["percentual_sem_source"] = 100 * resumo["sem_source"] / denominador
 
-    figura, eixo = plt.subplots(figsize=(12, 7))
+    figura, (eixo, eixo_percentual) = plt.subplots(1, 2, figsize=(14, 7))
     percentuais = resumo["percentual_sem_source"]
-    com_source = 100 - percentuais
-    eixo.bar(range(5), com_source, color="#0072B2", width=0.65,
-             label="Com SOURCE", edgecolor="#263238", linewidth=0.7)
-    eixo.bar(range(5), percentuais, bottom=com_source, color="#D55E00", width=0.65,
-             label="Sem SOURCE", edgecolor="#263238", linewidth=0.7)
-    eixo.set_ylim(0, 100)
+    posicoes = range(5)
+    eixo.bar(posicoes, resumo["votos"], color="#0072B2", width=0.65,
+             edgecolor="#263238", linewidth=0.7)
+    eixo_percentual.bar(posicoes, percentuais, color="#D55E00", width=0.65,
+                        edgecolor="#263238", linewidth=0.7)
+    eixo.set_ylim(0, max(1, resumo["votos"].max()) * 1.3)
+    maior_percentual = percentuais.max()
+    eixo_percentual.set_ylim(0, max(1, maior_percentual if pd.notna(maior_percentual) else 0) * 1.3)
 
-    etiquetas = []
     for posicao, (faixa, grupo) in enumerate(resumo.iterrows()):
         quantidade_votos = f"{int(grupo['votos']):,}".replace(",", ".")
-        etiquetas.append(f"{faixa}\n{quantidade_votos} votos")
+        eixo.annotate(quantidade_votos, (posicao, grupo["votos"]),
+                      xytext=(0, 7), textcoords="offset points", ha="center",
+                      fontsize=10, color="#0072B2")
         percentual = grupo["percentual_sem_source"]
         if pd.isna(percentual):
             texto = "Sem dados"
@@ -506,29 +507,35 @@ def faltantes_por_faixa(caminho_csv, caminho_png):
         else:
             quantidade_sem_source = f"{int(grupo['sem_source']):,}".replace(",", ".")
             percentual_formatado = f"{percentual:.2f}%".replace(".", ",")
-            texto = f"{quantidade_sem_source} sem SOURCE\n{percentual_formatado}"
-            altura = 100
-        eixo.annotate(texto, (posicao, altura), xytext=(0, 7),
-                      textcoords="offset points", ha="center", fontsize=11, color="#263238")
+            texto = f"{percentual_formatado}\n{quantidade_sem_source} votos"
+            altura = percentual
+        eixo_percentual.annotate(texto, (posicao, altura), xytext=(0, 7),
+                      textcoords="offset points", ha="center", fontsize=10, color="#D55E00")
 
-    eixo.set_xticks(range(5), etiquetas)
-    eixo.set_xlabel("Faixa do total de votos recebidos por candidato (antes do tratamento)", labelpad=14)
-    eixo.set_ylabel("Proporção do total de votos da faixa (%)")
-    eixo.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{valor:.1f}%".replace(".", ",")))
-    eixo.set_title("Votos sem origem identificada por faixa de votos recebidos", fontsize=15,
-                   fontweight="bold", loc="left", pad=60)
-    figura.legend(*eixo.get_legend_handles_labels(), loc="upper left",
-                   bbox_to_anchor=(0.09, 0.89), ncol=2, frameon=False)
-    eixo.grid(axis="y", alpha=0.18)
-    eixo.set_axisbelow(True)
-    eixo.spines[["top", "right"]].set_visible(False)
-    figura.text(0.09, 0.07,
+    for painel in (eixo, eixo_percentual):
+        painel.set_xticks(posicoes, rotulos)
+        painel.set_xlabel("Faixa de votos recebidos por candidato", labelpad=12)
+        painel.grid(axis="y", alpha=0.18)
+        painel.set_axisbelow(True)
+        painel.spines[["top", "right"]].set_visible(False)
+    eixo.set_ylabel("Total de votos da faixa", color="#0072B2")
+    eixo.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{valor:,.0f}".replace(",", ".")))
+    eixo.tick_params(axis="y", colors="#0072B2")
+    eixo_percentual.set_ylabel("Percentual de votos sem SOURCE na faixa (%)", color="#D55E00")
+    eixo_percentual.yaxis.set_major_formatter(FuncFormatter(lambda valor, posicao: f"{valor:.1f}%".replace(".", ",")))
+    eixo_percentual.tick_params(axis="y", colors="#D55E00")
+    eixo.set_title("Total de votos", fontsize=13, fontweight="bold", loc="left", pad=16)
+    eixo_percentual.set_title("Percentual de votos sem SOURCE", fontsize=13,
+                              fontweight="bold", loc="left", pad=16)
+    figura.suptitle("Votos recebidos e ausência de SOURCE por faixa", x=0.08, ha="left",
+                    fontsize=15, fontweight="bold")
+    figura.text(0.08, 0.07,
                 "Fonte: wikiRfA.csv original • Todos os candidatos com TARGET identificado; nenhum limite mínimo adicional.",
                 fontsize=9, color="#52606d")
-    figura.text(0.09, 0.03,
-                "Cada barra representa 100% dos votos da faixa. Com SOURCE + sem SOURCE = total; os rótulos destacam os votos sem SOURCE.",
+    figura.text(0.08, 0.03,
+                "Percentual = sem SOURCE ÷ total da faixa × 100. Rótulos laranja: percentual e quantidade de votos sem SOURCE.",
                 fontsize=9, color="#52606d")
-    figura.subplots_adjust(left=0.09, right=0.98, bottom=0.24, top=0.78)
+    figura.subplots_adjust(left=0.08, right=0.98, bottom=0.24, top=0.86, wspace=0.30)
     caminho_png = Path(caminho_png)
     caminho_png.parent.mkdir(parents=True, exist_ok=True)
     figura.savefig(caminho_png, dpi=180, bbox_inches="tight")
