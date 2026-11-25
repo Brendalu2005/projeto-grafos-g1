@@ -183,6 +183,24 @@
           : `A DFS classificou ${total} arcos. Rode o servidor do front para animar a exploração.`,
         passos:visits, ciclo_negativo:[], classificacao_arcos:counts, movimentos:null, custo_total:null, aviso:''};
     }
+    // Reproduz somente a exploração registrada, preservando o resultado sem solução.
+    if (row.status === 'SEM_SOLUCAO') {
+      const labels = Array.isArray(row.exploracao) && row.exploracao.length ? row.exploracao
+        : Array.isArray(row.ordem_visita) ? row.ordem_visita
+        : String(row.ordem_visita || '').split(/\s*->\s*/);
+      const visits = labels.filter(label => label && label !== 'ALVO').map(state);
+      for (const visit of visits) {
+        if (!grade[visit.linha] || grade[visit.linha][visit.coluna] === undefined || grade[visit.linha][visit.coluna] === '#') {
+          throw new Error('Exploração contém posição inválida no mapa.');
+        }
+      }
+      return {status:'sem_caminho', tipo_animacao:visits.length ? 'exploracao' : null,
+        mensagem:visits.length
+          ? `Não existe caminho até a saída. A animação reproduz ${visits.length} estados na ordem de visita registrada pelo algoritmo; não representa uma rota até a saída.`
+          : 'Não existe caminho até a saída. Este resultado não fornece uma sequência de exploração para animar.',
+        passos:visits, ciclo_negativo:[], classificacao_arcos:null,
+        movimentos:null, custo_total:null, aviso:''};
+    }
     const messages = {OK: algorithm === 'BFS' ? 'Caminho com o menor número de movimentos.' : 'Caminho de menor custo.', RECUSA:'O Dijkstra recusou o grafo porque ele tem pesos negativos.', SEM_SOLUCAO:'Não existe caminho até a saída.', CICLO_NEGATIVO:'Ciclo negativo encontrado. A animação percorre os estados do ciclo.', PENDENTE:'Reinicie o servidor do front para carregar a classificação DFS atual.'};
     const steps = row.status === 'OK' ? String(row.caminho).split(/\s*->\s*/).filter(label => label && label !== 'ALVO').map(state) : [];
     const cycle = row.status === 'CICLO_NEGATIVO' && Array.isArray(row.ciclo) ? row.ciclo.filter(label => label !== 'ALVO').map(state) : [];

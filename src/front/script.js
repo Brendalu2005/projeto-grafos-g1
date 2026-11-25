@@ -312,7 +312,7 @@
     const map = current(); if (!map) return;
     const wrap = $('#single-wrap');
     drawMaze($('#single-canvas'), map.grade, {width: wrap.clientWidth, maxHeight: Math.max(320, window.innerHeight * 0.62), maxCell: 44, minCell: 6,
-      steps: S.steps, upto: S.index, kind: S.kind, color: S.kind === 'explore' ? css('--alg-dfs') : null, visual:S.visual});
+      steps: S.steps, upto: S.index, kind: S.kind, color: S.kind === 'explore' ? css(algInfo(S.alg).cor) : null, visual:S.visual});
     const step = S.steps[S.index];
     $('#position-value').textContent = step ? `linha ${step.linha}, coluna ${step.coluna}` : '—';
     $('#keys-value').textContent = step ? step.chaves.join(', ') || 'nenhuma' : '—';
@@ -335,14 +335,14 @@
       status('Resultado indisponível', 'Rode python -m src.front.server na raiz do projeto e recarregue a página.', 'warning');
       return draw();
     }
-    S.kind = result.status === 'exploracao' ? 'explore' : result.status === 'ciclo_negativo' ? 'cycle' : 'path';
+    S.kind = result.status === 'exploracao' || result.tipo_animacao === 'exploracao' ? 'explore' : result.status === 'ciclo_negativo' ? 'cycle' : 'path';
     S.steps = S.kind === 'cycle' ? result.ciclo_negativo : result.passos;
     // [IA] ChatGPT (Codex) – mantém a origem importada visível após carregar o resultado.
     const nota = result.aviso || result.mensagem;
     $('#algorithm-note').textContent = result.arquivo_importado
       ? `Arquivo importado: ${result.arquivo_importado}. ${nota}` : nota;
     if (result.status === 'sucesso') status(`${algInfo(S.alg).nome} encontrou o caminho`, `${result.movimentos} movimentos, custo total ${result.custo_total ?? 'indisponível'}.`, result.aviso ? 'warning' : '');
-    else if (S.kind === 'explore') status('Exploração da DFS pronta', `${S.steps.length} estados na ordem em que foram descobertos.`);
+    else if (S.kind === 'explore') status(result.status === 'sem_caminho' ? 'Sem solução · exploração pronta' : `Exploração de ${algInfo(S.alg).nome} pronta`, result.mensagem, result.status === 'sem_caminho' ? 'warning' : '');
     else if (result.status === 'classificacao') status('Classificação da DFS carregada', result.mensagem);
     else status(S.kind === 'cycle' ? 'Ciclo negativo encontrado' : result.status === 'sem_caminho' ? 'Sem solução' : 'Execução recusada',
       S.kind === 'cycle' && result.custo_ciclo !== null ? `${result.mensagem} Custo do ciclo: ${result.custo_ciclo}.` : result.mensagem, 'warning');
@@ -354,7 +354,7 @@
     const r = lane.resultado;
     if (!r) return {texto: 'Sem dados', classe: ''};
     if (r.status === 'peso_negativo_recusado') return {texto: 'Recusou', classe: 'warn'};
-    if (r.status === 'sem_caminho') return {texto: 'Sem caminho', classe: 'warn'};
+    if (r.status === 'sem_caminho') return {texto: lane.kind === 'explore' && index < lane.steps.length - 1 ? 'Explorando · sem solução' : 'Sem caminho', classe: 'warn'};
     if (r.status === 'classificacao') return {texto: 'Só classificação', classe: ''};
     const fim = index >= lane.steps.length - 1;
     if (r.status === 'ciclo_negativo') return {texto: fim ? 'Fechou o ciclo' : 'Ciclo negativo', classe: fim ? 'done' : 'warn'};
@@ -365,7 +365,7 @@
     const map = current();
     S.race = {medido: data.medido, lanes: data.algoritmos.map(entry => {
       const r = entry.resultado;
-      const kind = r?.status === 'exploracao' ? 'explore' : r?.status === 'ciclo_negativo' ? 'cycle' : 'path';
+      const kind = r?.status === 'exploracao' || r?.tipo_animacao === 'exploracao' ? 'explore' : r?.status === 'ciclo_negativo' ? 'cycle' : 'path';
       return {...entry, kind, steps: !r ? [] : kind === 'cycle' ? r.ciclo_negativo : r.passos};
     })};
     const validos = S.race.lanes.filter(lane => lane.tempo_ms !== null && lane.resultado && lane.resultado.status !== 'peso_negativo_recusado');
@@ -376,7 +376,7 @@
       el.className = 'lane'; el.style.setProperty('--c', `var(${alg.cor})`);
       const explorar = lane.kind === 'explore';
       const stats = [
-        [explorar ? 'Estados descobertos' : 'Movimentos', explorar ? lane.steps.length : r?.movimentos ?? '—'],
+        [explorar ? 'Estados visitados' : 'Movimentos', explorar ? lane.steps.length : r?.movimentos ?? '—'],
         [explorar ? 'Arcos classificados' : 'Custo', explorar ? Object.values(r?.classificacao_arcos || {}).reduce((a, b) => a + b, 0) || '—' : r?.custo_total ?? '—'],
         ['Tempo', tempo(lane.tempo_ms)],
       ];
