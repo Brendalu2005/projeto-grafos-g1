@@ -200,9 +200,9 @@
     "camadas": [
       {
         "chaves": "-",
-        "ordem": 7,
-        "tamanho": 9,
-        "densidade": 0.21428571428571427
+        "ordem": 2,
+        "tamanho": 2,
+        "densidade": 1.0
       },
       {
         "chaves": "a",
@@ -212,22 +212,22 @@
       },
       {
         "chaves": "ab",
-        "ordem": 12,
-        "tamanho": 20,
-        "densidade": 0.15151515151515152
+        "ordem": 7,
+        "tamanho": 12,
+        "densidade": 0.2857142857142857
       },
       {
         "chaves": "abc",
-        "ordem": 16,
-        "tamanho": 27,
-        "densidade": 0.1125
+        "ordem": 11,
+        "tamanho": 19,
+        "densidade": 0.17272727272727273
       }
     ],
     "arcos_entre_camadas": 3,
     "casas_que_mudam_de_camada": [
       "(1,3) a",
-      "(1,6) b",
-      "(1,9) c"
+      "(3,7) b",
+      "(3,10) c"
     ]
   }
 }

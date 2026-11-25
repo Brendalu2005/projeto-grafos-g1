@@ -55,8 +55,8 @@
   },
   {
     "mapa": "grupo_rotas",
-    "total_estados": 44,
-    "total_armadilhas": 12,
-    "proporcao_armadilhas": 0.2727272727272727
+    "total_estados": 29,
+    "total_armadilhas": 0,
+    "proporcao_armadilhas": 0.0
   }
 ]
