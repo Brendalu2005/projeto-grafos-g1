@@ -1,0 +1,67 @@
+{
+  "arquivo_entrada": "data/dataset_parte2/processed/wikiRfA_tratado.csv",
+  "escopo": "subgrafo induzido dos três usuários aprovados; todas as ocorrências internas preservadas",
+  "usuarios": [
+    "Siva1979",
+    "9cds",
+    "Pilotguy"
+  ],
+  "fonte": "Siva1979",
+  "destino": "Pilotguy",
+  "arcos": [
+    {
+      "origem": "Siva1979",
+      "destino": "Pilotguy",
+      "PESO": 1,
+      "indice_registro_csv_base_zero": 143949
+    },
+    {
+      "origem": "9cds",
+      "destino": "Pilotguy",
+      "PESO": 1,
+      "indice_registro_csv_base_zero": 144017
+    },
+    {
+      "origem": "Siva1979",
+      "destino": "9cds",
+      "PESO": -1,
+      "indice_registro_csv_base_zero": 151935
+    }
+  ],
+  "transformacao": "PESO + 1",
+  "tem_ciclo_negativo": false,
+  "caminho_bellman_ford": [
+    "Siva1979",
+    "9cds",
+    "Pilotguy"
+  ],
+  "caminho_dijkstra": [
+    "Siva1979",
+    "Pilotguy"
+  ],
+  "custo_minimo_peso_bellman_ford": 0,
+  "custo_peso_caminho_dijkstra": 1,
+  "custo_transformado_dijkstra": 2,
+  "diferenca_em_peso": 1,
+  "alternativas": [
+    {
+      "caminho": [
+        "Siva1979",
+        "Pilotguy"
+      ],
+      "custo_peso": 1,
+      "custo_transformado": 2
+    },
+    {
+      "caminho": [
+        "Siva1979",
+        "9cds",
+        "Pilotguy"
+      ],
+      "custo_peso": 0,
+      "custo_transformado": 2
+    }
+  ],
+  "empate_transformado": true,
+  "benchmark": false
+}

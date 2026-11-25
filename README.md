@@ -1,10 +1,139 @@
-# Labirinto com chaves: grafo de estados e comparação de algoritmos
+# Teoria dos Grafos: labirintos e Wiki-RfA
 
-Projeto final de Teoria dos Grafos e Análise e Visualização de Dados (CESAR School, 2026.2).
+Projeto de Teoria dos Grafos e Análise e Visualização de Dados — CESAR School, 2026.2.
 
-Na Parte 1, cada mapa de `data/mapas/` vira um grafo de estados. Cada nó guarda a posição, as chaves que o jogador tem e os bônus que já consumiu, e sobre esse grafo rodamos BFS, DFS, Dijkstra e Bellman-Ford. Na Parte 2, os mesmos algoritmos rodam sobre um dataset real, e comparamos corretude e desempenho.
+- **Parte 1:** modelagem de labirintos como grafos de estados, considerando posição, chaves e bônus.
+- **Parte 2:** análise de votos da Wikipédia com o dataset Wiki-RfA.
 
-Os quatro algoritmos são implementação nossa. O `networkx` só aparece em `tests/`, como oráculo para conferir os resultados.
+As duas partes utilizam BFS, DFS, Dijkstra e Bellman-Ford. O `networkx` é usado somente nos testes, como referência para conferir os resultados.
+
+## Instalação
+
+Requer Python 3.11 ou superior. Clone o repositório e crie o ambiente virtual:
+
+```bash
+git clone https://github.com/Brendalu2005/projeto-grafos-g1.git
+cd projeto-grafos-g1
+python -m venv .venv
+```
+
+Ative o ambiente conforme seu sistema:
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+```
+
+```bash
+# Linux ou macOS
+source .venv/bin/activate
+```
+
+Instale as dependências:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Execute os comandos abaixo **na raiz do repositório**, com o ambiente ativado.
+
+## Parte 1 — Labirintos
+
+Para gerar os resultados de todos os mapas:
+
+```bash
+python -m src.cli --todos
+```
+
+Os resultados ficam em `out/parte1/`. A coluna `ordem_visita` de `solucoes.csv` registra a ordem em que os estados do BFS saem da fila. Para abrir a interface interativa:
+
+```bash
+python -m src.front.server
+```
+
+Acesse [o labirinto interativo](http://127.0.0.1:8766/out/parte1/labirinto_interativo.html). Para resolver apenas um mapa, consulte as opções em `python -m src.cli --help`.
+
+## Parte 2 — Dataset Wiki-RfA
+
+O [Wiki-RfA no Kaggle](https://www.kaggle.com/datasets/boneacrabonjac/wiki-rfa) é uma versão reduzida do dataset [SNAP](https://snap.stanford.edu/data/wiki-RfA.html), com votos em candidaturas a administrador da Wikipédia.
+
+Cada usuário é um vértice e cada voto é um arco dirigido do eleitor para o candidato. O grafo tratado tem **11.376 vértices e 196.614 arcos**, preservando laços e arcos paralelos.
+
+| Coluna | Significado |
+|---|---|
+| `SOURCE` | Usuário que votou; origem do arco. |
+| `TARGET` | Candidato que recebeu o voto; destino do arco. |
+| `VOTE` | Voto original: −1 contrário, 0 neutro e 1 favorável. |
+| `RESULT` | Resultado da candidatura: −1 rejeição e 1 aprovação. |
+| `PESO` | Peso calculado no tratamento, separado do voto original. |
+
+O CSV bruto contém 198.275 registros. Os 1.661 sem `SOURCE` são excluídos da construção do grafo e preservados no arquivo bruto. Para linhas idênticas em `SOURCE`, `TARGET`, `VOTE` e `RESULT`, o peso recebe um incremento por ocorrência: `VOTE`, `VOTE + 1`, `VOTE + 2` e assim por diante, na ordem original.
+
+**Pergunta de pesquisa:** como a transformação dos pesos negativos para permitir o uso de Dijkstra altera os caminhos mínimos e a interpretação dos custos no Wiki-RfA?
+
+Dijkstra utiliza `PESO + 1` para eliminar os pesos negativos. Essa transformação pode mudar os caminhos mínimos, pois acrescenta uma unidade por arco percorrido. BFS e DFS ignoram os pesos; Bellman-Ford utiliza `PESO`.
+
+### Preparar os dados e executar
+
+No VS Code, abra os notebooks com suporte a Jupyter e selecione o Python da `.venv`:
+
+1. [preparacao_dataset_wikiRfA.ipynb](data/dataset_parte2/preparacao_dataset_wikiRfA.ipynb): execute as células em ordem, com o diretório de trabalho em `data/dataset_parte2/`. Ele baixa os dados, faz o tratamento, calcula os pesos e exporta o CSV tratado e as métricas.
+2. [experimentos_parte2.ipynb](data/dataset_parte2/experimentos_parte2.ipynb): reúne os casos dos algoritmos, o benchmark e a consolidação. Para consolidar os resultados já salvos, execute somente a seção 1 e depois as seções 16 e 17, sem repetir as medições.
+
+Os CSVs não são versionados. O arquivo necessário para os experimentos é `data/dataset_parte2/processed/wikiRfA_tratado.csv`.
+
+Como alternativa ao notebook, reproduza os casos dos quatro algoritmos pela CLI:
+
+```bash
+python -m src.cli --dataset data/dataset_parte2/processed/wikiRfA_tratado.csv --experimentos
+```
+
+As saídas ficam em `out/parte2/`. Esse comando gera os casos, sem executar o benchmark. Para gerar as sete figuras, com os CSVs e os JSONs de resultados disponíveis:
+
+```bash
+python -m src.viz --parte2
+```
+
+As exportações e as figuras substituem os arquivos de mesmo nome. Use `--out outra_pasta` para salvar uma execução separadamente. Os procedimentos específicos de benchmark estão no notebook de experimentos.
+
+## Testes
+
+```bash
+python -m pytest -q
+```
+
+## Estrutura do projeto
+
+```text
+projeto-grafos-g1/
+├── data/
+│   ├── mapas/                       mapas fornecidos
+│   ├── mapas_grupo/                 mapas criados pela equipe
+│   └── dataset_parte2/
+│       ├── preparacao_dataset_wikiRfA.ipynb
+│       ├── experimentos_parte2.ipynb
+│       ├── raw/                     CSV bruto, gerado pelo notebook
+│       └── processed/               CSV tratado, gerado pelo notebook
+├── src/
+│   ├── cli.py                       execução pela linha de comando
+│   ├── solve.py                     integração dos algoritmos e resultados
+│   ├── graphs/                      representação, leitura, métricas e algoritmos
+│   ├── benchmark.py                 benchmark de BFS e Dijkstra
+│   ├── benchmark_dfs_bellman.py      benchmark de DFS e Bellman-Ford
+│   ├── viz.py                       geração das figuras
+│   └── front/                       interface interativa da Parte 1
+├── out/
+│   ├── parte1/                      resultados e interface dos labirintos
+│   └── parte2/                      casos, métricas, benchmarks, figuras e relatório JSON
+├── docs/                            relatório, justificativas e registros de IA
+├── tests/                           testes automatizados
+├── requirements.txt                 dependências
+└── pytest.ini                       configuração dos testes
+```
+
+## Documentação
+
+Links da documentação a inserir.
 
 ## Equipe
 
@@ -15,102 +144,3 @@ Os quatro algoritmos são implementação nossa. O `networkx` só aparece em `te
 | Clarissa | clarissalopes6 |
 | Brenda | Brendalu2005 |
 | Vinícius Spósito | nogsposito |
-
-## Instalação
-
-Precisa de Python 3.11 ou mais novo.
-
-```bash
-git clone https://github.com/Brendalu2005/projeto-grafos-g1.git
-cd projeto-grafos-g1
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-source .venv/bin/activate     # Linux e macOS
-pip install -r requirements.txt
-```,
-
-## Como executar
-
-Na raiz do repositório, a execução individual imprime e grava um JSON em `--out`:
-
-```bash
-# Parte 1: resolução individual
-python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
-python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg DIJKSTRA --out ./out/parte1/
-python -m src.cli --mapa ./data/mapas/m05_bonus.txt --alg BELLMAN_FORD --out ./out/parte1/
-python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
-
-# Parte 1: exportações para os oito mapas e data/mapas_grupo/*.txt
-python -m src.cli --todos --out ./out/parte1/
-
-# Recalcular todas as exportações com fontes consumíveis; os arquivos ficam
-# separados em ./out/parte1/fonte_consumivel/ para não misturar regras.
-python -m src.cli --todos --fonte-consumivel --out ./out/parte1/
-
-# --armadilhas é um alias da execução em lote (que também gera as armadilhas).
-python -m src.cli --armadilhas --out ./out/parte1/
-
-# Gerar as figuras estáticas da Parte 1
-python -m src.viz
-
-# Abrir a interface interativa em http://127.0.0.1:8766/out/parte1/labirinto_interativo.html
-python -m src.front.server
-```
-
-As exportações em lote incluem arestas, graus, métricas globais, camadas, soluções, classificação DFS, comparação das três modelagens, estados-armadilha, percurso do m03 e ciclo negativo do m06. As soluções BFS registram também `ordem_visita`, na ordem em que os estados saem da fila. A interface serve os resultados calculados pelo projeto; execute o servidor a partir da raiz para que mapas e CSVs sejam encontrados. O controle “Regra da fonte” permite comparar o cenário original com a fonte consumível.
-
-Os comandos de execução do dataset da Parte 2 ainda não estão implementados na CLI.
-
-## Testes
-
-```bash
-pytest
-```
-
-## Estrutura
-
-```
-projeto-grafos-g1/
-├── README.md
-├── requirements.txt
-├── pytest.ini
-├── docs/                  declaração de IA, registro de uso e relatório
-├── data/
-│   ├── mapas/             mapas fornecidos (m01 a m08)
-│   ├── mapas_grupo/       os 2 mapas criados pelo grupo
-│   └── dataset_parte2/    dataset da Parte 2
-├── out/
-│   ├── parte1/            CSVs, JSONs, figuras e labirinto interativo
-│   └── parte2/            relatório de desempenho e gráficos
-├── src/
-│   ├── cli.py             entrada pela linha de comando
-│   ├── solve.py           orquestra as duas partes
-│   ├── viz.py             visualizações
-│   └── graphs/
-│       ├── io.py          leitura e validação dos mapas e do dataset
-│       ├── estados.py     grafo de posições e grafo de estados
-│       ├── graph.py       lista de adjacência dirigida
-│       └── algorithms.py  BFS, DFS, Dijkstra e Bellman-Ford
-└── tests/                 testes com pytest
-```
-
-## Interface dos algoritmos
-
-`graph.py` representa o grafo dirigido por uma lista de adjacência: cada chave é um vértice e cada valor é uma lista de pares `(destino, peso)`. No grafo de estados, um vértice é `(linha, coluna, chaves, bônus_consumidos)`; a saída é ligada ao vértice virtual `ALVO`.
-
-| Algoritmo | Entrada | Retorno principal |
-|---|---|---|
-| `bfs(grafo, origem)` | Grafo e vértice de origem | Distâncias em arestas (passos) e predecessores |
-| `dfs(grafo, origem, cobrir_todos=False)` | Grafo dirigido e origem | Tempos de descoberta/finalização, predecessores, classificação de arcos e indicador de ciclo |
-| `dijkstra(grafo, origem)` | Grafo e origem | Distâncias de menor custo e predecessores; lança `ValueError` se encontrar peso negativo |
-| `bellman_ford(grafo, origem)` | Grafo e origem | Distâncias, predecessores e ciclo negativo (ou `None`) |
-
-`resolver()` converte esses retornos em status, custo, passos, caminho e sequência do ciclo, quando houver. A opção `--fonte-consumivel` altera a construção do grafo para que cada fonte `*` tenha peso `-2` na primeira entrada e `1` nas seguintes.
-
-## Dataset da Parte 2
-
-Wiki-RfA: votos de usuários da Wikipédia nas eleições para administrador, de 2003 a maio de 2013. Fonte: [Kaggle](https://www.kaggle.com/datasets/boneacrabonjac/wiki-rfa), versão reduzida do [SNAP](https://snap.stanford.edu/data/wiki-RfA.html). Descrição e pergunta de pesquisa a preencher.
-
-## Uso de IA
-
-Seguimos as regras de IA do enunciado. Todo trecho de código feito com apoio de IA leva a marca `# [IA] <ferramenta> – <finalidade>`, cada uso fica registrado em [`DECLARACAO_IA.md`], e a declaração assinada por todos fica em `docs/DECLARACAO_IA.pdf`.
