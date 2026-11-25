@@ -153,11 +153,32 @@ def test_comparacao_nao_conta_arco_virtual_como_movimento(tmp_path, monkeypatch)
     monkeypatch.setattr(solve, "construir_g_pos", lambda *args: grafo)
     monkeypatch.setattr(solve, "construir_g_est", lambda *args: grafo)
     monkeypatch.setattr(solve, "estado_inicial", lambda mapa: "S")
+    monkeypatch.setattr(solve, "descrever_caminho", lambda *args: ("sim", "caminho de teste"))
     linhas = solve.exportar_comparacao([], tmp_path)
     assert linhas and all(linha["passos"] == 1 for linha in linhas)
     with (tmp_path / "comparacao_modelagem.csv").open(encoding="utf-8") as arquivo:
         leitor = csv.DictReader(arquivo)
         assert {"mapa", "abordagem", "passos", "caminho_valido", "observacao"} <= set(leitor.fieldnames)
+
+
+# [IA] Claude – confere os campos caminho_valido e observacao em um mapa mínimo.
+def test_comparacao_descreve_se_o_caminho_segue_as_regras(tmp_path):
+    from src.graphs.algorithms import bfs
+    from src.graphs.estados import construir_g_est, construir_g_pos, estado_inicial
+    from src.graphs.io import ler_mapa
+    from src.solve import descrever_caminho
+
+    arquivo = tmp_path / "porta.txt"
+    arquivo.write_text("######\n#aSAG#\n######\n", encoding="utf-8")
+    mapa = ler_mapa(arquivo)
+
+    chao = descrever_caminho(mapa, *bfs(construir_g_pos(mapa, "chao"), mapa.inicio), False)
+    parede = descrever_caminho(mapa, *bfs(construir_g_pos(mapa, "parede"), mapa.inicio), False)
+    estados = descrever_caminho(mapa, *bfs(construir_g_est(mapa), estado_inicial(mapa)), False)
+
+    assert chao == ("nao", "Entra na porta A em (1,3) sem a chave a.")
+    assert parede == ("nao", "Não chega a G: a busca alcança só 2 dos 3 nós do grafo.")
+    assert estados == ("sim", "Todos os movimentos seguem as regras; chega a G com as chaves: a.")
 
 
 # [IA] ChatGPT (Codex) – confere os nomes exigidos sem resolver os mapas do grupo.

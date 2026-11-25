@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra, reconstruir_caminho
-from src.graphs.estados import ALVO, construir_g_est, estado_inicial, rotulo
+from src.graphs.estados import ALVO, construir_g_est, estado_inicial, movimentos, rotulo
 from src.graphs.io import (exportar_parte1, exportar_arestas, exportar_graus,
                            ler_mapa, escrever_json, carregar_dataset)
 from src.graphs.estados import (camadas_do_mapa, construir_g_pos,
@@ -174,6 +174,35 @@ def estados_armadilha_local(grafo, origem):
     return alcancados - conseguem_sair
 
 
+# [IA] Claude – confere o caminho da BFS pelas regras do jogo e preenche caminho_valido e observacao.
+def conferir_caminho(mapa, caminho, fonte_consumivel):
+    estado = estado_inicial(mapa)
+    for casa in caminho[1:]:
+        proximo = None
+        for candidato, _ in movimentos(mapa, estado, fonte_consumivel):
+            if candidato[:2] == casa[:2]:
+                proximo = candidato
+        if proximo is None:
+            linha, coluna = casa[:2]
+            porta = mapa.casa(linha, coluna)
+            return "nao", f"Entra na porta {porta} em ({linha},{coluna}) sem a chave {porta.lower()}."
+        estado = proximo
+    chaves = ", ".join(sorted(estado[2]))
+    return "sim", f"Todos os movimentos seguem as regras; chega a G com as chaves: {chaves}."
+
+
+def descrever_caminho(mapa, distancias, predecessores, fonte_consumivel):
+    if distancias[ALVO] == math.inf:
+        total = len(distancias) - 1
+        alcancados = 0
+        for vertice in distancias:
+            if distancias[vertice] != math.inf:
+                alcancados += 1
+        return "nao", f"Não chega a G: a busca alcança só {alcancados} dos {total} nós do grafo."
+    caminho = reconstruir_caminho(distancias, predecessores, ALVO)
+    return conferir_caminho(mapa, caminho[:-1], fonte_consumivel)
+
+
 # [IA] ChatGPT (Codex) – GERA TABELA DE COMPARAÇÃO
 def exportar_comparacao(pastas, pasta_saida, fonte_consumivel=False):
     modelos = ("portas_como_chao", "portas_como_parede", "grafo_de_estados")
@@ -184,13 +213,13 @@ def exportar_comparacao(pastas, pasta_saida, fonte_consumivel=False):
                       (construir_g_pos(mapa, "parede"), mapa.inicio),
                       (construir_g_est(mapa, fonte_consumivel), estado_inicial(mapa)))
         for nome, (grafo, origem) in zip(modelos, candidatos):
-            distancias, _ = bfs(grafo, origem)
+            distancias, predecessores = bfs(grafo, origem)
+            caminho_valido, observacao = descrever_caminho(mapa, distancias, predecessores, fonte_consumivel)
             # [IA] ChatGPT (Codex) – depuração: o arco virtual até ALVO não é movimento na grade.
             passos = distancias.get(ALVO, math.inf) - 1
             linhas.append({"mapa": mapa.nome, "abordagem": nome, "modelagem": nome,
                            "passos": "" if passos == math.inf else int(passos),
-                           # Validação e observação devem ser preenchidas pelo grupo.
-                           "caminho_valido": "", "observacao": "",
+                           "caminho_valido": caminho_valido, "observacao": observacao,
                            "status": "SEM_SOLUCAO" if passos == math.inf else "OK",
                            "fonte_consumivel": fonte_consumivel})
     escrever_csv(linhas, ["mapa", "abordagem", "passos", "caminho_valido", "observacao",

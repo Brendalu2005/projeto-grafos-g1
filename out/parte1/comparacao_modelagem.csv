@@ -1,10 +1,10 @@
 mapa,abordagem,passos,caminho_valido,observacao,modelagem,status,fonte_consumivel
-m02_uma_chave,portas_como_chao,10,,,portas_como_chao,OK,False
-m02_uma_chave,portas_como_parede,,,,portas_como_parede,SEM_SOLUCAO,False
-m02_uma_chave,grafo_de_estados,34,,,grafo_de_estados,OK,False
-m03_tres_chaves,portas_como_chao,21,,,portas_como_chao,OK,False
-m03_tres_chaves,portas_como_parede,,,,portas_como_parede,SEM_SOLUCAO,False
-m03_tres_chaves,grafo_de_estados,87,,,grafo_de_estados,OK,False
-m04_esteiras,portas_como_chao,14,,,portas_como_chao,OK,False
-m04_esteiras,portas_como_parede,,,,portas_como_parede,SEM_SOLUCAO,False
-m04_esteiras,grafo_de_estados,20,,,grafo_de_estados,OK,False
+m02_uma_chave,portas_como_chao,10,nao,"Entra na porta A em (1,6) sem a chave a.",portas_como_chao,OK,False
+m02_uma_chave,portas_como_parede,,nao,Não chega a G: a busca alcança só 17 dos 22 nós do grafo.,portas_como_parede,SEM_SOLUCAO,False
+m02_uma_chave,grafo_de_estados,34,sim,Todos os movimentos seguem as regras; chega a G com as chaves: a.,grafo_de_estados,OK,False
+m03_tres_chaves,portas_como_chao,21,nao,"Entra na porta C em (7,13) sem a chave c.",portas_como_chao,OK,False
+m03_tres_chaves,portas_como_parede,,nao,Não chega a G: a busca alcança só 48 dos 73 nós do grafo.,portas_como_parede,SEM_SOLUCAO,False
+m03_tres_chaves,grafo_de_estados,87,sim,"Todos os movimentos seguem as regras; chega a G com as chaves: a, b, c.",grafo_de_estados,OK,False
+m04_esteiras,portas_como_chao,14,nao,"Entra na porta A em (1,10) sem a chave a.",portas_como_chao,OK,False
+m04_esteiras,portas_como_parede,,nao,Não chega a G: a busca alcança só 18 dos 23 nós do grafo.,portas_como_parede,SEM_SOLUCAO,False
+m04_esteiras,grafo_de_estados,20,sim,Todos os movimentos seguem as regras; chega a G com as chaves: a.,grafo_de_estados,OK,False
