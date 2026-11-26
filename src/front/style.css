@@ -270,6 +270,21 @@ h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
 .dataset-intro { margin: -4px 0 26px; max-width: 760px; color: var(--muted); }
 .research-question { margin-bottom: 24px; }
 .research-question p { margin: 12px 0 0; }
+/* [IA] ChatGPT (Codex) – fluxo da Parte 2 com etapas e detalhes para a apresentação. */
+.dataset-flow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; list-style: none; padding: 0; margin: 0 0 24px; }
+.flow-step { padding: 26px; }
+.flow-step h3 { margin: 10px 0 14px; }
+.flow-step p, .flow-message p { margin: 0; }
+.flow-step details { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.flow-step summary { cursor: pointer; font-weight: 600; }
+.flow-step details p { margin-top: 12px; color: var(--muted); }
+.flow-step details .link-cta { display: inline-block; margin-top: 12px; }
+.flow-message { padding: 28px; }
+.flow-message h3 { margin: 10px 0 14px; }
+.flow-step, .flow-message { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .dataset-flow { grid-template-columns: minmax(0, 1fr); }
+}
 .dataset-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
 .figure-sidebar { padding: 22px 14px; }
 .figure-sidebar .eyebrow { padding-inline: 10px; margin-bottom: 16px; }

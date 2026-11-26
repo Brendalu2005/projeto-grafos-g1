@@ -36,6 +36,7 @@
     <a href="#figuras">Figuras</a>
   </nav>
   <nav class="section-nav" id="nav-parte2" aria-label="Parte 2" hidden>
+    <a href="#fluxo">Fluxo do projeto</a>
     <a href="#grafo">Grafo interativo</a>
     <a href="#exploratorias">Exploratórias</a>
     <a href="#explanatorias">Explanatórias</a>
@@ -180,6 +181,58 @@
           <p class="card-sub" id="figuras-sub">Geradas pelo src/viz.py a partir das saídas em out/parte1.</p>
           <div id="figures-view" class="figures"></div>
         </article>
+    </section>
+
+    <!-- [IA] ChatGPT (Codex) – resumo do fluxo existente da Parte 2 para apoiar a apresentação de André. -->
+    <section class="page-section" data-page="fluxo" aria-labelledby="fluxo-titulo" hidden>
+      <div class="section-head">
+        <div><p class="eyebrow">Parte 2 · Do dado ao resultado</p><h2 id="fluxo-titulo">Como uma tabela de votos vira uma investigação.</h2></div>
+        <span class="badge">Wiki-RfA</span>
+      </div>
+      <p class="dataset-intro">Entender os votos, preparar a rede e investigar como os algoritmos e as escolhas de pesos influenciam os resultados.</p>
+      <ol class="dataset-flow">
+        <li class="card flow-step">
+          <span class="eyebrow">01 · Entender os dados</span>
+          <h3>Quem votou em quem?</h3>
+          <p>Cada linha registra um voto: <strong>SOURCE</strong> é o eleitor, <strong>TARGET</strong> é o candidato, <strong>VOTE</strong> é o voto e <strong>RESULT</strong> é o resultado da candidatura.</p>
+          <details><summary>Por que começar aqui?</summary><p>Um voto contrário pode coexistir com a aprovação do candidato. Voto individual e resultado da candidatura são informações diferentes.</p></details>
+        </li>
+        <li class="card flow-step">
+          <span class="eyebrow">02 · Preparar os registros</span>
+          <h3>Tratar sem inventar informação.</h3>
+          <p>Os 1.661 registros sem eleitor ficaram fora do grafo, mas permanecem no bruto. Mantivemos laços e repetições e criamos <strong>PESO</strong>, preservando <strong>VOTE</strong>.</p>
+          <details><summary>Por que essas decisões?</summary><p>Sem SOURCE, falta a origem do arco. Sem data ou identificador de eleição, repetição não comprova erro. O incremento acordado usa a ordem das ocorrências idênticas nas quatro colunas; PESO é um custo derivado, não o voto original.</p></details>
+        </li>
+        <li class="card flow-step">
+          <span class="eyebrow">03 · Construir e conhecer o grafo</span>
+          <h3>Usuários viram vértices; votos viram arcos.</h3>
+          <p>O carregador transforma o CSV tratado em uma rede dirigida: <strong>eleitor → candidato</strong>. São 11.376 usuários e 196.614 arcos, preservando laços e paralelos.</p>
+          <details><summary>O que a exploração mostra?</summary><p>Graus de entrada e saída, distribuições dos votos e pesos, faltantes e relações com RESULT. Valores extremos foram conferidos; ser outlier não foi tratado como prova de erro.</p><a class="link-cta" href="#exploratorias">Ver A01, A02, A04 e B01 ›</a></details>
+        </li>
+        <li class="card flow-step">
+          <span class="eyebrow">04 · Executar os algoritmos</span>
+          <h3>Perguntas diferentes para a mesma rede.</h3>
+          <p><strong>BFS:</strong> alcance e menor número de arcos. <strong>DFS:</strong> exploração e ciclos dirigidos. <strong>Dijkstra:</strong> menor custo com pesos não negativos. <strong>Bellman-Ford:</strong> custos com negativos e detecção de ciclos negativos alcançáveis.</p>
+          <details><summary>Quais experimentos fizemos?</summary><p>BFS e DFS em três fontes; Dijkstra em cinco pares, usando PESO + 1; Bellman-Ford em dois recortes reais, um com arco negativo sem ciclo e outro com ciclo de custo −2. Os recortes pequenos verificam comportamentos, não representam toda a rede.</p><a class="link-cta" href="#grafo">Explorar a rede ›</a></details>
+        </li>
+        <li class="card flow-step">
+          <span class="eyebrow">05 · Medir o desempenho</span>
+          <h3>Como o tempo muda quando a rede cresce?</h3>
+          <p>Medimos os quatro algoritmos em 10%, 50% e 100% dos arcos, com aquecimento e cinco repetições por configuração. O conjunto reúne 34 configurações e 170 tempos.</p>
+          <details><summary>O que entra na comparação?</summary><p>O cronômetro mede a chamada do algoritmo; leitura, preparação externa e exportação ficam fora. Bellman-Ford tem uma fonte em 100%, limitando comparações entre fontes. Ser mais rápido não torna um algoritmo substituto dos outros: as tarefas diferem.</p><a class="link-cta" href="#desempenho">Ver desempenho ›</a></details>
+        </li>
+        <li class="card flow-step">
+          <span class="eyebrow">06 · Explicar os achados</span>
+          <h3>Da exploração a uma mensagem específica.</h3>
+          <p>A distribuição dos pesos motivou investigar a transformação para Dijkstra. No exemplo real da B03, dois caminhos com custos diferentes passam a empatar após somar 1 a cada arco.</p>
+          <details><summary>Por que passar à explanatória?</summary><p>A exploração revela padrões e perguntas; a explanatória seleciona uma evidência para comunicar. A B03 mostra o efeito sobre os caminhos; a A03 destaca os tempos de DFS e Bellman-Ford. O exemplo de caminhos não mede a frequência da mudança na rede inteira.</p><a class="link-cta" href="#explanatorias">Ver A03 e B03 ›</a></details>
+        </li>
+      </ol>
+      <article class="card flow-message" aria-labelledby="fluxo-mensagem">
+        <p class="eyebrow">Mensagem principal</p>
+        <h3 id="fluxo-mensagem">Permitir Dijkstra não significa preservar os caminhos mínimos.</h3>
+        <p>Ao somar 1 a cada arco, caminhos mais longos recebem acréscimos maiores. A transformação elimina os pesos negativos desta base, mas pode mudar a comparação entre os custos dos caminhos.</p>
+      </article>
     </section>
 
     <section class="page-section" data-page="parte2" aria-labelledby="dataset-titulo" hidden>
