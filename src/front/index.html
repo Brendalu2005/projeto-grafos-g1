@@ -188,6 +188,10 @@
         <span class="badge">11.376 usuários · 196.614 arcos</span>
       </div>
       <p class="dataset-intro">Cada voto liga um eleitor a um candidato. Navegue pelas figuras para conhecer os dados, acompanhar as explicações e comparar os algoritmos.</p>
+      <article class="card research-question" aria-labelledby="pergunta-pesquisa-titulo">
+        <h3 id="pergunta-pesquisa-titulo">Pergunta principal da pesquisa</h3>
+        <p>Como a transformação dos pesos negativos para permitir o uso de Dijkstra altera os caminhos mínimos e a interpretação dos custos no grafo Wiki-RfA?</p>
+      </article>
       <div class="dataset-layout">
         <aside class="card figure-sidebar" aria-label="Seleção da figura">
           <p class="eyebrow" id="figure-category">Exploratórias</p>
@@ -217,7 +221,7 @@
         <p class="card-sub" id="rede-status" role="status" aria-live="polite">Abra esta seção com o servidor local em execução.</p>
         <div class="rede-canvas"><canvas id="rede-canvas" tabindex="0" aria-label="Rede dirigida de votos. Arraste para mover, role para ampliar e clique em um usuário. Os resultados também estão descritos abaixo."></canvas></div>
         <p class="card-sub"><strong>Como navegar:</strong> arraste o grafo para mover e use a roda do mouse para aproximar ou afastar. Clique em um usuário para ver suas conexões e os nomes dos vizinhos.</p>
-        <p class="card-sub" id="rede-legenda">Cores do grafo: cinza = conexões da rede; vinho = arcos com PESO negativo; azul = resultado do algoritmo. As setas apontam de quem votou para quem recebeu o voto.</p>
+        <p class="card-sub" id="rede-legenda">Cores do grafo: cinza = conexões da rede; vinho = arcos com PESO negativo; azul = resultado do algoritmo. Curvas separadas representam múltiplas ligações entre os mesmos usuários. As setas apontam de quem votou para quem recebeu o voto.</p>
         <div class="graph-controls"><label>Localizar usuário <input id="rede-busca" type="search" placeholder="Nome exato no dataset"></label><button id="rede-localizar" class="ghost-button" type="button">Localizar</button><button id="rede-voltar" class="ghost-button" type="button" hidden>Voltar ao grafo</button></div>
         <p id="rede-usuario" class="card-sub" aria-live="polite">Clique em um usuário para mostrar somente suas conexões de entrada e saída, com os nomes dos vizinhos.</p>
         <div id="rede-vizinhos" class="rede-vizinhos" aria-label="Vizinhos do usuário selecionado" hidden></div>

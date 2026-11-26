@@ -15,6 +15,27 @@
     BELLMAN_FORD: ['Executar 2 cenários', 'Bellman-Ford em dois subgrafos reais pequenos: peso negativo sem ciclo e ciclo negativo.'],
   };
   const numero = n => n.toLocaleString('pt-BR');
+  const geometrias = new WeakMap();
+
+  function geometriaArcos(arcos) {
+    if (geometrias.has(arcos)) return geometrias.get(arcos);
+    const grupos = new Map(), resultado = new Map();
+    for (const item of arcos) {
+      const [u, v] = item;
+      // Agrupa também o sentido inverso para que A → B e B → A não coincidam.
+      const chave = JSON.stringify(u <= v ? [u, v] : [v, u]);
+      if (!grupos.has(chave)) grupos.set(chave, []);
+      grupos.get(chave).push(item);
+    }
+    for (const grupo of grupos.values()) grupo.forEach((item, i) => {
+      const [u, v] = item;
+      resultado.set(item, u === v ? {curva: 0, laco: i} : {
+        curva: (i - (grupo.length - 1) / 2) * (u <= v ? 1 : -1), laco: 0,
+      });
+    });
+    geometrias.set(arcos, resultado);
+    return resultado;
+  }
 
   async function consultar(url) {
     const resposta = await fetch(url);
@@ -80,21 +101,46 @@
     agendar();
   }
 
-  function arco(u, v, seta) {
+  function pontaSeta(x, y, angulo) {
+    ctx.moveTo(x - Math.cos(angulo - .5) * 7, y - Math.sin(angulo - .5) * 7);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x - Math.cos(angulo + .5) * 7, y - Math.sin(angulo + .5) * 7);
+  }
+
+  function arco(u, v, seta, geometria) {
     const x = u.x * escala + deslocX, y = u.y * escala + deslocY;
     const tx = v.x * escala + deslocX, ty = v.y * escala + deslocY;
-    ctx.moveTo(x, y);
+    const zoomCurva = Math.max(.65, escala);
     if (u === v) {
-      ctx.moveTo(x + 10, y - 9); ctx.arc(x, y - 9, 10, 0, Math.PI * 2);
+      const raio = (18 + geometria.laco * 12) * zoomCurva;
+      const fimX = x + 8, fimY = y - 7;
+      ctx.moveTo(x - 8, y - 7);
+      ctx.bezierCurveTo(x - raio, y - raio * 2, x + raio, y - raio * 2, fimX, fimY);
+      if (seta) pontaSeta(fimX, fimY, Math.atan2(fimY - (y - raio * 2), fimX - (x + raio)));
     } else {
-      ctx.lineTo(tx, ty);
+      const dx = tx - x, dy = ty - y, distancia = Math.hypot(dx, dy) || 1;
+      const desvio = geometria.curva * 28 * zoomCurva;
+      const cx = (x + tx) / 2 - dy / distancia * desvio;
+      const cy = (y + ty) / 2 + dx / distancia * desvio;
+      const angulo = Math.atan2(ty - cy, tx - cx);
+      // A ponta acompanha a tangente da curva e termina fora do nó de destino.
+      const fimX = seta ? tx - Math.cos(angulo) * 10 : tx;
+      const fimY = seta ? ty - Math.sin(angulo) * 10 : ty;
+      ctx.moveTo(x, y);
+      if (geometria.curva) ctx.quadraticCurveTo(cx, cy, fimX, fimY);
+      else ctx.lineTo(fimX, fimY);
       if (seta) {
-        const angulo = Math.atan2(ty - y, tx - x);
-        const pontaX = tx - Math.cos(angulo) * 6, pontaY = ty - Math.sin(angulo) * 6;
-        ctx.moveTo(pontaX - Math.cos(angulo - .5) * 7, pontaY - Math.sin(angulo - .5) * 7);
-        ctx.lineTo(pontaX, pontaY);
-        ctx.lineTo(pontaX - Math.cos(angulo + .5) * 7, pontaY - Math.sin(angulo + .5) * 7);
+        pontaSeta(fimX, fimY, angulo);
       }
+    }
+  }
+
+  function desenharArcos(arcos, mapaNos, seta, filtro) {
+    const geometriasArcos = geometriaArcos(arcos);
+    for (const item of arcos) {
+      if (filtro && !filtro(item)) continue;
+      const [u, v] = item;
+      arco(mapaNos.get(u), mapaNos.get(v), seta, geometriasArcos.get(item));
     }
   }
 
@@ -109,12 +155,12 @@
         if (negativos && !negativo) continue;
         ctx.strokeStyle = negativo ? cores.negativo : cores.normal;
         ctx.globalAlpha = .13; ctx.lineWidth = .6; ctx.beginPath();
-        for (const [u, v, peso] of dados.arcos) if ((peso < 0) === negativo) arco(indice.get(u), indice.get(v), false);
+        desenharArcos(dados.arcos, indice, false, ([u, v, peso]) => (peso < 0) === negativo);
         ctx.stroke();
       }
     }
     ctx.globalAlpha = .85; ctx.lineWidth = 1.5; ctx.strokeStyle = cores.resultado; ctx.beginPath();
-    for (const [u, v, peso] of caso?.arcos || []) if (!negativos || peso < 0) arco(indice.get(u), indice.get(v), true);
+    if (caso) desenharArcos(caso.arcos, indice, true, ([u, v, peso]) => !negativos || peso < 0);
     ctx.stroke(); ctx.globalAlpha = 1;
     for (const no of nos) {
       if (somente && !destacados.has(no.id)) continue;
@@ -133,13 +179,11 @@
   }
 
   function desenharConexoes() {
-    // Todas as ocorrências são desenhadas; paralelos podem se sobrepor.
+    // Cada ocorrência mantém sua curva mesmo quando as cores são desenhadas separadamente.
     for (const entrada of [false, true]) {
       ctx.globalAlpha = .5; ctx.lineWidth = 1.2;
       ctx.strokeStyle = entrada ? cores.negativo : cores.resultado; ctx.beginPath();
-      for (const [u, v] of foco.arcos) {
-        if ((v === foco.usuario) === entrada) arco(indiceFoco.get(u), indiceFoco.get(v), true);
-      }
+      desenharArcos(foco.arcos, indiceFoco, true, ([u, v]) => (v === foco.usuario) === entrada);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -160,7 +204,7 @@
     $('rede-vizinhos').hidden = true; $('rede-vizinhos').replaceChildren();
     $('rede-voltar').hidden = true;
     $('rede-negativos').disabled = false; $('rede-somente').disabled = false;
-    $('rede-legenda').textContent = 'Cores do grafo: cinza = conexões da rede; vinho = arcos com PESO negativo; azul = resultado do algoritmo. As setas apontam de quem votou para quem recebeu o voto.';
+    $('rede-legenda').textContent = 'Cores do grafo: cinza = conexões da rede; vinho = arcos com PESO negativo; azul = resultado do algoritmo. Curvas separadas representam múltiplas ligações entre os mesmos usuários. As setas apontam de quem votou para quem recebeu o voto.';
     $('rede-usuario').textContent = 'Clique em um usuário para mostrar somente suas conexões de entrada e saída, com os nomes dos vizinhos.';
     centralizar();
   }
@@ -291,7 +335,7 @@
       const resposta = await consultar(`/api/dataset/conexoes?usuario=${encodeURIComponent(id)}`);
       if (pedido !== pedidoSelecao) return;
       foco = resposta; selecionado = id;
-      $('rede-legenda').textContent = `Conexões de ${id}: vinho = votos recebidos; azul = votos enviados. As setas apontam de quem votou para quem recebeu o voto.`;
+      $('rede-legenda').textContent = `Conexões de ${id}: vinho = votos recebidos; azul = votos enviados. Curvas separadas representam múltiplas ligações entre os mesmos usuários. As setas apontam de quem votou para quem recebeu o voto.`;
       nosFoco = [{id, x: 0, y: 0}, ...resposta.vizinhos.filter(u => u !== id).map((usuario, i) => {
         const raio = 160 + Math.sqrt(i + 1) * 95;
         return {id: usuario, x: Math.cos(i * 2.39996) * raio, y: Math.sin(i * 2.39996) * raio};
