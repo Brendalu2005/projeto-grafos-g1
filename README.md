@@ -133,7 +133,7 @@ projeto-grafos-g1/
 
 ## Documentação
 
-Links da documentação a inserir.
+- [Relatório G1 (PDF)](docs/Relat%C3%B3rio%20-%20G1.pdf)
 
 ## Equipe
 
