@@ -134,6 +134,7 @@ projeto-grafos-g1/
 ## Documentação
 
 - [Relatório G1 (PDF)](docs/Relat%C3%B3rio%20-%20G1.pdf)
+- [Declaração de uso de IA assinada (PDF)](docs/DECLARACAO_USO_IA_2026-2.docx_assinado_assinado_assinado_assinado_assinado.pdf)
 
 ## Equipe
 
