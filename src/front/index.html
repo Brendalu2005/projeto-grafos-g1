@@ -228,6 +228,21 @@
         <div class="graph-controls" id="rede-casos" aria-label="Selecionar execução"></div>
         <p id="rede-nota" class="card-sub"></p>
         <pre id="rede-resumo" class="rede-resumo">Execute um algoritmo para consultar seus resultados.</pre>
+        <section id="rede-bfs" aria-labelledby="rede-bfs-titulo" hidden>
+          <h4 id="rede-bfs-titulo">Resultado da BFS no grafo completo</h4>
+          <dl id="rede-bfs-resumo" class="lane-stats"></dl>
+          <p class="card-sub">Distância é o menor número de arcos desde a fonte. O predecessor é o usuário anterior na árvore da busca. A BFS ignora os pesos.</p>
+          <div class="graph-controls">
+            <label>Buscar usuário <input id="rede-bfs-busca" type="search" placeholder="Parte do nome"></label>
+            <label>Alcance <select id="rede-bfs-filtro"><option value="todos">Todos os usuários</option><option value="alcancados">Alcançados</option><option value="inalcancaveis">Inalcançáveis</option></select></label>
+          </div>
+          <div class="rede-tabela"><table><caption>Usuários do grafo completo, incluindo os que estão fora do recorte visual. Ordenados por distância e nome; inalcançáveis ao final.</caption><thead><tr><th scope="col">Usuário</th><th scope="col">Distância (arcos)</th><th scope="col">Predecessor</th><th scope="col">Situação</th></tr></thead><tbody id="rede-bfs-usuarios"></tbody></table></div>
+          <div class="graph-controls">
+            <button id="rede-bfs-anterior" class="ghost-button" type="button">Anterior</button>
+            <span id="rede-bfs-pagina" role="status" aria-live="polite"></span>
+            <button id="rede-bfs-proxima" class="ghost-button" type="button">Próxima</button>
+          </div>
+        </section>
         <div class="rede-tabela"><table><caption id="rede-tabela-nota">Arcos do resultado selecionado</caption><thead><tr><th>Origem</th><th>Destino</th><th>PESO</th><th>PESO + 1 (Dijkstra)</th></tr></thead><tbody id="rede-arcos"></tbody></table></div>
       </div>
     </section>

@@ -52,6 +52,21 @@ def test_buscas_executam_tres_fontes_sem_restringir_grafo(csv_rede, algoritmo):
     for caso, fonte in zip(resposta["casos"], dataset.FONTES_DATASET):
         assert caso["fonte"] == fonte
         assert caso["resumo"]["outros_usuarios_alcancados"] >= 1
+        if algoritmo == "BFS":
+            resultado = caso["resultado_bfs"]
+            grafo = dataset.grafo_completo()
+            assert resultado == dataset.resultado_busca_dataset(grafo, fonte, "BFS")
+            assert resultado["grau_saida_fonte"] == len(grafo[fonte])
+            assert set(resultado["distancias"]) == set(grafo)
+            assert resultado["distancias"][fonte] == 0
+            assert resultado["predecessores"][fonte] is None
+            assert resultado["distancias"]["Rcsprinter123"] is None
+            assert resultado["predecessores"]["Rcsprinter123"] is None
+            alcancados = [d for d in resultado["distancias"].values() if d is not None]
+            assert resultado["outros_usuarios_alcancados"] == len(alcancados) - 1
+            assert resultado["maior_distancia_finita"] == max(alcancados)
+        else:
+            assert "resultado_bfs" not in caso
     json.dumps(resposta, allow_nan=False)
 
 

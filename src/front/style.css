@@ -293,6 +293,8 @@ h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
 .rede-vizinhos { display: flex; flex-wrap: wrap; gap: 8px; max-height: 220px; overflow-y: auto; padding: 8px 0; }
 .rede-vizinhos button { text-align: left; font-size: 12px; }
 .rede-resumo { white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.7 var(--mono); color: var(--ink); }
+#rede-bfs-resumo { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 18px; }
+#rede-bfs-resumo dd { overflow-wrap: anywhere; }
 .rede-tabela { overflow-x: auto; }
 .rede-tabela table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
 .rede-tabela th, .rede-tabela td { padding: 10px; border-bottom: 1px solid var(--line); }

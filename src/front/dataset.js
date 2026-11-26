@@ -165,6 +165,65 @@
     centralizar();
   }
 
+  let resultadoBfs = null, linhasBfs = [], paginaBfs = 0;
+  const tamanhoPaginaBfs = 50;
+
+  function tabelaBfs() {
+    const busca = $('rede-bfs-busca').value.trim().toLocaleLowerCase('pt-BR');
+    const filtro = $('rede-bfs-filtro').value;
+    const linhas = linhasBfs.filter(([usuario, distancia]) => usuario.toLocaleLowerCase('pt-BR').includes(busca)
+      && (filtro === 'todos' || (filtro === 'alcancados' ? distancia !== null : distancia === null)));
+    const paginas = Math.max(1, Math.ceil(linhas.length / tamanhoPaginaBfs));
+    paginaBfs = Math.max(0, Math.min(paginaBfs, paginas - 1));
+    const inicio = paginaBfs * tamanhoPaginaBfs;
+    const visiveis = linhas.slice(inicio, inicio + tamanhoPaginaBfs);
+    $('rede-bfs-usuarios').replaceChildren(...visiveis.map(([usuario, distancia]) => {
+      const linha = document.createElement('tr');
+      const situacao = distancia === null ? 'Inalcançável' : usuario === resultadoBfs.fonte ? 'Fonte' : 'Alcançado';
+      const predecessor = resultadoBfs.predecessores[usuario];
+      for (const valor of [usuario, distancia ?? '—', predecessor ?? '—', situacao]) {
+        const celula = document.createElement('td'); celula.textContent = valor; linha.append(celula);
+      }
+      return linha;
+    }));
+    if (!visiveis.length) {
+      const linha = document.createElement('tr'), celula = document.createElement('td');
+      celula.colSpan = 4; celula.textContent = 'Nenhum usuário encontrado para estes filtros.';
+      linha.append(celula); $('rede-bfs-usuarios').append(linha);
+    }
+    $('rede-bfs-pagina').textContent = `Página ${paginaBfs + 1} de ${paginas} · ${linhas.length ? inicio + 1 : 0}–${inicio + visiveis.length} de ${numero(linhas.length)} usuários`;
+    $('rede-bfs-anterior').disabled = paginaBfs === 0;
+    $('rede-bfs-proxima').disabled = paginaBfs >= paginas - 1;
+  }
+
+  function mostrarBfs(resultado) {
+    resultadoBfs = resultado; paginaBfs = 0;
+    $('rede-bfs').hidden = !resultado;
+    $('rede-resumo').hidden = !!resultado;
+    if (!resultado) {
+      linhasBfs = []; $('rede-bfs-resumo').replaceChildren(); $('rede-bfs-usuarios').replaceChildren();
+      return;
+    }
+    linhasBfs = Object.entries(resultado.distancias).sort(([a, da], [b, db]) => {
+      if (da === null && db !== null) return 1;
+      if (db === null && da !== null) return -1;
+      return (da ?? 0) - (db ?? 0) || a.localeCompare(b, 'pt-BR');
+    });
+    const metricas = [
+      ['Fonte', resultado.fonte], ['Grau de saída da fonte', numero(resultado.grau_saida_fonte)],
+      ['Outros usuários alcançados', numero(resultado.outros_usuarios_alcancados)],
+      ['Maior distância (arcos)', numero(resultado.maior_distancia_finita)],
+      ['Total de usuários', numero(linhasBfs.length)],
+      ['Usuários inalcançáveis', numero(linhasBfs.filter(([, distancia]) => distancia === null).length)],
+    ];
+    $('rede-bfs-resumo').replaceChildren(...metricas.map(([rotulo, valor]) => {
+      const item = document.createElement('div'), termo = document.createElement('dt'), descricao = document.createElement('dd');
+      termo.textContent = rotulo; descricao.textContent = valor; item.append(termo, descricao); return item;
+    }));
+    $('rede-bfs-busca').value = ''; $('rede-bfs-filtro').value = 'todos';
+    tabelaBfs();
+  }
+
   function selecionarCaso(resposta, indiceCaso) {
     limparFoco();
     caso = resposta.casos[indiceCaso];
@@ -180,6 +239,7 @@
     $('rede-somente').checked = ['DIJKSTRA', 'BELLMAN_FORD'].includes(algoritmo);
     $('rede-nota').textContent = resposta.nota + ' Arcos do teste fora do recorte base são sobrepostos em azul; não entram na contagem de 20 mil.';
     $('rede-resumo').textContent = JSON.stringify(caso.resumo, null, 2);
+    mostrarBfs(algoritmo === 'BFS' ? caso.resultado_bfs || null : null);
     $('rede-arcos').replaceChildren(...caso.arcos.slice(0, 30).map(([u, v, peso]) => {
       const linha = document.createElement('tr');
       for (const valor of [u, v, peso, algoritmo === 'DIJKSTRA' ? peso + 1 : '—']) {
@@ -215,6 +275,10 @@
     } catch (erro) { $('rede-status').textContent = erro.message; }
     finally { botao.disabled = false; $('rede-alg').disabled = false; }
   });
+  $('rede-bfs-busca').addEventListener('input', () => { paginaBfs = 0; tabelaBfs(); });
+  $('rede-bfs-filtro').addEventListener('change', () => { paginaBfs = 0; tabelaBfs(); });
+  $('rede-bfs-anterior').addEventListener('click', () => { paginaBfs--; tabelaBfs(); });
+  $('rede-bfs-proxima').addEventListener('click', () => { paginaBfs++; tabelaBfs(); });
   $('rede-alg').addEventListener('change', atualizarEscopo);
   $('rede-reset').addEventListener('click', centralizar);
   $('rede-negativos').addEventListener('change', agendar);

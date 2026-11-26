@@ -102,6 +102,8 @@ def executar(algoritmo):
                 resumo["tem_ciclo"] = resultado["tem_ciclo"]
             casos.append({"titulo": fonte, "fonte": fonte, "nos": sorted(visitados & visiveis),
                           "arcos": arcos, "resumo": resumo})
+            if algoritmo == "BFS":
+                casos[-1]["resultado_bfs"] = resultado
         nota = "Busca no grafo completo, em três fontes. Pesos ignorados. " \
                "Destacam-se os usuários alcançados e os arcos da árvore com ambos os extremos no recorte."
     elif algoritmo == "DIJKSTRA":
